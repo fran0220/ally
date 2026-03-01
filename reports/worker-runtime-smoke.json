@@ -1,0 +1,119 @@
+{
+  "generatedAt": "2026-03-01T13:41:51.459Z",
+  "summary": {
+    "total": 4,
+    "executed": 4,
+    "skipped": 0,
+    "pass": 4,
+    "fail": 0
+  },
+  "rows": [
+    {
+      "id": "image-asset-hub-generate",
+      "method": "POST",
+      "path": "/api/asset-hub/generate-image",
+      "submitStatus": 200,
+      "submitUrl": "http://127.0.0.1:3001/api/asset-hub/generate-image",
+      "submitBody": {
+        "async": true,
+        "deduped": false,
+        "status": "queued",
+        "success": true,
+        "taskId": "e46e08a1-dbe2-43f7-9438-a067433eac09"
+      },
+      "taskId": "e46e08a1-dbe2-43f7-9438-a067433eac09",
+      "finalStatus": "failed",
+      "errorCode": "NOT_FOUND",
+      "elapsedMs": 12537,
+      "polls": 3,
+      "eventTypes": [
+        "task.failed",
+        "task.processing",
+        "task.created"
+      ],
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "id": "text-asset-hub-ai-design-character",
+      "method": "POST",
+      "path": "/api/asset-hub/ai-design-character",
+      "submitStatus": 200,
+      "submitUrl": "http://127.0.0.1:3001/api/asset-hub/ai-design-character",
+      "submitBody": {
+        "async": true,
+        "deduped": false,
+        "status": "queued",
+        "success": true,
+        "taskId": "5bc9509d-1a92-4ce2-8655-07353ec595d9"
+      },
+      "taskId": "5bc9509d-1a92-4ce2-8655-07353ec595d9",
+      "finalStatus": "failed",
+      "errorCode": "INVALID_PARAMS",
+      "elapsedMs": 6418,
+      "polls": 2,
+      "eventTypes": [
+        "task.failed",
+        "task.processing",
+        "task.created"
+      ],
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "id": "voice-asset-hub-voice-design",
+      "method": "POST",
+      "path": "/api/asset-hub/voice-design",
+      "submitStatus": 200,
+      "submitUrl": "http://127.0.0.1:3001/api/asset-hub/voice-design",
+      "submitBody": {
+        "async": true,
+        "deduped": false,
+        "status": "queued",
+        "success": true,
+        "taskId": "7ec5a461-4c74-4739-b423-7ae57dadffd1"
+      },
+      "taskId": "7ec5a461-4c74-4739-b423-7ae57dadffd1",
+      "finalStatus": "failed",
+      "errorCode": "INVALID_PARAMS",
+      "elapsedMs": 8516,
+      "polls": 2,
+      "eventTypes": [
+        "task.failed",
+        "task.processing",
+        "task.created"
+      ],
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "id": "video-novel-generate-video",
+      "method": "POST",
+      "path": "/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/generate-video",
+      "submitStatus": 200,
+      "submitUrl": "http://127.0.0.1:3001/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/generate-video",
+      "submitBody": {
+        "async": true,
+        "deduped": false,
+        "status": "queued",
+        "success": true,
+        "taskId": "d31614d2-47ab-43b5-94de-800beca77a6b",
+        "tasks": [],
+        "total": 1
+      },
+      "taskId": "d31614d2-47ab-43b5-94de-800beca77a6b",
+      "finalStatus": "failed",
+      "errorCode": "NOT_FOUND",
+      "elapsedMs": 8633,
+      "polls": 2,
+      "eventTypes": [
+        "task.failed",
+        "task.processing",
+        "task.created"
+      ],
+      "status": "PASS",
+      "failures": []
+    }
+  ],
+  "skippedCases": []
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "modelType": "image",
+    "provider": "fal",
+    "modelId": "banana-2",
+    "capabilities": {
+      "image": {
+        "resolutionOptions": [
+          "1K",
+          "2K",
+          "4K"
+        ]
+      }
+    }
+  },
+  {
+    "modelType": "video",
+    "provider": "fal",
+    "modelId": "fal-ai/kling-video/v2.5-turbo/pro/image-to-video",
+    "capabilities": {
+      "video": {
+        "generationModeOptions": [
+          "normal"
+        ],
+        "durationOptions": [
+          5,
+          10
+        ],
+        "firstlastframe": false,
+        "supportGenerateAudio": false
+      }
+    }
+  },
+  {
+    "modelType": "video",
+    "provider": "fal",
+    "modelId": "fal-ai/kling-video/v3/standard/image-to-video",
+    "capabilities": {
+      "video": {
+        "generationModeOptions": [
+          "normal"
+        ],
+        "durationOptions": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "firstlastframe": false,
+        "supportGenerateAudio": false
+      }
+    }
+  },
+  {
+    "modelType": "video",
+    "provider": "fal",
+    "modelId": "fal-ai/kling-video/v3/pro/image-to-video",
+    "capabilities": {
+      "video": {
+        "generationModeOptions": [
+          "normal"
+        ],
+        "durationOptions": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "firstlastframe": false,
+        "supportGenerateAudio": false
+      }
+    }
+  }
+]

@@ -1,0 +1,52 @@
+{
+  admin off
+}
+
+:80 {
+  # Manual override for debugging.
+  @force_rust header X-Waoowaoo-Canary rust
+  handle @force_rust {
+    reverse_proxy 127.0.0.1:3001
+  }
+
+  @force_next header X-Waoowaoo-Canary next
+  handle @force_next {
+    reverse_proxy 127.0.0.1:3000
+  }
+
+  @api path /api/* /m/*
+  handle @api {
+    reverse_proxy {
+      lb_policy random
+
+      # Approximate 10% canary:
+      # 9 entries for legacy + 1 entry for rust.
+      to 127.0.0.1:3000
+      to 127.0.0.1:3000
+      to 127.0.0.1:3000
+      to 127.0.0.1:3000
+      to 127.0.0.1:3000
+      to 127.0.0.1:3000
+      to 127.0.0.1:3000
+      to 127.0.0.1:3000
+      to 127.0.0.1:3000
+      to 127.0.0.1:3001
+
+      header_up X-Forwarded-Proto {scheme}
+      header_up X-Forwarded-For {remote}
+      header_up X-Real-IP {remote_host}
+      header_up X-Canary-Upstream {upstream_hostport}
+    }
+  }
+
+  # Pin health checks to Rust API.
+  @health path /healthz
+  handle @health {
+    reverse_proxy 127.0.0.1:3001
+  }
+
+  # Keep frontend on legacy Next.js by default.
+  handle {
+    reverse_proxy 127.0.0.1:3000
+  }
+}

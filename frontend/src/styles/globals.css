@@ -1,0 +1,65 @@
+@import "tailwindcss";
+@import "./ui-tokens-glass.css";
+@import "./ui-semantic-glass.css";
+@import "./animations.css";
+
+:root {
+  color-scheme: light;
+  font-family: "Noto Sans SC", "Source Han Sans SC", "PingFang SC", sans-serif;
+  background: var(--glass-bg-canvas);
+  min-height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--glass-text-primary);
+  background:
+    radial-gradient(1200px 700px at 16% -18%, rgba(59, 130, 246, 0.16), transparent 62%),
+    radial-gradient(1000px 680px at 92% 0%, rgba(34, 211, 238, 0.16), transparent 58%),
+    linear-gradient(180deg, #eef2ff 0%, #f3f4f6 34%, #eef6ff 100%);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-shell {
+  width: min(1440px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.glass-page-title {
+  font-size: clamp(1.4rem, 2.6vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.glass-page-subtitle {
+  font-size: 0.95rem;
+  color: var(--glass-text-secondary);
+}
+
+.glass-kpi {
+  background: var(--glass-bg-surface-strong);
+  border: 1px solid var(--glass-stroke-soft);
+  border-radius: var(--glass-radius-md);
+  box-shadow: var(--glass-shadow-sm);
+}
+
+.glass-nav {
+  background: var(--glass-bg-nav);
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(1.1);
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(1.1);
+  border-bottom: 1px solid var(--glass-stroke-soft);
+  box-shadow: var(--glass-shadow-nav);
+}

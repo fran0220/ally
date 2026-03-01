@@ -1,0 +1,77 @@
+[
+  {
+    "id": "image-asset-hub-generate",
+    "method": "POST",
+    "path": "/api/asset-hub/generate-image",
+    "body": {
+      "type": "character",
+      "id": "worker-smoke-image",
+      "targetType": "character",
+      "targetId": "worker-smoke-image",
+      "prompt": "Generate a cinematic hero portrait for runtime smoke test"
+    },
+    "expectedSubmitStatus": 200,
+    "expectTerminalStatus": [
+      "completed",
+      "failed"
+    ],
+    "timeoutMs": 240000,
+    "pollIntervalMs": 2000
+  },
+  {
+    "id": "text-asset-hub-ai-design-character",
+    "method": "POST",
+    "path": "/api/asset-hub/ai-design-character",
+    "body": {
+      "targetType": "character",
+      "targetId": "worker-smoke-text",
+      "characterName": "Smoke Test Hero",
+      "prompt": "Design a protagonist character profile for action fantasy"
+    },
+    "expectedSubmitStatus": 200,
+    "expectTerminalStatus": [
+      "completed",
+      "failed"
+    ],
+    "timeoutMs": 240000,
+    "pollIntervalMs": 2000
+  },
+  {
+    "id": "voice-asset-hub-voice-design",
+    "method": "POST",
+    "path": "/api/asset-hub/voice-design",
+    "body": {
+      "targetType": "voice",
+      "targetId": "worker-smoke-voice",
+      "voicePrompt": "A calm mature narrator voice"
+    },
+    "expectedSubmitStatus": 200,
+    "expectTerminalStatus": [
+      "completed",
+      "failed"
+    ],
+    "timeoutMs": 240000,
+    "pollIntervalMs": 2000
+  },
+  {
+    "id": "video-novel-generate-video",
+    "method": "POST",
+    "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/generate-video",
+    "body": {
+      "targetType": "panel",
+      "targetId": "worker-smoke-panel",
+      "panelId": "worker-smoke-panel"
+    },
+    "expectedSubmitStatus": 200,
+    "expectTerminalStatus": [
+      "completed",
+      "failed"
+    ],
+    "timeoutMs": 300000,
+    "pollIntervalMs": 2500,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true
+  }
+]

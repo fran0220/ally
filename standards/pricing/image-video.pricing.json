@@ -1,0 +1,291 @@
+[
+  {
+    "apiType": "image",
+    "provider": "fal",
+    "modelId": "banana",
+    "pricing": {
+      "mode": "flat",
+      "flatAmount": 0.9648
+    }
+  },
+  {
+    "apiType": "image",
+    "provider": "fal",
+    "modelId": "banana-2",
+    "pricing": {
+      "mode": "capability",
+      "tiers": [
+        {
+          "when": {
+            "resolution": "1K"
+          },
+          "amount": 0.576
+        },
+        {
+          "when": {
+            "resolution": "2K"
+          },
+          "amount": 0.864
+        },
+        {
+          "when": {
+            "resolution": "4K"
+          },
+          "amount": 1.152
+        }
+      ]
+    }
+  },
+  {
+    "apiType": "video",
+    "provider": "fal",
+    "modelId": "fal-wan25",
+    "pricing": {
+      "mode": "flat",
+      "flatAmount": 1.8
+    }
+  },
+  {
+    "apiType": "video",
+    "provider": "fal",
+    "modelId": "fal-veo31",
+    "pricing": {
+      "mode": "flat",
+      "flatAmount": 2.88
+    }
+  },
+  {
+    "apiType": "video",
+    "provider": "fal",
+    "modelId": "fal-sora2",
+    "pricing": {
+      "mode": "flat",
+      "flatAmount": 3.6
+    }
+  },
+  {
+    "apiType": "video",
+    "provider": "fal",
+    "modelId": "fal-ai/kling-video/v2.5-turbo/pro/image-to-video",
+    "pricing": {
+      "mode": "capability",
+      "tiers": [
+        {
+          "when": {
+            "duration": 5
+          },
+          "amount": 0.35
+        },
+        {
+          "when": {
+            "duration": 10
+          },
+          "amount": 0.7
+        }
+      ]
+    }
+  },
+  {
+    "apiType": "video",
+    "provider": "fal",
+    "modelId": "fal-ai/kling-video/v3/standard/image-to-video",
+    "pricing": {
+      "mode": "capability",
+      "tiers": [
+        {
+          "when": {
+            "duration": 3
+          },
+          "amount": 0.504
+        },
+        {
+          "when": {
+            "duration": 4
+          },
+          "amount": 0.672
+        },
+        {
+          "when": {
+            "duration": 5
+          },
+          "amount": 0.84
+        },
+        {
+          "when": {
+            "duration": 6
+          },
+          "amount": 1.008
+        },
+        {
+          "when": {
+            "duration": 7
+          },
+          "amount": 1.176
+        },
+        {
+          "when": {
+            "duration": 8
+          },
+          "amount": 1.344
+        },
+        {
+          "when": {
+            "duration": 9
+          },
+          "amount": 1.512
+        },
+        {
+          "when": {
+            "duration": 10
+          },
+          "amount": 1.68
+        },
+        {
+          "when": {
+            "duration": 11
+          },
+          "amount": 1.848
+        },
+        {
+          "when": {
+            "duration": 12
+          },
+          "amount": 2.016
+        },
+        {
+          "when": {
+            "duration": 13
+          },
+          "amount": 2.184
+        },
+        {
+          "when": {
+            "duration": 14
+          },
+          "amount": 2.352
+        },
+        {
+          "when": {
+            "duration": 15
+          },
+          "amount": 2.52
+        }
+      ]
+    }
+  },
+  {
+    "apiType": "video",
+    "provider": "fal",
+    "modelId": "fal-ai/kling-video/v3/pro/image-to-video",
+    "pricing": {
+      "mode": "capability",
+      "tiers": [
+        {
+          "when": {
+            "duration": 3
+          },
+          "amount": 0.672
+        },
+        {
+          "when": {
+            "duration": 4
+          },
+          "amount": 0.896
+        },
+        {
+          "when": {
+            "duration": 5
+          },
+          "amount": 1.12
+        },
+        {
+          "when": {
+            "duration": 6
+          },
+          "amount": 1.344
+        },
+        {
+          "when": {
+            "duration": 7
+          },
+          "amount": 1.568
+        },
+        {
+          "when": {
+            "duration": 8
+          },
+          "amount": 1.792
+        },
+        {
+          "when": {
+            "duration": 9
+          },
+          "amount": 2.016
+        },
+        {
+          "when": {
+            "duration": 10
+          },
+          "amount": 2.24
+        },
+        {
+          "when": {
+            "duration": 11
+          },
+          "amount": 2.464
+        },
+        {
+          "when": {
+            "duration": 12
+          },
+          "amount": 2.688
+        },
+        {
+          "when": {
+            "duration": 13
+          },
+          "amount": 2.912
+        },
+        {
+          "when": {
+            "duration": 14
+          },
+          "amount": 3.136
+        },
+        {
+          "when": {
+            "duration": 15
+          },
+          "amount": 3.36
+        }
+      ]
+    }
+  },
+  {
+    "apiType": "voice",
+    "provider": "fal",
+    "modelId": "fal-ai/index-tts-2/text-to-speech",
+    "pricing": {
+      "mode": "flat",
+      "flatAmount": 0.0144
+    }
+  },
+  {
+    "apiType": "voice-design",
+    "provider": "qwen",
+    "modelId": "qwen",
+    "pricing": {
+      "mode": "flat",
+      "flatAmount": 0.2
+    }
+  },
+  {
+    "apiType": "lip-sync",
+    "provider": "fal",
+    "modelId": "fal-ai/kling-video/lipsync/audio-to-video",
+    "pricing": {
+      "mode": "flat",
+      "flatAmount": 0.5
+    }
+  }
+]

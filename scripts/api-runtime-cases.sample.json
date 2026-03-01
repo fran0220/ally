@@ -1,0 +1,522 @@
+[
+  {
+    "id": "system-healthz",
+    "method": "GET",
+    "path": "/healthz",
+    "expectedStatus": 200,
+    "requireAuth": false,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "system-boot-id",
+    "method": "GET",
+    "path": "/api/system/boot-id",
+    "expectedStatus": 200,
+    "requireAuth": false,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "auth-register-invalid",
+    "method": "POST",
+    "path": "/api/auth/register",
+    "expectedStatus": 400,
+    "requireAuth": false,
+    "body": {
+      "name": "",
+      "password": "123"
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "auth-login-invalid",
+    "method": "POST",
+    "path": "/api/auth/login",
+    "expectedStatus": 400,
+    "requireAuth": false,
+    "body": {
+      "username": "",
+      "password": ""
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "auth-refresh-unauthorized",
+    "method": "POST",
+    "path": "/api/auth/refresh",
+    "expectedStatus": 401,
+    "requireAuth": false,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "user-models-auth",
+    "method": "GET",
+    "path": "/api/user/models",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "user-api-config-auth",
+    "method": "GET",
+    "path": "/api/user/api-config",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "user-api-config-test-connection-invalid",
+    "method": "POST",
+    "path": "/api/user/api-config/test-connection",
+    "expectedStatus": 400,
+    "requireAuth": false,
+    "body": {},
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "user-preference-auth",
+    "method": "GET",
+    "path": "/api/user-preference",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "projects-list-auth",
+    "method": "GET",
+    "path": "/api/projects?page=1&pageSize=5",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "projects-create-invalid",
+    "method": "POST",
+    "path": "/api/projects",
+    "expectedStatus": 400,
+    "requireAuth": true,
+    "body": {
+      "name": ""
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "projects-get-by-id",
+    "method": "GET",
+    "path": "/api/projects/{{WW_PROJECT_ID}}",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "projects-assets-by-id",
+    "method": "GET",
+    "path": "/api/projects/{{WW_PROJECT_ID}}/assets",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "projects-data-by-id",
+    "method": "GET",
+    "path": "/api/projects/{{WW_PROJECT_ID}}/data",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "tasks-list-auth",
+    "method": "GET",
+    "path": "/api/tasks?limit=5",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "tasks-dismiss-invalid",
+    "method": "POST",
+    "path": "/api/tasks/dismiss",
+    "expectedStatus": 400,
+    "requireAuth": true,
+    "body": {
+      "taskIds": []
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "task-target-states-invalid",
+    "method": "POST",
+    "path": "/api/task-target-states",
+    "expectedStatus": 400,
+    "requireAuth": true,
+    "body": {
+      "projectId": "",
+      "targets": []
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "tasks-get-by-id",
+    "method": "GET",
+    "path": "/api/tasks/{{WW_TASK_ID}}?includeEvents=1&eventsLimit=50",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_TASK_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "runs-list-auth",
+    "method": "GET",
+    "path": "/api/runs?limit=5",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "runs-create-invalid",
+    "method": "POST",
+    "path": "/api/runs",
+    "expectedStatus": 400,
+    "requireAuth": true,
+    "body": {
+      "projectId": "",
+      "workflowType": "",
+      "targetType": "",
+      "targetId": ""
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "runs-get-by-id",
+    "method": "GET",
+    "path": "/api/runs/{{WW_RUN_ID}}",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_RUN_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "runs-events-by-id",
+    "method": "GET",
+    "path": "/api/runs/{{WW_RUN_ID}}/events?afterSeq=0&limit=50",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_RUN_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "sse-unauthorized",
+    "method": "GET",
+    "path": "/api/sse?projectId=global-asset-hub",
+    "expectedStatus": 401,
+    "requireAuth": false,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "asset-hub-folders-auth",
+    "method": "GET",
+    "path": "/api/asset-hub/folders",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "asset-hub-characters-auth",
+    "method": "GET",
+    "path": "/api/asset-hub/characters",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "asset-hub-picker-auth",
+    "method": "GET",
+    "path": "/api/asset-hub/picker?type=character",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "asset-hub-generate-image-submit",
+    "method": "POST",
+    "path": "/api/asset-hub/generate-image",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "body": {
+      "type": "character",
+      "id": "contract-image-smoke",
+      "targetType": "character",
+      "targetId": "contract-image-smoke"
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "asset-hub-ai-design-character-submit",
+    "method": "POST",
+    "path": "/api/asset-hub/ai-design-character",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "body": {
+      "targetType": "character",
+      "targetId": "contract-text-smoke",
+      "characterName": "Runtime Compare Hero"
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "asset-hub-voice-design-submit",
+    "method": "POST",
+    "path": "/api/asset-hub/voice-design",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "body": {
+      "targetType": "voice",
+      "targetId": "contract-voice-smoke",
+      "voicePrompt": "warm narrator"
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "novel-root-unauthorized",
+    "method": "GET",
+    "path": "/api/novel-promotion/runtime-compare-project",
+    "expectedStatus": 401,
+    "requireAuth": false,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "novel-root-by-id",
+    "method": "GET",
+    "path": "/api/novel-promotion/{{WW_PROJECT_ID}}",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "novel-assets-by-id",
+    "method": "GET",
+    "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/assets",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "novel-generate-image-submit",
+    "method": "POST",
+    "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/generate-image",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "body": {
+      "targetType": "panel",
+      "targetId": "contract-novel-image",
+      "panelId": "contract-novel-image"
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "novel-generate-video-submit",
+    "method": "POST",
+    "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/generate-video",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "body": {
+      "targetType": "panel",
+      "targetId": "contract-novel-video",
+      "panelId": "contract-novel-video"
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "admin-ai-config-unauthorized",
+    "method": "GET",
+    "path": "/api/admin/ai-config",
+    "expectedStatus": 401,
+    "requireAuth": false,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "cos-image-unauthorized",
+    "method": "GET",
+    "path": "/api/cos/image?key=runtime-compare.png",
+    "expectedStatus": 401,
+    "requireAuth": false,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "cos-image-invalid-key-auth",
+    "method": "GET",
+    "path": "/api/cos/image?key=",
+    "expectedStatus": 400,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "files-not-found",
+    "method": "GET",
+    "path": "/api/files/runtime-compare-not-found.png",
+    "expectedStatus": 404,
+    "requireAuth": false,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "media-not-found",
+    "method": "GET",
+    "path": "/m/runtime-compare-missing",
+    "expectedStatus": 404,
+    "requireAuth": false,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  }
+]

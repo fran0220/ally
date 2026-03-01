@@ -1,0 +1,48 @@
+[
+  {
+    "id": "system-healthz",
+    "method": "GET",
+    "path": "/healthz",
+    "requireAuth": false
+  },
+  {
+    "id": "system-boot-id",
+    "method": "GET",
+    "path": "/api/system/boot-id",
+    "requireAuth": false
+  },
+  {
+    "id": "projects-list-auth",
+    "method": "GET",
+    "path": "/api/projects?page=1&pageSize=5",
+    "requireAuth": true
+  },
+  {
+    "id": "tasks-list-auth",
+    "method": "GET",
+    "path": "/api/tasks?limit=5",
+    "requireAuth": true
+  },
+  {
+    "id": "runs-list-auth",
+    "method": "GET",
+    "path": "/api/runs?limit=5",
+    "requireAuth": true
+  },
+  {
+    "id": "asset-hub-picker-auth",
+    "method": "GET",
+    "path": "/api/asset-hub/picker?type=character",
+    "requireAuth": true
+  },
+  {
+    "id": "novel-root-auth",
+    "method": "GET",
+    "path": "/api/novel-promotion/{{WW_PROJECT_ID}}",
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true
+  }
+]
