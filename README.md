@@ -1,12 +1,47 @@
-# Ally (waoowaoo-rust)
+# Ally
 
-基于 Rust 全栈迁移的 Ally 视频生产系统，包含：
-- Axum HTTP API（`crates/server`）
-- Redis Stream Worker（`crates/worker`）
-- 超时与重试守护进程（`crates/watchdog`）
-- React + Vite 前端（`frontend`）
+Ally 是一个面向短视频内容生产的全栈系统，当前版本以 Rust 后端为核心实现，覆盖项目管理、小说改编、资产生产、视频与配音生成、编辑器落地与实时任务追踪。
 
-项目目标是对齐原项目 `allyvideo` 的核心业务能力（计费相关已移除）。
+## 功能特性总结
+
+- 全链路内容生产：从原始文本到分镜、画面、视频、配音、最终编辑数据
+- 前后端一体任务系统：任务提交、去重、实时 SSE 回传、失败兜底
+- 双资产域模型：项目内资产（Novel Promotion）+ 全局资产库（Asset Hub）
+- 媒体访问统一：支持 local/COS，两种模式下前端 URL 结构保持一致
+- 可运营配置层：用户 API 配置、模型可用集、管理员 AI 配置管理
+
+## Pipeline 图示
+
+### 业务阶段 Pipeline（项目工作台）
+
+```mermaid
+flowchart LR
+    A["Config<br/>模型/比例/风格"] --> B["Script<br/>剧情与分集文本"]
+    B --> C["Assets<br/>角色/场景资产分析与确认"]
+    C --> D["Prompts<br/>镜头提示词编辑"]
+    D --> E["Text Storyboard<br/>文本分镜生成"]
+    E --> F["Storyboard<br/>图像分镜生成与挑选"]
+    F --> G["Videos<br/>镜头视频与口型同步"]
+    G --> H["Voice<br/>声线分析与配音生成"]
+    H --> I["Editor<br/>剪辑时间线/导出数据"]
+```
+
+### 后端运行时 Pipeline（任务执行链）
+
+```mermaid
+flowchart TD
+    FE["Frontend<br/>React + Query"] --> API["Axum API<br/>/api/*"]
+    API --> SUBMIT["task_submit<br/>写入 tasks/task_events"]
+    SUBMIT --> REDIS["Redis Streams + PubSub"]
+    SUBMIT --> DB["MySQL"]
+    REDIS --> WORKER["Worker<br/>image/text/video/voice handlers"]
+    WORKER --> DB
+    WORKER --> PUB["publish task lifecycle"]
+    PUB --> SSE["/api/sse"]
+    SSE --> FE
+    WATCH["Watchdog<br/>heartbeat timeout scanner"] --> DB
+    WATCH --> REDIS
+```
 
 ## 功能总览
 
