@@ -1,0 +1,19 @@
+[Unit]
+Description=Ally Task Worker (Redis Stream Consumer)
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/ally
+ExecStart=/opt/ally/bin/waoowaoo-worker
+Restart=on-failure
+RestartSec=3
+EnvironmentFile=/opt/ally/.env
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ally-worker
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,20 @@
+[Unit]
+Description=Ally API Server (Axum)
+After=network.target docker.service
+Wants=ally-worker.service ally-watchdog.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/ally
+ExecStart=/opt/ally/bin/waoowaoo-server
+Restart=on-failure
+RestartSec=3
+EnvironmentFile=/opt/ally/.env
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ally-server
+
+[Install]
+WantedBy=multi-user.target

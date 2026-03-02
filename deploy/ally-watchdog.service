@@ -1,0 +1,19 @@
+[Unit]
+Description=Ally Watchdog (Timeout Scanner)
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/ally
+ExecStart=/opt/ally/bin/waoowaoo-watchdog
+Restart=on-failure
+RestartSec=5
+EnvironmentFile=/opt/ally/.env
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ally-watchdog
+
+[Install]
+WantedBy=multi-user.target

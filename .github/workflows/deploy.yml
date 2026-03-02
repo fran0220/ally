@@ -1,0 +1,167 @@
+name: CI / Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test
+          MYSQL_DATABASE: waoowaoo
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Rust format check
+        run: cargo fmt --check
+
+      - name: Rust clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Rust tests
+        env:
+          DATABASE_URL: mysql://root:test@127.0.0.1:3306/waoowaoo
+          REDIS_URL: redis://127.0.0.1:6379
+          JWT_SECRET: ci-test-jwt-secret-minimum-32-chars-long
+        run: cargo test --workspace
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Frontend type check & build
+        working-directory: frontend
+        run: |
+          npm ci
+          npx tsc --noEmit
+          npm run build
+
+  deploy:
+    name: Deploy
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H 185.200.65.233 >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        env:
+          SERVER: root@185.200.65.233
+          APP_DIR: /opt/ally
+          SSH_OPTS: -i ~/.ssh/id_deploy -o StrictHostKeyChecking=no
+        run: |
+          # Sync source code
+          rsync -azP --delete \
+            -e "ssh $SSH_OPTS" \
+            --exclude='.git' \
+            --exclude='target' \
+            --exclude='node_modules' \
+            --exclude='frontend/node_modules' \
+            --exclude='frontend/dist' \
+            --exclude='.DS_Store' \
+            --exclude='.env' \
+            ./ $SERVER:$APP_DIR/src/
+
+          # Sync frontend dist
+          rsync -azP --delete \
+            -e "ssh $SSH_OPTS" \
+            frontend/dist/ $SERVER:$APP_DIR/frontend/dist/
+
+          # Build & restart on server
+          ssh $SSH_OPTS $SERVER bash -c "'
+            set -euo pipefail
+            source /root/.cargo/env
+            cd $APP_DIR/src
+
+            echo \">>> cargo build --release...\"
+            cargo build --release 2>&1 | tail -10
+
+            mkdir -p $APP_DIR/bin
+            cp target/release/waoowaoo-server $APP_DIR/bin/
+            cp target/release/waoowaoo-worker $APP_DIR/bin/
+            cp target/release/waoowaoo-watchdog $APP_DIR/bin/
+
+            # Install systemd services
+            cp deploy/ally-server.service /etc/systemd/system/
+            cp deploy/ally-worker.service /etc/systemd/system/
+            cp deploy/ally-watchdog.service /etc/systemd/system/
+            systemctl daemon-reload
+
+            # Nginx
+            cp deploy/nginx-ally.conf /etc/nginx/sites-available/ally
+            ln -sf /etc/nginx/sites-available/ally /etc/nginx/sites-enabled/ally
+            nginx -t && systemctl reload nginx
+
+            # Restart
+            systemctl restart ally-server ally-worker ally-watchdog
+            systemctl enable ally-server ally-worker ally-watchdog
+
+            sleep 3
+            curl -sf http://localhost:3001/healthz && echo \" ✅ Deploy OK\" || exit 1
+            systemctl is-active ally-server ally-worker ally-watchdog
+          '"
+
+      - name: Cleanup SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
