@@ -352,16 +352,17 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
                         ))
                     })?;
                 let key = format!("{}:{}", storyboard_id, panel_index);
-                let panel_id = panel_id_by_storyboard_panel
-                    .get(&key)
-                    .cloned()
-                    .ok_or_else(|| {
-                        AppError::invalid_params(format!(
-                            "voice line {} references non-existent panel {}",
-                            index + 1,
-                            key
-                        ))
-                    })?;
+                let panel_id =
+                    panel_id_by_storyboard_panel
+                        .get(&key)
+                        .cloned()
+                        .ok_or_else(|| {
+                            AppError::invalid_params(format!(
+                                "voice line {} references non-existent panel {}",
+                                index + 1,
+                                key
+                            ))
+                        })?;
                 matched_panel_id = Some(panel_id);
                 matched_storyboard_id = Some(storyboard_id.to_string());
                 matched_panel_index = Some(panel_index);

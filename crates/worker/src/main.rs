@@ -17,8 +17,7 @@ use waoowaoo_core::{config::AppConfig, db};
 fn init_tracing() {
     tracing_subscriber::registry()
         .with(
-            EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| EnvFilter::new("info,sqlx=warn")),
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info,sqlx=warn")),
         )
         .with(fmt::layer().json())
         .init();
