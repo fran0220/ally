@@ -891,6 +891,7 @@ async fn patch_root(
     Ok(Json(json!({ "success": true, "project": project })))
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn submit_novel_task(
     state: &AppState,
     user: &AuthUser,

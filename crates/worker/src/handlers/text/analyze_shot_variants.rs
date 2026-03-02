@@ -133,8 +133,13 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         &prompt_variables,
     )?;
 
-    let response =
-        shared::vision_chat(task, &analysis_model, &prompt, &[image_source.clone()]).await?;
+    let response = shared::vision_chat(
+        task,
+        &analysis_model,
+        &prompt,
+        std::slice::from_ref(&image_source),
+    )
+    .await?;
     let suggestions = shared::parse_json_array_response(&response)?;
     if suggestions.len() < 3 {
         return Err(AppError::invalid_params(

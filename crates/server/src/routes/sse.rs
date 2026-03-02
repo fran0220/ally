@@ -125,7 +125,7 @@ fn parse_pubsub_event_meta(raw: &str) -> (Option<String>, Option<String>) {
 }
 
 fn to_pubsub_sse_event(raw: &str) -> Event {
-    let mut event = Event::default().data(raw.to_string());
+    let mut event = Event::default().data(raw);
     let (event_name, event_id) = parse_pubsub_event_meta(raw);
 
     if let Some(event_name) = event_name {

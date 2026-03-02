@@ -45,7 +45,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     let current_prompt = shared::read_string(payload, "currentPrompt")
         .ok_or_else(|| AppError::invalid_params("currentPrompt is required"))?;
     let current_video_prompt =
-        shared::read_string(payload, "currentVideoPrompt").unwrap_or_else(|| "".to_string());
+        shared::read_string(payload, "currentVideoPrompt").unwrap_or_default();
     let modify_instruction = shared::read_string(payload, "modifyInstruction")
         .ok_or_else(|| AppError::invalid_params("modifyInstruction is required"))?;
     let analysis_model = shared::resolve_analysis_model(task, payload).await?;

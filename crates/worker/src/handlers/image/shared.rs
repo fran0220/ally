@@ -128,12 +128,8 @@ pub fn resolve_art_style_prompt(style_key: Option<&str>, locale: &str) -> Option
     }
 }
 
-pub fn default_image_style_prompt(locale: &str) -> &'static str {
-    if locale == "en" {
-        "Match the style of provided references"
-    } else {
-        "Match the style of provided references"
-    }
+pub fn default_image_style_prompt(_locale: &str) -> &'static str {
+    "Match the style of provided references"
 }
 
 pub fn add_character_prompt_suffix(prompt: &str) -> String {

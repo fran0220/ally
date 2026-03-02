@@ -321,53 +321,52 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         let mut matched_panel_id: Option<String> = None;
         let mut matched_storyboard_id: Option<String> = None;
         let mut matched_panel_index: Option<i32> = None;
-        if let Some(matched_panel) = line.get("matchedPanel") {
-            if !matched_panel.is_null() {
-                let matched_panel = matched_panel.as_object().ok_or_else(|| {
+        if let Some(matched_panel) = line.get("matchedPanel")
+            && !matched_panel.is_null()
+        {
+            let matched_panel = matched_panel.as_object().ok_or_else(|| {
+                AppError::invalid_params(format!(
+                    "voice line {} has invalid matchedPanel",
+                    index + 1
+                ))
+            })?;
+            let storyboard_id = matched_panel
+                .get("storyboardId")
+                .and_then(Value::as_str)
+                .map(str::trim)
+                .filter(|item| !item.is_empty())
+                .ok_or_else(|| {
                     AppError::invalid_params(format!(
                         "voice line {} has invalid matchedPanel",
                         index + 1
                     ))
                 })?;
-                let storyboard_id = matched_panel
-                    .get("storyboardId")
-                    .and_then(Value::as_str)
-                    .map(str::trim)
-                    .filter(|item| !item.is_empty())
-                    .ok_or_else(|| {
-                        AppError::invalid_params(format!(
-                            "voice line {} has invalid matchedPanel",
-                            index + 1
-                        ))
-                    })?;
-                let panel_index = matched_panel
-                    .get("panelIndex")
-                    .and_then(Value::as_i64)
-                    .and_then(|value| i32::try_from(value).ok())
-                    .filter(|value| *value >= 0)
-                    .ok_or_else(|| {
-                        AppError::invalid_params(format!(
-                            "voice line {} has invalid matchedPanel",
-                            index + 1
-                        ))
-                    })?;
-                let key = format!("{}:{}", storyboard_id, panel_index);
-                let panel_id =
-                    panel_id_by_storyboard_panel
-                        .get(&key)
-                        .cloned()
-                        .ok_or_else(|| {
-                            AppError::invalid_params(format!(
-                                "voice line {} references non-existent panel {}",
-                                index + 1,
-                                key
-                            ))
-                        })?;
-                matched_panel_id = Some(panel_id);
-                matched_storyboard_id = Some(storyboard_id.to_string());
-                matched_panel_index = Some(panel_index);
-                matched_count += 1;
-            }
+            let panel_index = matched_panel
+                .get("panelIndex")
+                .and_then(Value::as_i64)
+                .and_then(|value| i32::try_from(value).ok())
+                .filter(|value| *value >= 0)
+                .ok_or_else(|| {
+                    AppError::invalid_params(format!(
+                        "voice line {} has invalid matchedPanel",
+                        index + 1
+                    ))
+                })?;
+            let key = format!("{}:{}", storyboard_id, panel_index);
+            let panel_id = panel_id_by_storyboard_panel
+                .get(&key)
+                .cloned()
+                .ok_or_else(|| {
+                    AppError::invalid_params(format!(
+                        "voice line {} references non-existent panel {}",
+                        index + 1,
+                        key
+                    ))
+                })?;
+            matched_panel_id = Some(panel_id);
+            matched_storyboard_id = Some(storyboard_id.to_string());
+            matched_panel_index = Some(panel_index);
+            matched_count += 1;
         }
 
         sqlx::query(

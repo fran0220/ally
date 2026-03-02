@@ -47,25 +47,25 @@ impl FlowFields {
     }
 
     fn apply(&self, payload: &mut Map<String, Value>) {
-        if should_fill(payload, "flowId") {
-            if let Some(value) = &self.flow_id {
-                payload.insert("flowId".to_string(), Value::String(value.clone()));
-            }
+        if should_fill(payload, "flowId")
+            && let Some(value) = &self.flow_id
+        {
+            payload.insert("flowId".to_string(), Value::String(value.clone()));
         }
-        if should_fill(payload, "flowStageTitle") {
-            if let Some(value) = &self.flow_stage_title {
-                payload.insert("flowStageTitle".to_string(), Value::String(value.clone()));
-            }
+        if should_fill(payload, "flowStageTitle")
+            && let Some(value) = &self.flow_stage_title
+        {
+            payload.insert("flowStageTitle".to_string(), Value::String(value.clone()));
         }
-        if should_fill(payload, "flowStageIndex") {
-            if let Some(value) = self.flow_stage_index {
-                payload.insert("flowStageIndex".to_string(), Value::from(value));
-            }
+        if should_fill(payload, "flowStageIndex")
+            && let Some(value) = self.flow_stage_index
+        {
+            payload.insert("flowStageIndex".to_string(), Value::from(value));
         }
-        if should_fill(payload, "flowStageTotal") {
-            if let Some(value) = self.flow_stage_total {
-                payload.insert("flowStageTotal".to_string(), Value::from(value));
-            }
+        if should_fill(payload, "flowStageTotal")
+            && let Some(value) = self.flow_stage_total
+        {
+            payload.insert("flowStageTotal".to_string(), Value::from(value));
         }
     }
 }
