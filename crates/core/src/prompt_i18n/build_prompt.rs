@@ -143,15 +143,15 @@ mod tests {
         });
 
         // Skip if prompt template files are not available (CI environment)
-        let rendered = match result {
-            Ok(v) => v,
-            Err(ref e) if e.code == PromptI18nErrorCode::PromptTemplateNotFound => return,
+        match result {
+            Ok(rendered) => {
+                assert!(rendered.contains("character draft"));
+                assert!(!rendered.contains("{user_input}"));
+                assert!(!rendered.contains("{{user_input}}"));
+            }
+            Err(ref e) if e.code == PromptI18nErrorCode::PromptTemplateNotFound => {}
             Err(e) => panic!("unexpected error: {e:?}"),
-        };
-
-        assert!(rendered.contains("character draft"));
-        assert!(!rendered.contains("{user_input}"));
-        assert!(!rendered.contains("{{user_input}}"));
+        }
     }
 
     #[test]
@@ -168,7 +168,7 @@ mod tests {
 
         // Skip if prompt template files are not available (CI environment)
         match result {
-            Err(ref e) if e.code == PromptI18nErrorCode::PromptTemplateNotFound => return,
+            Err(ref e) if e.code == PromptI18nErrorCode::PromptTemplateNotFound => {}
             Err(ref e) => {
                 assert_eq!(
                     e.code,
