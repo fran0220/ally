@@ -41,7 +41,8 @@ ssh "$SERVER" bash -c "'
   echo \">>> cargo build --release...\"
   cargo build --release 2>&1 | tail -5
 
-  # Copy binaries
+  # Copy binaries (stop first to avoid Text file busy)
+  systemctl stop ally-server ally-worker ally-watchdog 2>/dev/null || true
   mkdir -p $APP_DIR/bin
   cp target/release/waoowaoo-server $APP_DIR/bin/
   cp target/release/waoowaoo-worker $APP_DIR/bin/
