@@ -76,3 +76,5 @@ export function ImagePreviewModal({ imageUrl, onClose }: ImagePreviewModalProps)
     </div>
   );
 }
+
+export default ImagePreviewModal;

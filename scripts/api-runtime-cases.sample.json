@@ -344,7 +344,11 @@
       "type": "character",
       "id": "contract-image-smoke",
       "targetType": "character",
-      "targetId": "contract-image-smoke"
+      "targetId": "contract-image-smoke",
+      "modelId": "fal::fal-ai/flux-pro/kontext",
+      "meta": {
+        "locale": "zh-CN"
+      }
     },
     "compare": {
       "strictStatus": true,
@@ -360,7 +364,12 @@
     "body": {
       "targetType": "character",
       "targetId": "contract-text-smoke",
-      "characterName": "Runtime Compare Hero"
+      "characterName": "Runtime Compare Hero",
+      "userInstruction": "Design a protagonist character for runtime compare",
+      "model": "ark::doubao-1-5-pro-256k",
+      "meta": {
+        "locale": "zh-CN"
+      }
     },
     "compare": {
       "strictStatus": true,
@@ -376,7 +385,11 @@
     "body": {
       "targetType": "voice",
       "targetId": "contract-voice-smoke",
-      "voicePrompt": "warm narrator"
+      "voicePrompt": "warm narrator",
+      "previewText": "The sun sets over the distant mountains casting golden light",
+      "meta": {
+        "locale": "zh-CN"
+      }
     },
     "compare": {
       "strictStatus": true,
@@ -437,7 +450,11 @@
     "body": {
       "targetType": "panel",
       "targetId": "contract-novel-image",
-      "panelId": "contract-novel-image"
+      "panelId": "contract-novel-image",
+      "modelId": "fal::fal-ai/flux-pro/kontext",
+      "meta": {
+        "locale": "zh-CN"
+      }
     },
     "compare": {
       "strictStatus": true,
@@ -457,7 +474,11 @@
     "body": {
       "targetType": "panel",
       "targetId": "contract-novel-video",
-      "panelId": "contract-novel-video"
+      "panelId": "contract-novel-video",
+      "modelId": "fal::fal-ai/kling-video/v2/master/image-to-video",
+      "meta": {
+        "locale": "zh-CN"
+      }
     },
     "compare": {
       "strictStatus": true,

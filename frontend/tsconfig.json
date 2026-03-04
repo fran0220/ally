@@ -3,6 +3,13 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "next-intl": ["src/compat/next-intl.ts"],
+      "next/navigation": ["src/compat/next-navigation.ts"],
+      "next/link": ["src/compat/NextLink.tsx"]
+    },
     "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,

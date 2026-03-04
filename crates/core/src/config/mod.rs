@@ -2,6 +2,8 @@ use anyhow::{Context, Result};
 use config::{Config, Environment, File};
 use serde::{Deserialize, Deserializer};
 
+use crate::billing::BillingMode;
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct AppConfig {
     #[serde(default = "default_host")]
@@ -12,12 +14,44 @@ pub struct AppConfig {
     #[serde(default = "default_redis_url")]
     pub redis_url: String,
     pub jwt_secret: String,
+    #[serde(default = "default_api_encryption_key")]
+    pub api_encryption_key: String,
     #[serde(default = "default_jwt_ttl_seconds")]
     pub jwt_ttl_seconds: i64,
     #[serde(default, deserialize_with = "deserialize_cors_allow_origin")]
     pub cors_allow_origin: Vec<String>,
     #[serde(default)]
     pub internal_task_token: String,
+    #[serde(default)]
+    pub billing_mode: BillingMode,
+    #[serde(default)]
+    pub ark_api_key: String,
+    #[serde(default)]
+    pub google_ai_key: String,
+    #[serde(default)]
+    pub minimax_api_key: String,
+    #[serde(default)]
+    pub vidu_api_key: String,
+    #[serde(default = "default_ark_api_base_url")]
+    pub ark_api_base_url: String,
+    #[serde(default = "default_google_api_base_url")]
+    pub google_api_base_url: String,
+    #[serde(default = "default_minimax_api_base_url")]
+    pub minimax_api_base_url: String,
+    #[serde(default = "default_vidu_api_base_url")]
+    pub vidu_api_base_url: String,
+    #[serde(default = "default_generator_http_timeout_secs")]
+    pub generator_http_timeout_secs: u64,
+    #[serde(default = "default_llm_stream_chunk_timeout_ms")]
+    pub llm_stream_chunk_timeout_ms: u64,
+    #[serde(default = "default_generator_poll_interval_ms")]
+    pub generator_poll_interval_ms: u64,
+    #[serde(default = "default_generator_poll_timeout_secs")]
+    pub generator_poll_timeout_secs: u64,
+    #[serde(default = "default_generator_retry_max_attempts")]
+    pub generator_retry_max_attempts: u32,
+    #[serde(default = "default_generator_retry_backoff_ms")]
+    pub generator_retry_backoff_ms: u64,
 }
 
 fn deserialize_cors_allow_origin<'de, D>(
@@ -52,7 +86,7 @@ fn default_host() -> String {
 }
 
 fn default_port() -> u16 {
-    3001
+    43001
 }
 
 fn default_redis_url() -> String {
@@ -61,6 +95,50 @@ fn default_redis_url() -> String {
 
 fn default_jwt_ttl_seconds() -> i64 {
     60 * 60 * 24 * 7
+}
+
+fn default_api_encryption_key() -> String {
+    String::new()
+}
+
+fn default_ark_api_base_url() -> String {
+    "https://ark.cn-beijing.volces.com/api/v3".to_string()
+}
+
+fn default_google_api_base_url() -> String {
+    "https://generativelanguage.googleapis.com".to_string()
+}
+
+fn default_minimax_api_base_url() -> String {
+    "https://api.minimaxi.com/v1".to_string()
+}
+
+fn default_vidu_api_base_url() -> String {
+    "https://api.vidu.cn/ent/v2".to_string()
+}
+
+fn default_generator_http_timeout_secs() -> u64 {
+    120
+}
+
+fn default_llm_stream_chunk_timeout_ms() -> u64 {
+    180_000
+}
+
+fn default_generator_poll_interval_ms() -> u64 {
+    3_000
+}
+
+fn default_generator_poll_timeout_secs() -> u64 {
+    20 * 60
+}
+
+fn default_generator_retry_max_attempts() -> u32 {
+    3
+}
+
+fn default_generator_retry_backoff_ms() -> u64 {
+    1_000
 }
 
 impl AppConfig {
@@ -90,7 +168,14 @@ mod tests {
 
     #[test]
     fn defaults_are_stable() {
-        assert_eq!(default_port(), 3001);
+        assert_eq!(default_port(), 43001);
         assert_eq!(default_jwt_ttl_seconds(), 604_800);
+        assert_eq!(default_api_encryption_key(), "");
+        assert_eq!(BillingMode::default(), BillingMode::Off);
+        assert_eq!(default_llm_stream_chunk_timeout_ms(), 180_000);
+        assert_eq!(default_generator_poll_interval_ms(), 3_000);
+        assert_eq!(default_generator_poll_timeout_secs(), 1_200);
+        assert_eq!(default_generator_retry_max_attempts(), 3);
+        assert_eq!(default_generator_retry_backoff_ms(), 1_000);
     }
 }

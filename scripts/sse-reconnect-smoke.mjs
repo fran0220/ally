@@ -177,6 +177,7 @@ async function submitAssetHubTask({ baseUrl, token, suffix }) {
     method: 'POST',
     headers: {
       Accept: 'application/json',
+      'Accept-Language': 'en-US',
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
@@ -185,7 +186,11 @@ async function submitAssetHubTask({ baseUrl, token, suffix }) {
       id: targetId,
       targetType: 'character',
       targetId,
+      modelId: 'gpt-image-1',
       prompt: 'SSE reconnect smoke test image generation',
+      meta: {
+        locale: 'en',
+      },
     }),
   })
 
@@ -197,7 +202,7 @@ async function submitAssetHubTask({ baseUrl, token, suffix }) {
     body = null
   }
 
-  assert(response.status === 200, `task submit failed status=${response.status}`)
+  assert(response.status === 200, `task submit failed status=${response.status} body=${raw}`)
   assert(body && typeof body.taskId === 'string' && body.taskId.trim().length > 0, 'task submit response missing taskId')
 
   return {

@@ -1,4 +1,7 @@
-use std::{collections::HashMap, time::Duration};
+use std::{
+    collections::{HashMap, HashSet},
+    time::Duration,
+};
 
 use axum::{Json, extract::State};
 use chrono::{NaiveDateTime, Utc};
@@ -10,6 +13,7 @@ use waoowaoo_core::api_config::{
     CustomModel, UnifiedModelType, UpdateUserApiConfigInput, get_system_models_raw,
     get_system_providers, read_user_api_config, update_user_api_config,
 };
+use waoowaoo_core::crypto::{decrypt_api_key, encrypt_api_key};
 
 use crate::{app_state::AppState, error::AppError, extractors::auth::AuthUser};
 
@@ -73,6 +77,304 @@ struct PreferenceRow {
     created_at: NaiveDateTime,
     #[sqlx(rename = "updatedAt")]
     updated_at: NaiveDateTime,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct StoredApiProvider {
+    id: String,
+    name: String,
+    base_url: Option<String>,
+    api_mode: Option<String>,
+    api_key: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct UserApiConfigProvider {
+    id: String,
+    name: String,
+    base_url: Option<String>,
+    api_mode: Option<String>,
+    api_key: String,
+    has_api_key: bool,
+}
+
+#[derive(Debug)]
+enum ApiKeyUpdateAction {
+    KeepExisting,
+    Clear,
+    Encrypt(String),
+}
+
+#[derive(Debug)]
+struct ProviderUpdateInput {
+    id: String,
+    name: String,
+    base_url: Option<String>,
+    api_mode: Option<String>,
+    api_key_action: ApiKeyUpdateAction,
+}
+
+#[derive(Debug, sqlx::FromRow)]
+struct CustomProvidersRow {
+    #[sqlx(rename = "customProviders")]
+    custom_providers: Option<String>,
+}
+
+fn normalize_required_string(value: &Value, field: &str) -> Result<String, AppError> {
+    match value {
+        Value::String(raw) => {
+            let normalized = raw.trim();
+            if normalized.is_empty() {
+                return Err(AppError::invalid_params(format!("{field} cannot be empty")));
+            }
+            Ok(normalized.to_string())
+        }
+        _ => Err(AppError::invalid_params(format!(
+            "{field} must be a string"
+        ))),
+    }
+}
+
+fn normalize_optional_string(value: &Value, field: &str) -> Result<Option<String>, AppError> {
+    match value {
+        Value::Null => Ok(None),
+        Value::String(raw) => {
+            let normalized = raw.trim();
+            if normalized.is_empty() {
+                Ok(None)
+            } else {
+                Ok(Some(normalized.to_string()))
+            }
+        }
+        _ => Err(AppError::invalid_params(format!(
+            "{field} must be a string or null"
+        ))),
+    }
+}
+
+fn parse_provider_updates(value: &Value) -> Result<Vec<ProviderUpdateInput>, AppError> {
+    let providers = value
+        .as_array()
+        .ok_or_else(|| AppError::invalid_params("providers must be an array"))?;
+
+    let mut updates = Vec::with_capacity(providers.len());
+    let mut seen_ids = HashSet::new();
+
+    for (index, provider) in providers.iter().enumerate() {
+        let object = provider.as_object().ok_or_else(|| {
+            AppError::invalid_params(format!("providers[{index}] must be an object"))
+        })?;
+
+        let id = normalize_required_string(
+            object.get("id").ok_or_else(|| {
+                AppError::invalid_params(format!("providers[{index}].id is required"))
+            })?,
+            &format!("providers[{index}].id"),
+        )?;
+
+        if !seen_ids.insert(id.to_ascii_lowercase()) {
+            return Err(AppError::invalid_params(format!(
+                "providers contains duplicate id: {id}"
+            )));
+        }
+
+        let name = normalize_required_string(
+            object.get("name").ok_or_else(|| {
+                AppError::invalid_params(format!("providers[{index}].name is required"))
+            })?,
+            &format!("providers[{index}].name"),
+        )?;
+
+        let base_url = match object.get("baseUrl") {
+            Some(value) => {
+                normalize_optional_string(value, &format!("providers[{index}].baseUrl"))?
+            }
+            None => None,
+        };
+
+        let api_mode = match object.get("apiMode") {
+            Some(value) => {
+                normalize_optional_string(value, &format!("providers[{index}].apiMode"))?
+            }
+            None => None,
+        };
+
+        let api_key_action = match object.get("apiKey") {
+            None => ApiKeyUpdateAction::KeepExisting,
+            Some(Value::Null) => ApiKeyUpdateAction::Clear,
+            Some(Value::String(api_key)) => {
+                let normalized = api_key.trim();
+                if normalized.is_empty() {
+                    ApiKeyUpdateAction::Clear
+                } else {
+                    ApiKeyUpdateAction::Encrypt(normalized.to_string())
+                }
+            }
+            Some(_) => {
+                return Err(AppError::invalid_params(format!(
+                    "providers[{index}].apiKey must be a string or null"
+                )));
+            }
+        };
+
+        updates.push(ProviderUpdateInput {
+            id,
+            name,
+            base_url,
+            api_mode,
+            api_key_action,
+        });
+    }
+
+    Ok(updates)
+}
+
+fn parse_stored_custom_providers(raw: &str) -> Result<Vec<StoredApiProvider>, AppError> {
+    serde_json::from_str::<Vec<StoredApiProvider>>(raw)
+        .map_err(|err| AppError::internal(format!("invalid customProviders json: {err}")))
+}
+
+fn decrypt_provider_for_response(
+    provider: StoredApiProvider,
+    encryption_secret: &str,
+) -> Result<UserApiConfigProvider, AppError> {
+    let decrypted_api_key = match provider.api_key.as_deref() {
+        Some(ciphertext) if !ciphertext.trim().is_empty() => {
+            decrypt_api_key(ciphertext, encryption_secret).map_err(|err| {
+                AppError::internal(format!(
+                    "failed to decrypt provider apiKey for {}: {err}",
+                    provider.id
+                ))
+            })?
+        }
+        _ => String::new(),
+    };
+
+    Ok(UserApiConfigProvider {
+        id: provider.id,
+        name: provider.name,
+        base_url: provider.base_url,
+        api_mode: provider.api_mode,
+        has_api_key: !decrypted_api_key.is_empty(),
+        api_key: decrypted_api_key,
+    })
+}
+
+async fn fetch_stored_custom_providers(
+    pool: &sqlx::MySqlPool,
+    user_id: &str,
+) -> Result<Option<Vec<StoredApiProvider>>, AppError> {
+    let row = sqlx::query_as::<_, CustomProvidersRow>(
+        "SELECT customProviders FROM user_preferences WHERE userId = ? LIMIT 1",
+    )
+    .bind(user_id)
+    .fetch_optional(pool)
+    .await?;
+
+    let Some(row) = row else {
+        return Ok(None);
+    };
+
+    let Some(raw) = row.custom_providers else {
+        return Ok(None);
+    };
+
+    if raw.trim().is_empty() {
+        return Ok(None);
+    }
+
+    parse_stored_custom_providers(&raw).map(Some)
+}
+
+async fn persist_custom_providers(
+    pool: &sqlx::MySqlPool,
+    user_id: &str,
+    providers: &[StoredApiProvider],
+) -> Result<(), AppError> {
+    ensure_preference_exists(pool, user_id).await?;
+
+    let raw = serde_json::to_string(providers)
+        .map_err(|err| AppError::internal(format!("failed to serialize customProviders: {err}")))?;
+
+    sqlx::query(
+        "UPDATE user_preferences SET customProviders = ?, updatedAt = NOW(3) WHERE userId = ?",
+    )
+    .bind(raw)
+    .bind(user_id)
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
+async fn upsert_custom_providers(
+    pool: &sqlx::MySqlPool,
+    user_id: &str,
+    updates: Vec<ProviderUpdateInput>,
+    encryption_secret: &str,
+) -> Result<(), AppError> {
+    let existing = fetch_stored_custom_providers(pool, user_id)
+        .await?
+        .unwrap_or_default();
+    let existing_by_id = existing
+        .into_iter()
+        .map(|provider| (provider.id.to_ascii_lowercase(), provider))
+        .collect::<HashMap<_, _>>();
+
+    let mut providers_to_save = Vec::with_capacity(updates.len());
+
+    for update in updates {
+        let existing_provider = existing_by_id.get(&update.id.to_ascii_lowercase());
+        let encrypted_api_key = match update.api_key_action {
+            ApiKeyUpdateAction::KeepExisting => {
+                existing_provider.and_then(|provider| provider.api_key.clone())
+            }
+            ApiKeyUpdateAction::Clear => None,
+            ApiKeyUpdateAction::Encrypt(plaintext) => Some(
+                encrypt_api_key(&plaintext, encryption_secret).map_err(|err| {
+                    AppError::internal(format!(
+                        "failed to encrypt provider apiKey for {}: {err}",
+                        update.id
+                    ))
+                })?,
+            ),
+        };
+
+        providers_to_save.push(StoredApiProvider {
+            id: update.id,
+            name: update.name,
+            base_url: update.base_url,
+            api_mode: update.api_mode,
+            api_key: encrypted_api_key,
+        });
+    }
+
+    persist_custom_providers(pool, user_id, &providers_to_save).await
+}
+
+async fn build_api_config_response(
+    pool: &sqlx::MySqlPool,
+    user_id: &str,
+    encryption_secret: &str,
+) -> Result<Value, AppError> {
+    let data = read_user_api_config(pool, user_id).await?;
+    let mut payload = serde_json::to_value(data)
+        .map_err(|err| AppError::internal(format!("failed to serialize api-config: {err}")))?;
+
+    if let Some(stored_providers) = fetch_stored_custom_providers(pool, user_id).await? {
+        let decrypted_providers = stored_providers
+            .into_iter()
+            .map(|provider| decrypt_provider_for_response(provider, encryption_secret))
+            .collect::<Result<Vec<_>, _>>()?;
+
+        if let Some(object) = payload.as_object_mut() {
+            object.insert("providers".to_string(), json!(decrypted_providers));
+        }
+    }
+
+    Ok(payload)
 }
 
 fn push_grouped_model(
@@ -161,21 +463,64 @@ pub async fn get_api_config(
     State(state): State<AppState>,
     user: AuthUser,
 ) -> Result<Json<Value>, AppError> {
-    let data = read_user_api_config(&state.mysql, &user.id).await?;
-    serde_json::to_value(data)
-        .map(Json)
-        .map_err(|err| AppError::internal(format!("failed to serialize api-config: {err}")))
+    let payload =
+        build_api_config_response(&state.mysql, &user.id, &state.config.api_encryption_key).await?;
+    Ok(Json(payload))
 }
 
 pub async fn update_api_config(
     State(state): State<AppState>,
     user: AuthUser,
-    Json(payload): Json<UpdateUserApiConfigInput>,
+    Json(payload): Json<Value>,
 ) -> Result<Json<Value>, AppError> {
-    let data = update_user_api_config(&state.mysql, &user.id, payload).await?;
-    serde_json::to_value(data)
-        .map(Json)
-        .map_err(|err| AppError::internal(format!("failed to serialize api-config: {err}")))
+    let object = payload
+        .as_object()
+        .ok_or_else(|| AppError::invalid_params("request body must be an object"))?;
+
+    let has_default_models = object.contains_key("defaultModels");
+    let has_capability_defaults = object.contains_key("capabilityDefaults");
+    let has_providers = object.contains_key("providers");
+
+    if !has_default_models && !has_capability_defaults && !has_providers {
+        return Err(AppError::invalid_params(
+            "request body must include providers, defaultModels or capabilityDefaults",
+        ));
+    }
+
+    if has_default_models || has_capability_defaults {
+        let mut core_payload = serde_json::Map::new();
+        if let Some(default_models) = object.get("defaultModels") {
+            core_payload.insert("defaultModels".to_string(), default_models.clone());
+        }
+        if let Some(capability_defaults) = object.get("capabilityDefaults") {
+            core_payload.insert(
+                "capabilityDefaults".to_string(),
+                capability_defaults.clone(),
+            );
+        }
+
+        let normalized_payload: UpdateUserApiConfigInput =
+            serde_json::from_value(Value::Object(core_payload)).map_err(|err| {
+                AppError::invalid_params(format!("invalid api-config payload: {err}"))
+            })?;
+
+        update_user_api_config(&state.mysql, &user.id, normalized_payload).await?;
+    }
+
+    if let Some(providers_raw) = object.get("providers") {
+        let updates = parse_provider_updates(providers_raw)?;
+        upsert_custom_providers(
+            &state.mysql,
+            &user.id,
+            updates,
+            &state.config.api_encryption_key,
+        )
+        .await?;
+    }
+
+    let response =
+        build_api_config_response(&state.mysql, &user.id, &state.config.api_encryption_key).await?;
+    Ok(Json(response))
 }
 
 fn normalize_provider(input: Option<String>, base_url: Option<&str>) -> Result<String, AppError> {

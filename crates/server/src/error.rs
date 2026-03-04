@@ -2,6 +2,8 @@ use axum::{Json, http::StatusCode, response::IntoResponse};
 use uuid::Uuid;
 use waoowaoo_core::errors::{ApiErrorBody, AppError as CoreAppError};
 
+use crate::middleware::request_id::current_request_id;
+
 #[derive(Debug)]
 pub struct AppError(pub CoreAppError);
 
@@ -44,7 +46,7 @@ impl IntoResponse for AppError {
         let spec = self.0.code.spec();
         let status =
             StatusCode::from_u16(spec.http_status).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
-        let request_id = Uuid::new_v4().to_string();
+        let request_id = current_request_id().unwrap_or_else(|| Uuid::new_v4().to_string());
         let body = Json(ApiErrorBody::from_app_error(&self.0, request_id.clone()));
 
         (status, [("x-request-id", request_id)], body).into_response()

@@ -1,1 +1,0 @@
-import{b as n,s as i}from"./index-ySriYnQV.js";async function s(a,o){const t=await n("/api/auth/login",{method:"POST",body:JSON.stringify({username:a,password:o})});return i(t.token),t}async function r(a,o){const t=await n("/api/auth/register",{method:"POST",body:JSON.stringify({name:a,password:o})});return i(t.token),t}export{s as l,r};

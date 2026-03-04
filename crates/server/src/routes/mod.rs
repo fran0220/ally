@@ -8,6 +8,7 @@ use crate::app_state::AppState;
 pub mod admin;
 pub mod asset_hub;
 pub mod auth;
+pub mod billing;
 pub mod cos;
 pub mod files;
 pub mod media;
@@ -47,6 +48,7 @@ pub fn api_router(state: AppState) -> Router {
         .merge(cos::router())
         .merge(files::router())
         .merge(media::router())
+        .merge(billing::router())
         .merge(asset_hub::router())
         .merge(novel::router())
         .merge(admin::router())

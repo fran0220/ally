@@ -4,6 +4,7 @@ use serde::Serialize;
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ErrorCategory {
     Auth,
+    Billing,
     Content,
     Provider,
     System,
@@ -25,6 +26,7 @@ pub enum ErrorCode {
     QuotaExceeded,
     ExternalError,
     NetworkError,
+    InsufficientBalance,
     SensitiveContent,
     GenerationTimeout,
     GenerationFailed,
@@ -129,6 +131,13 @@ impl ErrorCode {
                 user_message_key: "errors.NETWORK_ERROR",
                 default_message: "Network request failed",
             },
+            ErrorCode::InsufficientBalance => ErrorSpec {
+                http_status: 402,
+                retryable: false,
+                category: ErrorCategory::Billing,
+                user_message_key: "errors.INSUFFICIENT_BALANCE",
+                default_message: "Insufficient balance",
+            },
             ErrorCode::SensitiveContent => ErrorSpec {
                 http_status: 422,
                 retryable: false,
@@ -188,6 +197,7 @@ impl ErrorCode {
             ErrorCode::QuotaExceeded => "QUOTA_EXCEEDED",
             ErrorCode::ExternalError => "EXTERNAL_ERROR",
             ErrorCode::NetworkError => "NETWORK_ERROR",
+            ErrorCode::InsufficientBalance => "INSUFFICIENT_BALANCE",
             ErrorCode::SensitiveContent => "SENSITIVE_CONTENT",
             ErrorCode::GenerationTimeout => "GENERATION_TIMEOUT",
             ErrorCode::GenerationFailed => "GENERATION_FAILED",

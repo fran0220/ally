@@ -8,7 +8,11 @@
       "id": "worker-smoke-image",
       "targetType": "character",
       "targetId": "worker-smoke-image",
-      "prompt": "Generate a cinematic hero portrait for runtime smoke test"
+      "modelId": "fal::fal-ai/flux-pro/kontext",
+      "prompt": "Generate a cinematic hero portrait for runtime smoke test",
+      "meta": {
+        "locale": "zh-CN"
+      }
     },
     "expectedSubmitStatus": 200,
     "expectTerminalStatus": [
@@ -26,7 +30,11 @@
       "targetType": "character",
       "targetId": "worker-smoke-text",
       "characterName": "Smoke Test Hero",
-      "prompt": "Design a protagonist character profile for action fantasy"
+      "userInstruction": "Design a protagonist character profile for action fantasy",
+      "model": "ark::doubao-1-5-pro-256k",
+      "meta": {
+        "locale": "zh-CN"
+      }
     },
     "expectedSubmitStatus": 200,
     "expectTerminalStatus": [
@@ -43,7 +51,11 @@
     "body": {
       "targetType": "voice",
       "targetId": "worker-smoke-voice",
-      "voicePrompt": "A calm mature narrator voice"
+      "voicePrompt": "A calm mature narrator voice",
+      "previewText": "The sun sets over the distant mountains casting golden light",
+      "meta": {
+        "locale": "zh-CN"
+      }
     },
     "expectedSubmitStatus": 200,
     "expectTerminalStatus": [
@@ -60,7 +72,11 @@
     "body": {
       "targetType": "panel",
       "targetId": "worker-smoke-panel",
-      "panelId": "worker-smoke-panel"
+      "panelId": "worker-smoke-panel",
+      "modelId": "fal::fal-ai/kling-video/v2/master/image-to-video",
+      "meta": {
+        "locale": "zh-CN"
+      }
     },
     "expectedSubmitStatus": 200,
     "expectTerminalStatus": [

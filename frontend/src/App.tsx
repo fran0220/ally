@@ -10,6 +10,7 @@ import {
 } from 'react-router-dom';
 
 import { Navbar } from './components/Navbar';
+import { useHasAuthToken } from './hooks/useHasAuthToken';
 import i18n from './i18n';
 
 const Landing = lazy(() => import('./routes/Landing').then((module) => ({ default: module.Landing })));
@@ -42,6 +43,33 @@ function AppLayout() {
       </Suspense>
     </>
   );
+}
+
+function RequireAuth() {
+  const hasToken = useHasAuthToken();
+  const location = useLocation();
+
+  if (!hasToken) {
+    return (
+      <Navigate
+        to="/auth/signin"
+        replace
+        state={{ from: `${location.pathname}${location.search}${location.hash}` }}
+      />
+    );
+  }
+
+  return <Outlet />;
+}
+
+function RedirectIfAuthenticated() {
+  const hasToken = useHasAuthToken();
+
+  if (hasToken) {
+    return <Navigate to="/workspace" replace />;
+  }
+
+  return <Outlet />;
 }
 
 function NotFound() {
@@ -93,32 +121,42 @@ const router = createBrowserRouter([
         element: <Landing />,
       },
       {
-        path: '/auth/signin',
-        element: <SignIn />,
+        element: <RedirectIfAuthenticated />,
+        children: [
+          {
+            path: '/auth/signin',
+            element: <SignIn />,
+          },
+          {
+            path: '/auth/signup',
+            element: <SignUp />,
+          },
+        ],
       },
       {
-        path: '/auth/signup',
-        element: <SignUp />,
-      },
-      {
-        path: '/workspace',
-        element: <WorkspaceList />,
-      },
-      {
-        path: '/workspace/:projectId',
-        element: <ProjectWorkbench />,
-      },
-      {
-        path: '/workspace/asset-hub',
-        element: <AssetHub />,
-      },
-      {
-        path: '/profile',
-        element: <Profile />,
-      },
-      {
-        path: '/admin/ai-config',
-        element: <AiConfig />,
+        element: <RequireAuth />,
+        children: [
+          {
+            path: '/workspace',
+            element: <WorkspaceList />,
+          },
+          {
+            path: '/workspace/:projectId',
+            element: <ProjectWorkbench />,
+          },
+          {
+            path: '/workspace/asset-hub',
+            element: <AssetHub />,
+          },
+          {
+            path: '/profile',
+            element: <Profile />,
+          },
+          {
+            path: '/admin/ai-config',
+            element: <AiConfig />,
+          },
+        ],
       },
       {
         path: '/:locale/*',

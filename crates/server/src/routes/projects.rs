@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sqlx::{MySql, QueryBuilder};
 use uuid::Uuid;
+use waoowaoo_core::media;
 
 use crate::{app_state::AppState, error::AppError, extractors::auth::AuthUser};
 
@@ -49,27 +50,176 @@ struct ProjectRow {
     last_accessed_at: Option<NaiveDateTime>,
 }
 
-#[derive(Debug, Serialize, sqlx::FromRow)]
-#[serde(rename_all = "camelCase")]
-struct EpisodeRow {
+#[derive(Debug, sqlx::FromRow)]
+struct EpisodeDetailRow {
     id: String,
+    #[sqlx(rename = "novelPromotionProjectId")]
+    novel_promotion_project_id: String,
     #[sqlx(rename = "episodeNumber")]
     episode_number: i32,
     name: String,
+    description: Option<String>,
+    #[sqlx(rename = "novelText")]
+    novel_text: Option<String>,
+    #[sqlx(rename = "audioUrl")]
+    audio_url: Option<String>,
+    #[sqlx(rename = "audioMediaId")]
+    audio_media_id: Option<String>,
+    #[sqlx(rename = "srtContent")]
+    srt_content: Option<String>,
+    #[sqlx(rename = "speakerVoices")]
+    speaker_voices: Option<String>,
+    #[sqlx(rename = "createdAt")]
+    created_at: NaiveDateTime,
+    #[sqlx(rename = "updatedAt")]
+    updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Serialize, sqlx::FromRow)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, sqlx::FromRow)]
 struct CharacterRow {
     id: String,
+    #[sqlx(rename = "novelPromotionProjectId")]
+    novel_promotion_project_id: String,
     name: String,
+    aliases: Option<String>,
+    #[sqlx(rename = "profileData")]
+    profile_data: Option<String>,
+    #[sqlx(rename = "profileConfirmed")]
+    profile_confirmed: bool,
+    #[sqlx(rename = "customVoiceUrl")]
+    custom_voice_url: Option<String>,
+    #[sqlx(rename = "customVoiceMediaId")]
+    custom_voice_media_id: Option<String>,
+    #[sqlx(rename = "voiceId")]
+    voice_id: Option<String>,
+    #[sqlx(rename = "voiceType")]
+    voice_type: Option<String>,
+    introduction: Option<String>,
+    #[sqlx(rename = "sourceGlobalCharacterId")]
+    source_global_character_id: Option<String>,
+    #[sqlx(rename = "createdAt")]
+    created_at: NaiveDateTime,
+    #[sqlx(rename = "updatedAt")]
+    updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Serialize, sqlx::FromRow)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, sqlx::FromRow)]
+struct CharacterAppearanceRow {
+    id: String,
+    #[sqlx(rename = "characterId")]
+    character_id: String,
+    #[sqlx(rename = "appearanceIndex")]
+    appearance_index: i32,
+    #[sqlx(rename = "changeReason")]
+    change_reason: String,
+    description: Option<String>,
+    descriptions: Option<String>,
+    #[sqlx(rename = "imageUrl")]
+    image_url: Option<String>,
+    #[sqlx(rename = "imageMediaId")]
+    image_media_id: Option<String>,
+    #[sqlx(rename = "imageUrls")]
+    image_urls: Option<String>,
+    #[sqlx(rename = "selectedIndex")]
+    selected_index: Option<i32>,
+    #[sqlx(rename = "previousImageUrl")]
+    previous_image_url: Option<String>,
+    #[sqlx(rename = "previousDescription")]
+    previous_description: Option<String>,
+    #[sqlx(rename = "previousDescriptions")]
+    previous_descriptions: Option<String>,
+    #[sqlx(rename = "createdAt")]
+    created_at: NaiveDateTime,
+    #[sqlx(rename = "updatedAt")]
+    updated_at: NaiveDateTime,
+}
+
+#[derive(Debug, sqlx::FromRow)]
 struct LocationRow {
     id: String,
+    #[sqlx(rename = "novelPromotionProjectId")]
+    novel_promotion_project_id: String,
     name: String,
+    summary: Option<String>,
+    #[sqlx(rename = "sourceGlobalLocationId")]
+    source_global_location_id: Option<String>,
+    #[sqlx(rename = "selectedImageId")]
+    selected_image_id: Option<String>,
+    #[sqlx(rename = "createdAt")]
+    created_at: NaiveDateTime,
+    #[sqlx(rename = "updatedAt")]
+    updated_at: NaiveDateTime,
+}
+
+#[derive(Debug, sqlx::FromRow)]
+struct LocationImageRow {
+    id: String,
+    #[sqlx(rename = "locationId")]
+    location_id: String,
+    #[sqlx(rename = "imageIndex")]
+    image_index: i32,
+    description: Option<String>,
+    #[sqlx(rename = "imageUrl")]
+    image_url: Option<String>,
+    #[sqlx(rename = "imageMediaId")]
+    image_media_id: Option<String>,
+    #[sqlx(rename = "isSelected")]
+    is_selected: bool,
+    #[sqlx(rename = "previousImageUrl")]
+    previous_image_url: Option<String>,
+    #[sqlx(rename = "previousDescription")]
+    previous_description: Option<String>,
+    #[sqlx(rename = "createdAt")]
+    created_at: NaiveDateTime,
+    #[sqlx(rename = "updatedAt")]
+    updated_at: NaiveDateTime,
+}
+
+#[derive(Debug, sqlx::FromRow)]
+struct NovelProjectDataRow {
+    id: String,
+    #[sqlx(rename = "projectId")]
+    project_id: String,
+    #[sqlx(rename = "analysisModel")]
+    analysis_model: Option<String>,
+    #[sqlx(rename = "imageModel")]
+    image_model: Option<String>,
+    #[sqlx(rename = "videoModel")]
+    video_model: Option<String>,
+    #[sqlx(rename = "videoRatio")]
+    video_ratio: String,
+    #[sqlx(rename = "ttsRate")]
+    tts_rate: String,
+    #[sqlx(rename = "globalAssetText")]
+    global_asset_text: Option<String>,
+    #[sqlx(rename = "artStyle")]
+    art_style: String,
+    #[sqlx(rename = "artStylePrompt")]
+    art_style_prompt: Option<String>,
+    #[sqlx(rename = "characterModel")]
+    character_model: Option<String>,
+    #[sqlx(rename = "locationModel")]
+    location_model: Option<String>,
+    #[sqlx(rename = "storyboardModel")]
+    storyboard_model: Option<String>,
+    #[sqlx(rename = "editModel")]
+    edit_model: Option<String>,
+    #[sqlx(rename = "videoResolution")]
+    video_resolution: String,
+    #[sqlx(rename = "workflowMode")]
+    workflow_mode: String,
+    #[sqlx(rename = "lastEpisodeId")]
+    last_episode_id: Option<String>,
+    #[sqlx(rename = "imageResolution")]
+    image_resolution: String,
+    #[sqlx(rename = "importStatus")]
+    import_status: Option<String>,
+    #[sqlx(rename = "capabilityOverrides")]
+    capability_overrides: Option<String>,
+    #[sqlx(rename = "createdAt")]
+    created_at: NaiveDateTime,
+    #[sqlx(rename = "updatedAt")]
+    updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, sqlx::FromRow)]
@@ -92,6 +242,186 @@ fn normalize_page(page: i64) -> i64 {
 
 fn normalize_page_size(page_size: i64) -> i64 {
     page_size.clamp(1, 100)
+}
+
+fn parse_json_value(value: Option<&str>) -> Option<Value> {
+    value
+        .and_then(|raw| serde_json::from_str::<Value>(raw).ok())
+        .filter(|parsed| !parsed.is_null())
+}
+
+fn parse_json_array(value: Option<&str>) -> Value {
+    parse_json_value(value).unwrap_or_else(|| json!([]))
+}
+
+fn normalize_media_url(value: Option<&str>) -> Option<String> {
+    media::to_public_media_url(value)
+}
+
+async fn load_project_assets_payload(
+    state: &AppState,
+    novel_id: &str,
+) -> Result<(Vec<Value>, Vec<Value>), AppError> {
+    let characters = sqlx::query_as::<_, CharacterRow>(
+        "SELECT id, novelPromotionProjectId, name, aliases, profileData, profileConfirmed, customVoiceUrl, customVoiceMediaId, voiceId, voiceType, introduction, sourceGlobalCharacterId, createdAt, updatedAt
+         FROM novel_promotion_characters
+         WHERE novelPromotionProjectId = ?
+         ORDER BY createdAt ASC",
+    )
+    .bind(novel_id)
+    .fetch_all(&state.mysql)
+    .await?;
+    let locations = sqlx::query_as::<_, LocationRow>(
+        "SELECT id, novelPromotionProjectId, name, summary, sourceGlobalLocationId, selectedImageId, createdAt, updatedAt
+         FROM novel_promotion_locations
+         WHERE novelPromotionProjectId = ?
+         ORDER BY createdAt ASC",
+    )
+    .bind(novel_id)
+    .fetch_all(&state.mysql)
+    .await?;
+
+    let character_ids = characters
+        .iter()
+        .map(|item| item.id.clone())
+        .collect::<Vec<_>>();
+    let location_ids = locations
+        .iter()
+        .map(|item| item.id.clone())
+        .collect::<Vec<_>>();
+
+    let appearances = if character_ids.is_empty() {
+        Vec::new()
+    } else {
+        let mut builder: QueryBuilder<'_, MySql> = QueryBuilder::new(
+            "SELECT id, characterId, appearanceIndex, changeReason, description, descriptions, imageUrl, imageMediaId, imageUrls, selectedIndex, previousImageUrl, previousDescription, previousDescriptions, createdAt, updatedAt
+             FROM character_appearances
+             WHERE characterId IN (",
+        );
+        let mut separated = builder.separated(",");
+        for id in &character_ids {
+            separated.push_bind(id);
+        }
+        separated.push_unseparated(") ORDER BY appearanceIndex ASC, createdAt ASC");
+        builder
+            .build_query_as::<CharacterAppearanceRow>()
+            .fetch_all(&state.mysql)
+            .await?
+    };
+
+    let images = if location_ids.is_empty() {
+        Vec::new()
+    } else {
+        let mut builder: QueryBuilder<'_, MySql> = QueryBuilder::new(
+            "SELECT id, locationId, imageIndex, description, imageUrl, imageMediaId, isSelected, previousImageUrl, previousDescription, createdAt, updatedAt
+             FROM location_images
+             WHERE locationId IN (",
+        );
+        let mut separated = builder.separated(",");
+        for id in &location_ids {
+            separated.push_bind(id);
+        }
+        separated.push_unseparated(") ORDER BY imageIndex ASC, createdAt ASC");
+        builder
+            .build_query_as::<LocationImageRow>()
+            .fetch_all(&state.mysql)
+            .await?
+    };
+
+    let mut appearance_map: std::collections::HashMap<String, Vec<Value>> =
+        std::collections::HashMap::new();
+    for item in appearances {
+        let image_url = normalize_media_url(item.image_url.as_deref()).or(item.image_url.clone());
+        let previous_image_url =
+            normalize_media_url(item.previous_image_url.as_deref()).or(item.previous_image_url);
+        let value = json!({
+          "id": item.id,
+          "characterId": item.character_id,
+          "appearanceIndex": item.appearance_index,
+          "changeReason": item.change_reason,
+          "description": item.description,
+          "descriptions": parse_json_value(item.descriptions.as_deref()),
+          "imageUrl": image_url,
+          "imageMediaId": item.image_media_id,
+          "imageUrls": parse_json_array(item.image_urls.as_deref()),
+          "selectedIndex": item.selected_index,
+          "previousImageUrl": previous_image_url,
+          "previousDescription": item.previous_description,
+          "previousDescriptions": parse_json_value(item.previous_descriptions.as_deref()),
+          "createdAt": item.created_at,
+          "updatedAt": item.updated_at,
+        });
+        appearance_map
+            .entry(item.character_id)
+            .or_default()
+            .push(value);
+    }
+
+    let mut image_map: std::collections::HashMap<String, Vec<Value>> =
+        std::collections::HashMap::new();
+    for item in images {
+        let image_url = normalize_media_url(item.image_url.as_deref()).or(item.image_url.clone());
+        let previous_image_url =
+            normalize_media_url(item.previous_image_url.as_deref()).or(item.previous_image_url);
+        let value = json!({
+          "id": item.id,
+          "locationId": item.location_id,
+          "imageIndex": item.image_index,
+          "description": item.description,
+          "imageUrl": image_url,
+          "imageMediaId": item.image_media_id,
+          "isSelected": item.is_selected,
+          "previousImageUrl": previous_image_url,
+          "previousDescription": item.previous_description,
+          "createdAt": item.created_at,
+          "updatedAt": item.updated_at,
+        });
+        image_map.entry(item.location_id).or_default().push(value);
+    }
+
+    let character_values = characters
+        .into_iter()
+        .map(|item| {
+            let custom_voice_url =
+                normalize_media_url(item.custom_voice_url.as_deref()).or(item.custom_voice_url);
+            json!({
+              "id": item.id,
+              "novelPromotionProjectId": item.novel_promotion_project_id,
+              "name": item.name,
+              "aliases": parse_json_value(item.aliases.as_deref()),
+              "profileData": parse_json_value(item.profile_data.as_deref()),
+              "profileConfirmed": item.profile_confirmed,
+              "customVoiceUrl": custom_voice_url,
+              "customVoiceMediaId": item.custom_voice_media_id,
+              "voiceId": item.voice_id,
+              "voiceType": item.voice_type,
+              "introduction": item.introduction,
+              "sourceGlobalCharacterId": item.source_global_character_id,
+              "appearances": appearance_map.remove(&item.id).unwrap_or_default(),
+              "createdAt": item.created_at,
+              "updatedAt": item.updated_at,
+            })
+        })
+        .collect::<Vec<_>>();
+
+    let location_values = locations
+        .into_iter()
+        .map(|item| {
+            json!({
+              "id": item.id,
+              "novelPromotionProjectId": item.novel_promotion_project_id,
+              "name": item.name,
+              "summary": item.summary,
+              "sourceGlobalLocationId": item.source_global_location_id,
+              "selectedImageId": item.selected_image_id,
+              "images": image_map.remove(&item.id).unwrap_or_default(),
+              "createdAt": item.created_at,
+              "updatedAt": item.updated_at,
+            })
+        })
+        .collect::<Vec<_>>();
+
+    Ok((character_values, location_values))
 }
 
 async fn verify_project_owner(
@@ -335,19 +665,7 @@ pub async fn assets(
         return Err(AppError::not_found("novel promotion data not found"));
     };
 
-    let characters = sqlx::query_as::<_, CharacterRow>(
-        "SELECT id, name FROM novel_promotion_characters WHERE novelPromotionProjectId = ? ORDER BY createdAt ASC",
-    )
-    .bind(&novel_id)
-    .fetch_all(&state.mysql)
-    .await?;
-
-    let locations = sqlx::query_as::<_, LocationRow>(
-        "SELECT id, name FROM novel_promotion_locations WHERE novelPromotionProjectId = ? ORDER BY createdAt ASC",
-    )
-    .bind(&novel_id)
-    .fetch_all(&state.mysql)
-    .await?;
+    let (characters, locations) = load_project_assets_payload(&state, &novel_id).await?;
 
     Ok(Json(json!({
       "characters": characters,
@@ -369,19 +687,53 @@ pub async fn data(
     .fetch_one(&state.mysql)
     .await?;
 
-    let novel_data = sqlx::query_as::<_, (String, String, Option<String>, Option<String>, Option<String>, String, String, String)>(
-        "SELECT id, projectId, analysisModel, imageModel, videoModel, videoRatio, artStyle, ttsRate FROM novel_promotion_projects WHERE projectId = ? LIMIT 1",
+    let novel_data = sqlx::query_as::<_, NovelProjectDataRow>(
+        "SELECT id, projectId, analysisModel, imageModel, videoModel, videoRatio, ttsRate, globalAssetText, artStyle, artStylePrompt, characterModel, locationModel, storyboardModel, editModel, videoResolution, workflowMode, lastEpisodeId, imageResolution, importStatus, capabilityOverrides, createdAt, updatedAt
+         FROM novel_promotion_projects
+         WHERE projectId = ?
+         LIMIT 1",
     )
     .bind(&project_id)
     .fetch_optional(&state.mysql)
     .await?;
 
-    let episodes = sqlx::query_as::<_, EpisodeRow>(
-        "SELECT id, episodeNumber, name FROM novel_promotion_episodes WHERE novelPromotionProjectId = (SELECT id FROM novel_promotion_projects WHERE projectId = ? LIMIT 1) ORDER BY episodeNumber ASC",
+    let novel_data = match novel_data {
+        Some(value) => value,
+        None => return Err(AppError::not_found("novel promotion data not found")),
+    };
+
+    let episodes = sqlx::query_as::<_, EpisodeDetailRow>(
+        "SELECT id, novelPromotionProjectId, episodeNumber, name, description, novelText, audioUrl, audioMediaId, srtContent, speakerVoices, createdAt, updatedAt
+         FROM novel_promotion_episodes
+         WHERE novelPromotionProjectId = ?
+         ORDER BY episodeNumber ASC",
     )
-    .bind(&project_id)
+    .bind(&novel_data.id)
     .fetch_all(&state.mysql)
     .await?;
+    let episodes = episodes
+        .into_iter()
+        .map(|episode| {
+            let audio_url = normalize_media_url(episode.audio_url.as_deref()).or(episode.audio_url);
+            json!({
+              "id": episode.id,
+              "novelPromotionProjectId": episode.novel_promotion_project_id,
+              "episodeNumber": episode.episode_number,
+              "name": episode.name,
+              "description": episode.description,
+              "novelText": episode.novel_text,
+              "audioUrl": audio_url,
+              "audioMediaId": episode.audio_media_id,
+              "srtContent": episode.srt_content,
+              "speakerVoices": parse_json_value(episode.speaker_voices.as_deref()),
+              "createdAt": episode.created_at,
+              "updatedAt": episode.updated_at,
+            })
+        })
+        .collect::<Vec<_>>();
+    let (characters, locations) = load_project_assets_payload(&state, &novel_data.id).await?;
+    let capability_overrides =
+        parse_json_value(novel_data.capability_overrides.as_deref()).unwrap_or_else(|| json!({}));
 
     Ok(Json(json!({
       "project": {
@@ -393,19 +745,33 @@ pub async fn data(
         "createdAt": project.created_at,
         "updatedAt": project.updated_at,
         "lastAccessedAt": project.last_accessed_at,
-        "novelPromotionData": novel_data.map(|row| {
-          json!({
-            "id": row.0,
-            "projectId": row.1,
-            "analysisModel": row.2,
-            "imageModel": row.3,
-            "videoModel": row.4,
-            "videoRatio": row.5,
-            "artStyle": row.6,
-            "ttsRate": row.7,
-            "episodes": episodes,
-          })
-        })
+        "novelPromotionData": {
+          "id": novel_data.id,
+          "projectId": novel_data.project_id,
+          "analysisModel": novel_data.analysis_model,
+          "imageModel": novel_data.image_model,
+          "videoModel": novel_data.video_model,
+          "videoRatio": novel_data.video_ratio,
+          "ttsRate": novel_data.tts_rate,
+          "globalAssetText": novel_data.global_asset_text,
+          "artStyle": novel_data.art_style,
+          "artStylePrompt": novel_data.art_style_prompt,
+          "characterModel": novel_data.character_model,
+          "locationModel": novel_data.location_model,
+          "storyboardModel": novel_data.storyboard_model,
+          "editModel": novel_data.edit_model,
+          "videoResolution": novel_data.video_resolution,
+          "workflowMode": novel_data.workflow_mode,
+          "lastEpisodeId": novel_data.last_episode_id,
+          "imageResolution": novel_data.image_resolution,
+          "importStatus": novel_data.import_status,
+          "capabilityOverrides": capability_overrides,
+          "episodes": episodes,
+          "characters": characters,
+          "locations": locations,
+          "createdAt": novel_data.created_at,
+          "updatedAt": novel_data.updated_at,
+        }
       }
     })))
 }

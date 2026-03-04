@@ -45,6 +45,9 @@ export function useTaskSse({ projectId, episodeId, enabled = true }: UseTaskSseO
           if (episodeId) {
             queryClient.invalidateQueries({ queryKey: queryKeys.novel.episode(projectId, episodeId) });
             queryClient.invalidateQueries({ queryKey: queryKeys.novel.storyboards(projectId, episodeId) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.novel.voiceLines(projectId, episodeId) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.novel.videoUrls(projectId, episodeId) });
+            queryClient.invalidateQueries({ queryKey: queryKeys.novel.editor(projectId, episodeId) });
           }
           if (projectId === 'global-asset-hub') {
             queryClient.invalidateQueries({ queryKey: queryKeys.assetHub.folders() });

@@ -167,6 +167,7 @@
   - `crates/worker/src/dispatcher.rs`：消费/持久化错误不再导致 worker 主循环退出（避免 `1213 deadlock` 直接中断进程）
   - `scripts/worker-runtime-smoke.mjs`：兼容 Rust 任务事件的 `snake_case` 字段读取
   - `crates/core/src/config/mod.rs`：`CORS_ALLOW_ORIGIN` 支持逗号字符串反序列化
+  - `crates/core/src/generators/mod.rs`：新增 Ark/Google/Minimax/Vidu/OpenAI-Compatible 视频生成器、Google Imagen + Gemini Batch + Ark Seedream 图片生成器、Vidu Lip Sync，并统一引入轮询超时 + 重试退避策略
   - `crates/server/src/middleware/cors.rs`：按 credentials 场景修正 CORS 头（显式 allow-headers + allow-credentials）
   - `frontend/src`：清理误提交的 `.js` 产物文件，避免覆盖同名 `.ts/.tsx` 模块
 - `cd frontend && npm run build` → Vite 构建通过（`dist/` 产物生成）

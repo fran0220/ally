@@ -1,7 +1,7 @@
-import { type FormEvent, useMemo, useState } from 'react';
+import { type FormEvent, type KeyboardEvent, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import {
   type ProjectSummary,
@@ -36,6 +36,7 @@ const EMPTY_FORM: ProjectFormState = { name: '', description: '' };
 export function WorkspaceList() {
   const { t } = useTranslation(['workspace', 'common']);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const [page, setPage] = useState(1);
   const [searchInput, setSearchInput] = useState('');
@@ -129,6 +130,21 @@ export function WorkspaceList() {
     });
   }
 
+  function openProject(projectId: string) {
+    navigate(`/workspace/${projectId}`);
+  }
+
+  function handleProjectCardKeyDown(event: KeyboardEvent<HTMLDivElement>, projectId: string) {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      openProject(projectId);
+    }
+  }
+
   return (
     <main className="page-shell py-8 md:py-10">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
@@ -199,17 +215,39 @@ export function WorkspaceList() {
               </div>
             ))
           : projects.map((project) => (
-              <GlassSurface key={project.id} className="min-h-48" interactive>
+              <GlassSurface
+                key={project.id}
+                className="min-h-48 cursor-pointer"
+                interactive
+                role="link"
+                tabIndex={0}
+                onClick={() => openProject(project.id)}
+                onKeyDown={(event) => handleProjectCardKeyDown(event, project.id)}
+              >
                 <div className="flex h-full flex-col">
                   <div className="mb-3 flex items-start justify-between gap-3">
-                    <Link className="text-lg font-semibold text-[var(--glass-text-primary)] hover:text-[var(--glass-tone-info-fg)]" to={`/workspace/${project.id}`}>
+                    <span className="text-lg font-semibold text-[var(--glass-text-primary)]">
                       {project.name}
-                    </Link>
+                    </span>
                     <div className="flex gap-1">
-                      <GlassButton variant="ghost" size="sm" onClick={() => openEditModal(project)}>
+                      <GlassButton
+                        variant="ghost"
+                        size="sm"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openEditModal(project);
+                        }}
+                      >
                         {t('common:edit')}
                       </GlassButton>
-                      <GlassButton variant="danger" size="sm" onClick={() => setDeleteTarget(project)}>
+                      <GlassButton
+                        variant="danger"
+                        size="sm"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setDeleteTarget(project);
+                        }}
+                      >
                         {t('common:delete')}
                       </GlassButton>
                     </div>

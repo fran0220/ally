@@ -1,5 +1,6 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3001';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 const AUTH_TOKEN_STORAGE_KEY = 'waoowaoo.auth_token';
+const AUTH_TOKEN_CHANGE_EVENT = 'waoowaoo:auth-token-changed';
 
 let authTokenCache: string | null = null;
 let authTokenLoaded = false;
@@ -35,23 +36,63 @@ function readAuthToken(): string | null {
   return authTokenCache;
 }
 
+function emitAuthTokenChanged(): void {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(AUTH_TOKEN_CHANGE_EVENT));
+  }
+}
+
+export function hasAuthToken(): boolean {
+  return readAuthToken() !== null;
+}
+
+export function getAuthToken(): string | null {
+  return readAuthToken();
+}
+
+export function subscribeAuthToken(listener: () => void): () => void {
+  if (typeof window === 'undefined') {
+    return () => {
+      // no-op in non-browser runtimes
+    };
+  }
+
+  const onTokenChanged = () => {
+    authTokenLoaded = false;
+    listener();
+  };
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === AUTH_TOKEN_STORAGE_KEY) {
+      onTokenChanged();
+    }
+  };
+
+  window.addEventListener(AUTH_TOKEN_CHANGE_EVENT, onTokenChanged);
+  window.addEventListener('storage', onStorage);
+
+  return () => {
+    window.removeEventListener(AUTH_TOKEN_CHANGE_EVENT, onTokenChanged);
+    window.removeEventListener('storage', onStorage);
+  };
+}
+
 export function setAuthToken(token: string | null): void {
   authTokenCache = normalizeToken(token);
   authTokenLoaded = true;
 
-  if (!canUseStorage()) {
-    return;
+  if (canUseStorage()) {
+    try {
+      if (authTokenCache) {
+        window.localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, authTokenCache);
+      } else {
+        window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+      }
+    } catch {
+      // Storage can fail in privacy modes; keep in-memory token as the fallback.
+    }
   }
 
-  try {
-    if (authTokenCache) {
-      window.localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, authTokenCache);
-    } else {
-      window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
-    }
-  } catch {
-    // Storage can fail in privacy modes; keep in-memory token as the fallback.
-  }
+  emitAuthTokenChanged();
 }
 
 export class ApiClientError extends Error {
@@ -95,9 +136,22 @@ function resolveErrorMessage(status: number, payload: unknown): string {
   return `API request failed: ${status}`;
 }
 
-export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+function hasScheme(value: string): boolean {
+  return /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(value);
+}
+
+function shouldSetJsonContentType(init: RequestInit): boolean {
+  return Boolean(init.body) && !(init.body instanceof FormData);
+}
+
+export function resolveApiUrl(path: string): string {
+  return hasScheme(path) ? path : `${API_BASE_URL}${path}`;
+}
+
+export function buildAuthHeaders(init: RequestInit = {}): Headers {
   const headers = new Headers(init.headers ?? undefined);
-  if (!headers.has('Content-Type') && init.body && !(init.body instanceof FormData)) {
+
+  if (!headers.has('Content-Type') && shouldSetJsonContentType(init)) {
     headers.set('Content-Type', 'application/json');
   }
 
@@ -108,16 +162,30 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
     }
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    credentials: 'include',
-    headers,
+  return headers;
+}
+
+export async function fetchWithAuth(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
+  const headers = buildAuthHeaders(init);
+  const resolvedInput = typeof input === 'string' && !hasScheme(input) ? resolveApiUrl(input) : input;
+
+  return fetch(resolvedInput, {
     ...init,
+    credentials: init.credentials ?? 'include',
+    headers,
   });
+}
+
+export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const response = await fetchWithAuth(path, init);
 
   const rawText = await response.text();
   const payload = parseResponsePayload(response, rawText);
 
   if (!response.ok) {
+    if (response.status === 401) {
+      setAuthToken(null);
+    }
     throw new ApiClientError(resolveErrorMessage(response.status, payload), response.status, payload);
   }
 

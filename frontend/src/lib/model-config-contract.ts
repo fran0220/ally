@@ -2,6 +2,12 @@ export type CapabilityValue = string | number | boolean;
 
 export type CapabilitySelections = Record<string, Record<string, CapabilityValue>>;
 
+export interface CapabilityFieldI18n {
+  labelKey?: string;
+  unitKey?: string;
+  optionLabelKeys?: Record<string, string>;
+}
+
 export interface LLMCapabilities {
   reasoningEffortOptions?: string[];
 }
@@ -16,6 +22,7 @@ export interface VideoCapabilities {
   durationOptions?: number[];
   fpsOptions?: number[];
   resolutionOptions?: string[];
+  fieldI18n?: Record<string, CapabilityFieldI18n>;
   firstlastframe?: boolean;
   supportGenerateAudio?: boolean;
 }

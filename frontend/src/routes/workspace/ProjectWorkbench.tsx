@@ -5,6 +5,9 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 
 import {
   createEpisode,
+  downloadProjectImagesZip,
+  downloadProjectVideosZip,
+  downloadProjectVoicesZip,
   deleteEpisode,
   getEditorProject,
   getEpisode,
@@ -13,6 +16,7 @@ import {
   listVideoUrls,
   listVoiceLines,
   saveEditorProject,
+  splitEpisodesByMarkers,
   updateEpisode,
 } from '../../api/novel';
 import { listTasks } from '../../api/tasks';
@@ -98,6 +102,17 @@ function stageLabel(stage: StageId): string {
   return '1. Config';
 }
 
+function triggerZipDownload(blob: Blob, fileName: string): void {
+  const objectUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = objectUrl;
+  anchor.download = fileName;
+  anchor.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(objectUrl);
+  }, 500);
+}
+
 export function ProjectWorkbench() {
   const { t } = useTranslation(['workspaceDetail', 'common']);
   const queryClient = useQueryClient();
@@ -111,6 +126,8 @@ export function ProjectWorkbench() {
   const [renameEpisodeName, setRenameEpisodeName] = useState('');
   const [deleteEpisodeTarget, setDeleteEpisodeTarget] = useState<{ id: string; name: string } | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+  const [smartImportText, setSmartImportText] = useState('');
+  const [smartImportError, setSmartImportError] = useState<string | null>(null);
 
   if (!projectId) {
     return (
@@ -258,6 +275,37 @@ export function ProjectWorkbench() {
     },
   });
 
+  const smartImportMutation = useMutation({
+    mutationFn: (content: string) => splitEpisodesByMarkers(projectId, content),
+    onSuccess: async (result) => {
+      setSmartImportError(null);
+      setSmartImportText('');
+      await queryClient.invalidateQueries({ queryKey: queryKeys.novel.root(projectId) });
+      const firstEpisodeId = result.episodes?.[0]?.id ?? null;
+      if (firstEpisodeId) {
+        updateUrl({ stage: 'config', episode: firstEpisodeId });
+      }
+    },
+    onError: (error) => {
+      setSmartImportError(error instanceof Error ? error.message : 'Smart import failed.');
+    },
+  });
+
+  const downloadImagesMutation = useMutation({
+    mutationFn: () => downloadProjectImagesZip(projectId, selectedEpisodeId ?? undefined),
+    onSuccess: (blob) => triggerZipDownload(blob, `${projectId}_images.zip`),
+  });
+
+  const downloadVideosMutation = useMutation({
+    mutationFn: () => downloadProjectVideosZip(projectId, { episodeId: selectedEpisodeId ?? undefined }),
+    onSuccess: (blob) => triggerZipDownload(blob, `${projectId}_videos.zip`),
+  });
+
+  const downloadVoicesMutation = useMutation({
+    mutationFn: () => downloadProjectVoicesZip(projectId, selectedEpisodeId ?? undefined),
+    onSuccess: (blob) => triggerZipDownload(blob, `${projectId}_voices.zip`),
+  });
+
   const { connected, events } = useTaskSse({ projectId, episodeId: selectedEpisodeId, enabled: true });
 
   const selectedEpisode = episodeQuery.data?.episode;
@@ -332,6 +380,53 @@ export function ProjectWorkbench() {
         </GlassSurface>
       ) : null}
 
+      {episodes.length === 0 ? (
+        <GlassSurface className="space-y-4 p-6">
+          <h2 className="text-lg font-semibold">Smart Import</h2>
+          <p className="text-sm text-[var(--glass-text-secondary)]">
+            Paste full novel content and split episodes automatically, or create the first episode manually.
+          </p>
+          <GlassTextarea
+            rows={12}
+            value={smartImportText}
+            onChange={(event) => setSmartImportText(event.target.value)}
+            placeholder="Paste the full story text here..."
+          />
+          {smartImportError ? (
+            <p className="text-sm text-[var(--glass-tone-danger-fg)]">{smartImportError}</p>
+          ) : null}
+          <div className="flex flex-wrap gap-2">
+            <GlassButton
+              variant="primary"
+              loading={smartImportMutation.isPending}
+              onClick={() => {
+                const trimmed = smartImportText.trim();
+                if (!trimmed) {
+                  setSmartImportError('Please paste content before importing.');
+                  return;
+                }
+                smartImportMutation.mutate(trimmed);
+              }}
+            >
+              Split by Markers
+            </GlassButton>
+            <GlassButton
+              variant="soft"
+              loading={episodeCreateMutation.isPending}
+              onClick={() => {
+                episodeCreateMutation.mutate({
+                  name: 'Episode 1',
+                  novelText: '',
+                });
+              }}
+            >
+              Manual Create Episode
+            </GlassButton>
+          </div>
+        </GlassSurface>
+      ) : null}
+
+      {episodes.length > 0 ? (
       <div className="grid gap-4 xl:grid-cols-[280px_minmax(0,1fr)]">
         <GlassSurface>
           <div className="mb-3 flex items-center justify-between">
@@ -471,7 +566,19 @@ export function ProjectWorkbench() {
 
           {currentStage === 'storyboard' ? (
             <GlassSurface>
-              <h3 className="mb-3 text-base font-semibold">Stage: Storyboard</h3>
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <h3 className="text-base font-semibold">Stage: Storyboard</h3>
+                <GlassButton
+                  size="sm"
+                  variant="soft"
+                  loading={downloadImagesMutation.isPending}
+                  onClick={() => {
+                    downloadImagesMutation.mutate();
+                  }}
+                >
+                  Download Images ZIP
+                </GlassButton>
+              </div>
               <div className="space-y-2">
                 {(storyboardsQuery.data?.storyboards ?? []).map((item) => {
                   const row = asRecord(item);
@@ -519,7 +626,19 @@ export function ProjectWorkbench() {
 
           {currentStage === 'videos' ? (
             <GlassSurface>
-              <h3 className="mb-3 text-base font-semibold">Stage: Videos</h3>
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <h3 className="text-base font-semibold">Stage: Videos</h3>
+                <GlassButton
+                  size="sm"
+                  variant="soft"
+                  loading={downloadVideosMutation.isPending}
+                  onClick={() => {
+                    downloadVideosMutation.mutate();
+                  }}
+                >
+                  Download Videos ZIP
+                </GlassButton>
+              </div>
               <div className="space-y-2">
                 {(videoUrlsQuery.data?.videos ?? []).map((video) => (
                   <article key={video.panelId} className="glass-list-row">
@@ -538,7 +657,19 @@ export function ProjectWorkbench() {
 
           {currentStage === 'voice' ? (
             <GlassSurface>
-              <h3 className="mb-3 text-base font-semibold">Stage: Voice</h3>
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <h3 className="text-base font-semibold">Stage: Voice</h3>
+                <GlassButton
+                  size="sm"
+                  variant="soft"
+                  loading={downloadVoicesMutation.isPending}
+                  onClick={() => {
+                    downloadVoicesMutation.mutate();
+                  }}
+                >
+                  Download Voices ZIP
+                </GlassButton>
+              </div>
               <div className="space-y-2">
                 {(voiceLinesQuery.data?.voiceLines ?? []).map((line) => (
                   <article key={line.id} className="glass-list-row flex-col items-stretch gap-1">
@@ -592,6 +723,7 @@ export function ProjectWorkbench() {
           </GlassSurface>
         </div>
       </div>
+      ) : null}
 
       <GlassModalShell
         open={episodeModalOpen}

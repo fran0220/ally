@@ -20,6 +20,7 @@ pub struct WorkerTask {
     pub attempt: i32,
     pub max_attempts: i32,
     pub payload: Value,
+    pub billing_info: Option<Value>,
 }
 
 #[derive(Debug, sqlx::FromRow)]
@@ -41,6 +42,8 @@ struct TaskClaimRow {
     #[sqlx(rename = "maxAttempts")]
     max_attempts: i32,
     payload: Option<sqlx::types::Json<Value>>,
+    #[sqlx(rename = "billingInfo")]
+    billing_info: Option<sqlx::types::Json<Value>>,
 }
 
 fn queue_task_types(queue: &str) -> &'static [&'static str] {
@@ -101,7 +104,7 @@ pub async fn consume_next(
     let mut tx = mysql.begin().await?;
 
     let mut qb: QueryBuilder<'_, MySql> = QueryBuilder::new(
-        "SELECT id, userId, projectId, episodeId, type, targetType, targetId, attempt, maxAttempts, payload FROM tasks WHERE status = 'queued' AND attempt < maxAttempts AND type IN (",
+        "SELECT id, userId, projectId, episodeId, type, targetType, targetId, attempt, maxAttempts, payload, billingInfo FROM tasks WHERE status = 'queued' AND attempt < maxAttempts AND type IN (",
     );
     let mut separated = qb.separated(",");
     for task_type in types {
@@ -167,5 +170,6 @@ pub async fn consume_next(
         attempt: claimed_attempt,
         max_attempts,
         payload: row.payload.map(|item| item.0).unwrap_or_else(|| json!({})),
+        billing_info: row.billing_info.map(|item| item.0),
     }))
 }

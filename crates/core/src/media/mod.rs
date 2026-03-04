@@ -1,5 +1,11 @@
 use std::{env, path::PathBuf};
 
+use aws_credential_types::{Credentials, provider::SharedCredentialsProvider};
+use aws_sdk_s3::{
+    Client as S3Client,
+    config::{Builder as S3ConfigBuilder, Region},
+    primitives::ByteStream,
+};
 use base64::{Engine as _, engine::general_purpose::STANDARD};
 use tokio::fs;
 use uuid::Uuid;
@@ -36,6 +42,41 @@ fn normalize_storage_key(key: &str) -> String {
     key.trim_start_matches('/').trim().to_string()
 }
 
+fn encode_storage_key(key: &str) -> String {
+    key.trim_matches('/')
+        .split('/')
+        .filter(|part| !part.is_empty())
+        .map(urlencoding::encode)
+        .collect::<Vec<_>>()
+        .join("/")
+}
+
+fn cos_public_url_for_key(key: &str) -> Option<String> {
+    let encoded = encode_storage_key(key);
+    if encoded.is_empty() {
+        return None;
+    }
+
+    if let Ok(base_url) = env::var("COS_PUBLIC_BASE_URL") {
+        let normalized = base_url.trim().trim_end_matches('/');
+        if !normalized.is_empty() {
+            return Some(format!("{normalized}/{encoded}"));
+        }
+    }
+
+    if let (Ok(bucket), Ok(region)) = (env::var("COS_BUCKET"), env::var("COS_REGION")) {
+        let bucket = bucket.trim();
+        let region = region.trim();
+        if !bucket.is_empty() && !region.is_empty() {
+            return Some(format!(
+                "https://{bucket}.cos.{region}.myqcloud.com/{encoded}"
+            ));
+        }
+    }
+
+    None
+}
+
 fn content_type_to_extension(content_type: &str) -> &'static str {
     match content_type.to_ascii_lowercase().as_str() {
         "image/jpeg" | "image/jpg" => "jpg",
@@ -70,6 +111,10 @@ pub fn to_fetchable_url(input_url: &str) -> String {
 
     if storage_type() == "local" {
         return format!("{}/api/files/{}", app_base_url(), trimmed);
+    }
+
+    if let Some(url) = cos_public_url_for_key(trimmed) {
+        return url;
     }
 
     trimmed.to_string()
@@ -170,26 +215,75 @@ pub async fn upload_bytes_to_storage(key: &str, bytes: &[u8]) -> Result<String, 
         return Err(AppError::invalid_params("storage key cannot be empty"));
     }
 
-    if storage_type() != "local" {
-        return Err(AppError::internal(
-            "only local storage mode is currently supported by rust worker",
-        ));
+    let storage = storage_type();
+
+    if storage == "local" {
+        let root = upload_dir();
+        let file_path = root.join(&storage_key);
+        let parent = file_path
+            .parent()
+            .ok_or_else(|| AppError::internal("invalid storage path"))?;
+
+        fs::create_dir_all(parent).await.map_err(|err| {
+            AppError::internal(format!("failed to create upload directory: {err}"))
+        })?;
+        fs::write(&file_path, bytes)
+            .await
+            .map_err(|err| AppError::internal(format!("failed to write upload file: {err}")))?;
+
+        return Ok(storage_key);
     }
 
-    let root = upload_dir();
-    let file_path = root.join(&storage_key);
-    let parent = file_path
-        .parent()
-        .ok_or_else(|| AppError::internal("invalid storage path"))?;
+    if storage == "cos" {
+        let secret_id = env::var("COS_SECRET_ID")
+            .ok()
+            .map(|value| value.trim().to_string())
+            .filter(|value| !value.is_empty())
+            .ok_or_else(|| AppError::internal("COS_SECRET_ID is required in cos mode"))?;
+        let secret_key = env::var("COS_SECRET_KEY")
+            .ok()
+            .map(|value| value.trim().to_string())
+            .filter(|value| !value.is_empty())
+            .ok_or_else(|| AppError::internal("COS_SECRET_KEY is required in cos mode"))?;
+        let bucket = env::var("COS_BUCKET")
+            .ok()
+            .map(|value| value.trim().to_string())
+            .filter(|value| !value.is_empty())
+            .ok_or_else(|| AppError::internal("COS_BUCKET is required in cos mode"))?;
+        let region = env::var("COS_REGION")
+            .ok()
+            .map(|value| value.trim().to_string())
+            .filter(|value| !value.is_empty())
+            .ok_or_else(|| AppError::internal("COS_REGION is required in cos mode"))?;
+        let endpoint = env::var("COS_S3_ENDPOINT")
+            .ok()
+            .map(|value| value.trim().to_string())
+            .filter(|value| !value.is_empty())
+            .unwrap_or_else(|| format!("https://{bucket}.cos.{region}.myqcloud.com"));
 
-    fs::create_dir_all(parent)
-        .await
-        .map_err(|err| AppError::internal(format!("failed to create upload directory: {err}")))?;
-    fs::write(&file_path, bytes)
-        .await
-        .map_err(|err| AppError::internal(format!("failed to write upload file: {err}")))?;
+        let credentials = Credentials::new(secret_id, secret_key, None, None, "cos-env");
+        let config = S3ConfigBuilder::new()
+            .region(Region::new(region))
+            .endpoint_url(endpoint)
+            .credentials_provider(SharedCredentialsProvider::new(credentials))
+            .force_path_style(false)
+            .build();
+        let client = S3Client::from_conf(config);
+        client
+            .put_object()
+            .bucket(bucket)
+            .key(&storage_key)
+            .body(ByteStream::from(bytes.to_vec()))
+            .send()
+            .await
+            .map_err(|err| AppError::internal(format!("failed to upload object to COS: {err}")))?;
 
-    Ok(storage_key)
+        return Ok(storage_key);
+    }
+
+    Err(AppError::internal(format!(
+        "unsupported storage type: {storage}"
+    )))
 }
 
 pub async fn upload_source_to_storage(

@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { login } from '../../api/auth';
 import { GlassButton, GlassField, GlassInput, GlassSurface } from '../../components/ui/primitives';
@@ -8,10 +8,16 @@ import { GlassButton, GlassField, GlassInput, GlassSurface } from '../../compone
 export function SignIn() {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
+  const location = useLocation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const fromPath = (() => {
+    const state = location.state as { from?: unknown } | null;
+    return typeof state?.from === 'string' && state.from.startsWith('/') ? state.from : '/workspace';
+  })();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -19,7 +25,7 @@ export function SignIn() {
     setError(null);
     try {
       await login(username, password);
-      navigate('/workspace');
+      navigate(fromPath, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {

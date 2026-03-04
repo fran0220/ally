@@ -12,6 +12,10 @@ use serde_json::{Map, Value, json};
 use sqlx::MySqlPool;
 use uuid::Uuid;
 use waoowaoo_core::{
+    billing::{
+        BillingStatus, TaskBillingInfo, parse_task_billing_info, rollback_task_billing,
+        serialize_task_billing_info, settle_task_billing,
+    },
     errors::AppError,
     runtime::{
         publisher::{
@@ -188,6 +192,16 @@ impl TaskContext {
         self.queue.as_ref()
     }
 
+    fn task_billing_info(&self) -> Result<Option<TaskBillingInfo>, AppError> {
+        parse_task_billing_info(self.task.billing_info.clone())
+    }
+
+    fn billing_info_bind(
+        info: Option<&TaskBillingInfo>,
+    ) -> Result<Option<sqlx::types::Json<Value>>, AppError> {
+        Ok(serialize_task_billing_info(info)?.map(sqlx::types::Json))
+    }
+
     pub fn should_retry(&self, error: &AppError) -> bool {
         error.code.spec().retryable && self.task.attempt < self.task.max_attempts
     }
@@ -253,10 +267,34 @@ impl TaskContext {
     }
 
     pub async fn mark_completed(&self, result: &Value) -> Result<bool, AppError> {
+        let current_billing = self.task_billing_info()?;
+        let settled_billing = match settle_task_billing(
+            &self.mysql,
+            &self.task.task_id,
+            &self.task.user_id,
+            &self.task.project_id,
+            self.task.episode_id.as_deref(),
+            current_billing.as_ref(),
+        )
+        .await
+        {
+            Ok(value) => value,
+            Err(error) => {
+                let _ = self.mark_failed(&error).await?;
+                return Ok(false);
+            }
+        };
+        let billed = settled_billing
+            .as_ref()
+            .is_some_and(|info| info.billable && info.status == Some(BillingStatus::Settled));
+        let billing_info = Self::billing_info_bind(settled_billing.as_ref())?;
+
         let updated = sqlx::query(
-            "UPDATE tasks SET status = 'completed', progress = 100, result = ?, errorCode = NULL, errorMessage = NULL, dedupeKey = NULL, finishedAt = NOW(3), heartbeatAt = NULL, updatedAt = NOW(3) WHERE id = ? AND status = 'processing'",
+            "UPDATE tasks SET status = 'completed', progress = 100, result = ?, errorCode = NULL, errorMessage = NULL, billingInfo = ?, billedAt = CASE WHEN ? THEN COALESCE(billedAt, NOW(3)) ELSE billedAt END, dedupeKey = NULL, finishedAt = NOW(3), heartbeatAt = NULL, updatedAt = NOW(3) WHERE id = ? AND status = 'processing'",
         )
         .bind(sqlx::types::Json(result.clone()))
+        .bind(billing_info)
+        .bind(billed)
         .bind(&self.task.task_id)
         .execute(&self.mysql)
         .await?;
@@ -277,13 +315,28 @@ impl TaskContext {
 
     pub async fn mark_failed(&self, error: &AppError) -> Result<bool, AppError> {
         let code = error.code.as_str().to_string();
-        let message = error.message.clone();
+        let mut message = error.message.clone();
+
+        let current_billing = self.task_billing_info()?;
+        let next_billing = match rollback_task_billing(&self.mysql, current_billing.as_ref()).await
+        {
+            Ok(value) => value,
+            Err(rollback_error) => {
+                message = format!("{}; billing rollback failed: {}", message, rollback_error);
+                current_billing.map(|mut info| {
+                    info.status = Some(BillingStatus::Failed);
+                    info
+                })
+            }
+        };
+        let billing_info = Self::billing_info_bind(next_billing.as_ref())?;
 
         let updated = sqlx::query(
-            "UPDATE tasks SET status = 'failed', errorCode = ?, errorMessage = ?, dedupeKey = NULL, finishedAt = NOW(3), heartbeatAt = NULL, updatedAt = NOW(3) WHERE id = ? AND status = 'processing'",
+            "UPDATE tasks SET status = 'failed', errorCode = ?, errorMessage = ?, billingInfo = ?, dedupeKey = NULL, finishedAt = NOW(3), heartbeatAt = NULL, updatedAt = NOW(3) WHERE id = ? AND status = 'processing'",
         )
         .bind(&code)
         .bind(&message)
+        .bind(billing_info)
         .bind(&self.task.task_id)
         .execute(&self.mysql)
         .await?;

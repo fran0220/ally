@@ -3,20 +3,41 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
+import { apiRequest } from '../../api/client';
 import {
+  type AssetCharacter,
+  type AssetLocation,
+  bindCharacterVoice,
   createAssetCharacter,
   createAssetFolder,
   createAssetLocation,
   createAssetVoice,
+  deleteAssetCharacter,
   deleteAssetFolder,
+  deleteAssetLocation,
+  deleteAssetVoice,
   listAssetCharacters,
   listAssetFolders,
   listAssetLocations,
   listAssetVoices,
+  updateAssetCharacter,
+  updateAssetCharacterAppearance,
+  updateAssetFolder,
+  updateAssetLocation,
 } from '../../api/asset-hub';
+import { MediaImageWithLoading } from '../../components/media';
+import { ImagePreviewModal } from '../../components/ui/ImagePreviewModal';
+import {
+  GlassButton,
+  GlassChip,
+  GlassField,
+  GlassInput,
+  GlassModalShell,
+  GlassSurface,
+  GlassTextarea,
+} from '../../components/ui/primitives';
 import { useTaskSse } from '../../hooks/use-task-sse';
 import { queryKeys } from '../../lib/query-keys';
-import { GlassButton, GlassField, GlassModalShell, GlassSurface, GlassInput, GlassTextarea, GlassChip } from '../../components/ui/primitives';
 
 interface FolderFormState {
   name: string;
@@ -27,11 +48,50 @@ interface AssetFormState {
   description: string;
 }
 
+interface CharacterEditState {
+  characterId: string;
+  appearanceIndex: number;
+  name: string;
+  description: string;
+  originalName: string;
+  originalDescription: string;
+}
+
+interface LocationEditState {
+  locationId: string;
+  name: string;
+  summary: string;
+  originalName: string;
+  originalSummary: string;
+}
+
+interface VoiceBindState {
+  characterId: string;
+  characterName: string;
+  selectedVoiceId: string;
+}
+
 const EMPTY_FOLDER: FolderFormState = { name: '' };
 const EMPTY_ASSET: AssetFormState = { name: '', description: '' };
 
+function getCharacterPreview(character: AssetCharacter): string | null {
+  const appearance = character.appearances[0];
+  if (!appearance) {
+    return null;
+  }
+  if (appearance.selectedIndex !== null && appearance.selectedIndex >= 0) {
+    return appearance.imageUrls[appearance.selectedIndex] ?? appearance.imageUrl ?? null;
+  }
+  return appearance.imageUrl ?? appearance.imageUrls[0] ?? null;
+}
+
+function getLocationPreview(location: AssetLocation): string | null {
+  const selected = location.images.find((image) => image.isSelected);
+  return selected?.imageUrl ?? location.images[0]?.imageUrl ?? null;
+}
+
 export function AssetHub() {
-  const { t } = useTranslation('assetHub');
+  const { t } = useTranslation(['assetHub', 'common']);
   const queryClient = useQueryClient();
 
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
@@ -41,9 +101,17 @@ export function AssetHub() {
   const [voiceForm, setVoiceForm] = useState<AssetFormState>(EMPTY_ASSET);
 
   const [folderModalOpen, setFolderModalOpen] = useState(false);
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [characterModalOpen, setCharacterModalOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+  const [characterEdit, setCharacterEdit] = useState<CharacterEditState | null>(null);
+  const [locationEdit, setLocationEdit] = useState<LocationEditState | null>(null);
+  const [voiceBind, setVoiceBind] = useState<VoiceBindState | null>(null);
+  const [isCharacterSaving, setIsCharacterSaving] = useState(false);
+  const [isLocationSaving, setIsLocationSaving] = useState(false);
 
   const foldersQuery = useQuery({
     queryKey: queryKeys.assetHub.folders(),
@@ -61,19 +129,33 @@ export function AssetHub() {
     queryKey: queryKeys.assetHub.voices(selectedFolderId),
     queryFn: () => listAssetVoices(selectedFolderId),
   });
+  const allVoicesQuery = useQuery({
+    queryKey: queryKeys.assetHub.voices(null),
+    queryFn: () => listAssetVoices(null),
+  });
 
-  const folderMutation = useMutation({
+  const folderCreateMutation = useMutation({
     mutationFn: (name: string) => createAssetFolder(name),
     onSuccess: () => {
       setFolderModalOpen(false);
+      setEditingFolderId(null);
+      setFolderForm(EMPTY_FOLDER);
+      void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
+    },
+  });
+  const folderUpdateMutation = useMutation({
+    mutationFn: ({ folderId, name }: { folderId: string; name: string }) => updateAssetFolder(folderId, name),
+    onSuccess: () => {
+      setFolderModalOpen(false);
+      setEditingFolderId(null);
       setFolderForm(EMPTY_FOLDER);
       void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
     },
   });
   const folderDeleteMutation = useMutation({
     mutationFn: (folderId: string) => deleteAssetFolder(folderId),
-    onSuccess: () => {
-      if (selectedFolderId) {
+    onSuccess: (_, folderId) => {
+      if (selectedFolderId === folderId) {
         setSelectedFolderId(null);
       }
       void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
@@ -91,7 +173,7 @@ export function AssetHub() {
     onSuccess: () => {
       setCharacterModalOpen(false);
       setCharacterForm(EMPTY_ASSET);
-      void queryClient.invalidateQueries({ queryKey: ['asset-hub', 'characters'] });
+      void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
     },
   });
   const locationMutation = useMutation({
@@ -100,24 +182,67 @@ export function AssetHub() {
         name: locationForm.name.trim(),
         summary: locationForm.description.trim(),
         folderId: selectedFolderId,
+        description: locationForm.description.trim(),
       }),
     onSuccess: () => {
       setLocationModalOpen(false);
       setLocationForm(EMPTY_ASSET);
-      void queryClient.invalidateQueries({ queryKey: ['asset-hub', 'locations'] });
+      void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
     },
   });
-  const voiceMutation = useMutation({
+  const voiceCreateMutation = useMutation({
     mutationFn: () =>
       createAssetVoice({
         name: voiceForm.name.trim(),
-        description: voiceForm.description.trim(),
+        description: voiceForm.description.trim() || undefined,
         folderId: selectedFolderId,
       }),
     onSuccess: () => {
       setVoiceModalOpen(false);
       setVoiceForm(EMPTY_ASSET);
-      void queryClient.invalidateQueries({ queryKey: ['asset-hub', 'voices'] });
+      void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
+    },
+  });
+  const characterDeleteMutation = useMutation({
+    mutationFn: (characterId: string) => deleteAssetCharacter(characterId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
+    },
+  });
+  const locationDeleteMutation = useMutation({
+    mutationFn: (locationId: string) => deleteAssetLocation(locationId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
+    },
+  });
+  const voiceDeleteMutation = useMutation({
+    mutationFn: (voiceId: string) => deleteAssetVoice(voiceId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
+    },
+  });
+  const voiceBindMutation = useMutation({
+    mutationFn: async ({ characterId, voiceId }: { characterId: string; voiceId: string }) => {
+      const voice = (allVoicesQuery.data?.voices ?? []).find((item) => item.id === voiceId);
+      await bindCharacterVoice(characterId, {
+        globalVoiceId: voiceId || null,
+        customVoiceUrl: voice?.customVoiceUrl ?? null,
+        voiceType: voice?.voiceType ?? null,
+      });
+    },
+    onSuccess: () => {
+      setVoiceBind(null);
+      void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
+    },
+  });
+  const regenerateMutation = useMutation({
+    mutationFn: (payload: { type: 'character' | 'location'; id: string; appearanceIndex?: number }) =>
+      apiRequest<{ success: boolean; taskId?: string; async?: boolean }>('/api/asset-hub/generate-image', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
     },
   });
 
@@ -127,6 +252,7 @@ export function AssetHub() {
   const characters = charactersQuery.data?.characters ?? [];
   const locations = locationsQuery.data?.locations ?? [];
   const voices = voicesQuery.data?.voices ?? [];
+  const allVoices = allVoicesQuery.data?.voices ?? [];
 
   const activeFolderName = useMemo(() => {
     if (!selectedFolderId) {
@@ -135,12 +261,28 @@ export function AssetHub() {
     return folders.find((folder) => folder.id === selectedFolderId)?.name ?? t('allAssets');
   }, [folders, selectedFolderId, t]);
 
+  function openCreateFolderModal() {
+    setEditingFolderId(null);
+    setFolderForm(EMPTY_FOLDER);
+    setFolderModalOpen(true);
+  }
+
+  function openEditFolderModal(folder: { id: string; name: string }) {
+    setEditingFolderId(folder.id);
+    setFolderForm({ name: folder.name });
+    setFolderModalOpen(true);
+  }
+
   async function onCreateFolder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!folderForm.name.trim()) {
       return;
     }
-    await folderMutation.mutateAsync(folderForm.name.trim());
+    if (editingFolderId) {
+      await folderUpdateMutation.mutateAsync({ folderId: editingFolderId, name: folderForm.name.trim() });
+      return;
+    }
+    await folderCreateMutation.mutateAsync(folderForm.name.trim());
   }
 
   async function onCreateCharacter(event: FormEvent<HTMLFormElement>) {
@@ -164,7 +306,72 @@ export function AssetHub() {
     if (!voiceForm.name.trim()) {
       return;
     }
-    await voiceMutation.mutateAsync();
+    await voiceCreateMutation.mutateAsync();
+  }
+
+  async function submitCharacterEdit(regenerate: boolean) {
+    if (!characterEdit) {
+      return;
+    }
+    setIsCharacterSaving(true);
+    try {
+      const nextName = characterEdit.name.trim();
+      const nextDescription = characterEdit.description.trim();
+      if (!nextName || !nextDescription) {
+        return;
+      }
+
+      if (nextName !== characterEdit.originalName) {
+        await updateAssetCharacter(characterEdit.characterId, { name: nextName });
+      }
+      if (nextDescription !== characterEdit.originalDescription) {
+        await updateAssetCharacterAppearance(characterEdit.characterId, characterEdit.appearanceIndex, {
+          description: nextDescription,
+        });
+      }
+      if (regenerate) {
+        await regenerateMutation.mutateAsync({
+          type: 'character',
+          id: characterEdit.characterId,
+          appearanceIndex: characterEdit.appearanceIndex,
+        });
+      }
+      setCharacterEdit(null);
+      void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
+    } finally {
+      setIsCharacterSaving(false);
+    }
+  }
+
+  async function submitLocationEdit(regenerate: boolean) {
+    if (!locationEdit) {
+      return;
+    }
+    setIsLocationSaving(true);
+    try {
+      const nextName = locationEdit.name.trim();
+      const nextSummary = locationEdit.summary.trim();
+      if (!nextName || !nextSummary) {
+        return;
+      }
+
+      if (nextName !== locationEdit.originalName || nextSummary !== locationEdit.originalSummary) {
+        await updateAssetLocation(locationEdit.locationId, {
+          name: nextName,
+          summary: nextSummary,
+        });
+      }
+      if (regenerate) {
+        await regenerateMutation.mutateAsync({
+          type: 'location',
+          id: locationEdit.locationId,
+        });
+      }
+      setLocationEdit(null);
+      void queryClient.invalidateQueries({ queryKey: ['asset-hub'] });
+    } finally {
+      setIsLocationSaving(false);
+    }
   }
 
   return (
@@ -191,7 +398,7 @@ export function AssetHub() {
         <GlassSurface>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-[var(--glass-text-secondary)]">{t('folders')}</h2>
-            <GlassButton size="sm" variant="soft" onClick={() => setFolderModalOpen(true)}>
+            <GlassButton size="sm" variant="soft" onClick={openCreateFolderModal}>
               +
             </GlassButton>
           </div>
@@ -204,26 +411,28 @@ export function AssetHub() {
               <span>{t('allAssets')}</span>
             </button>
             {folders.map((folder) => (
-              <div key={folder.id} className="glass-list-row">
-                <button
-                  type="button"
-                  className="flex-1 text-left"
-                  onClick={() => setSelectedFolderId(folder.id)}
-                >
+              <div key={folder.id} className={`glass-list-row ${selectedFolderId === folder.id ? 'border-[var(--glass-stroke-focus)]' : ''}`}>
+                <button type="button" className="flex-1 text-left" onClick={() => setSelectedFolderId(folder.id)}>
                   {folder.name}
                 </button>
-                <GlassButton
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    if (window.confirm(t('confirmDeleteFolder'))) {
-                      folderDeleteMutation.mutate(folder.id);
-                    }
-                  }}
-                >
-                  x
-                </GlassButton>
+                <div className="flex items-center gap-1">
+                  <GlassButton type="button" variant="ghost" size="sm" onClick={() => openEditFolderModal(folder)}>
+                    {t('common:edit')}
+                  </GlassButton>
+                  <GlassButton
+                    type="button"
+                    variant="danger"
+                    size="sm"
+                    loading={folderDeleteMutation.isPending}
+                    onClick={() => {
+                      if (window.confirm(t('confirmDeleteFolder'))) {
+                        folderDeleteMutation.mutate(folder.id);
+                      }
+                    }}
+                  >
+                    {t('common:delete')}
+                  </GlassButton>
+                </div>
               </div>
             ))}
             {!foldersQuery.isLoading && folders.length === 0 ? (
@@ -270,15 +479,100 @@ export function AssetHub() {
 
           <GlassSurface>
             <h3 className="mb-3 text-sm font-semibold text-[var(--glass-text-secondary)]">{t('characters')}</h3>
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {characters.map((character) => (
-                <article key={character.id} className="glass-list-row flex-col items-start gap-1">
-                  <p className="text-sm font-semibold">{character.name}</p>
-                  <p className="text-xs text-[var(--glass-text-tertiary)]">
-                    {character.appearances.length} appearances
-                  </p>
-                </article>
-              ))}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {characters.map((character) => {
+                const appearance = character.appearances[0];
+                const preview = getCharacterPreview(character);
+                return (
+                  <article key={character.id} className="glass-list-row flex-col items-stretch gap-2 p-2">
+                    <button
+                      type="button"
+                      className="block w-full text-left"
+                      onClick={() => {
+                        if (preview) {
+                          setPreviewImageUrl(preview);
+                        }
+                      }}
+                    >
+                      <div className="mb-2 overflow-hidden rounded-lg bg-[var(--glass-bg-muted)]">
+                        {preview ? (
+                          <MediaImageWithLoading
+                            src={preview}
+                            alt={character.name}
+                            containerClassName="h-28 w-full"
+                            className="h-28 w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-28 items-center justify-center text-xs text-[var(--glass-text-tertiary)]">
+                            {t('emptyState')}
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm font-semibold">{character.name}</p>
+                      <p className="text-xs text-[var(--glass-text-tertiary)]">
+                        {character.appearances.length} appearances
+                      </p>
+                    </button>
+                    <div className="flex flex-wrap gap-1">
+                      <GlassButton
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setCharacterEdit({
+                            characterId: character.id,
+                            appearanceIndex: appearance?.appearanceIndex ?? 0,
+                            name: character.name,
+                            description: appearance?.description ?? '',
+                            originalName: character.name,
+                            originalDescription: appearance?.description ?? '',
+                          });
+                        }}
+                      >
+                        {t('common:edit')}
+                      </GlassButton>
+                      <GlassButton
+                        size="sm"
+                        variant="soft"
+                        onClick={() => {
+                          setVoiceBind({
+                            characterId: character.id,
+                            characterName: character.name,
+                            selectedVoiceId: character.globalVoiceId ?? '',
+                          });
+                        }}
+                      >
+                        {t('voicePickerTitle')}
+                      </GlassButton>
+                      <GlassButton
+                        size="sm"
+                        variant="soft"
+                        loading={regenerateMutation.isPending}
+                        onClick={() => {
+                          regenerateMutation.mutate({
+                            type: 'character',
+                            id: character.id,
+                            appearanceIndex: appearance?.appearanceIndex ?? 0,
+                          });
+                        }}
+                      >
+                        {t('regenerate')}
+                      </GlassButton>
+                      <GlassButton
+                        size="sm"
+                        variant="danger"
+                        loading={characterDeleteMutation.isPending}
+                        onClick={() => {
+                          if (window.confirm(t('confirmDeleteCharacter'))) {
+                            characterDeleteMutation.mutate(character.id);
+                          }
+                        }}
+                      >
+                        {t('common:delete')}
+                      </GlassButton>
+                    </div>
+                  </article>
+                );
+              })}
               {!charactersQuery.isLoading && characters.length === 0 ? (
                 <p className="text-xs text-[var(--glass-text-tertiary)]">{t('emptyState')}</p>
               ) : null}
@@ -287,13 +581,82 @@ export function AssetHub() {
 
           <GlassSurface>
             <h3 className="mb-3 text-sm font-semibold text-[var(--glass-text-secondary)]">{t('locations')}</h3>
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {locations.map((location) => (
-                <article key={location.id} className="glass-list-row flex-col items-start gap-1">
-                  <p className="text-sm font-semibold">{location.name}</p>
-                  <p className="text-xs text-[var(--glass-text-tertiary)]">{location.images.length} images</p>
-                </article>
-              ))}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {locations.map((location) => {
+                const preview = getLocationPreview(location);
+                return (
+                  <article key={location.id} className="glass-list-row flex-col items-stretch gap-2 p-2">
+                    <button
+                      type="button"
+                      className="block w-full text-left"
+                      onClick={() => {
+                        if (preview) {
+                          setPreviewImageUrl(preview);
+                        }
+                      }}
+                    >
+                      <div className="mb-2 overflow-hidden rounded-lg bg-[var(--glass-bg-muted)]">
+                        {preview ? (
+                          <MediaImageWithLoading
+                            src={preview}
+                            alt={location.name}
+                            containerClassName="h-28 w-full"
+                            className="h-28 w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-28 items-center justify-center text-xs text-[var(--glass-text-tertiary)]">
+                            {t('emptyState')}
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm font-semibold">{location.name}</p>
+                      <p className="text-xs text-[var(--glass-text-tertiary)]">{location.images.length} images</p>
+                    </button>
+                    <div className="flex flex-wrap gap-1">
+                      <GlassButton
+                        size="sm"
+                        variant="ghost"
+                        onClick={() =>
+                          setLocationEdit({
+                            locationId: location.id,
+                            name: location.name,
+                            summary: location.summary ?? '',
+                            originalName: location.name,
+                            originalSummary: location.summary ?? '',
+                          })
+                        }
+                      >
+                        {t('common:edit')}
+                      </GlassButton>
+                      <GlassButton
+                        size="sm"
+                        variant="soft"
+                        loading={regenerateMutation.isPending}
+                        onClick={() => {
+                          regenerateMutation.mutate({
+                            type: 'location',
+                            id: location.id,
+                          });
+                        }}
+                      >
+                        {t('regenerate')}
+                      </GlassButton>
+                      <GlassButton
+                        size="sm"
+                        variant="danger"
+                        loading={locationDeleteMutation.isPending}
+                        onClick={() => {
+                          if (window.confirm(t('confirmDeleteLocation'))) {
+                            locationDeleteMutation.mutate(location.id);
+                          }
+                        }}
+                      >
+                        {t('common:delete')}
+                      </GlassButton>
+                    </div>
+                  </article>
+                );
+              })}
               {!locationsQuery.isLoading && locations.length === 0 ? (
                 <p className="text-xs text-[var(--glass-text-tertiary)]">{t('emptyState')}</p>
               ) : null}
@@ -307,6 +670,20 @@ export function AssetHub() {
                 <article key={voice.id} className="glass-list-row flex-col items-start gap-1">
                   <p className="text-sm font-semibold">{voice.name}</p>
                   <p className="text-xs text-[var(--glass-text-tertiary)]">{voice.voiceType}</p>
+                  <div className="mt-2 flex gap-1">
+                    <GlassButton
+                      size="sm"
+                      variant="danger"
+                      loading={voiceDeleteMutation.isPending}
+                      onClick={() => {
+                        if (window.confirm(t('confirmDeleteVoice'))) {
+                          voiceDeleteMutation.mutate(voice.id);
+                        }
+                      }}
+                    >
+                      {t('common:delete')}
+                    </GlassButton>
+                  </div>
                 </article>
               ))}
               {!voicesQuery.isLoading && voices.length === 0 ? (
@@ -317,7 +694,16 @@ export function AssetHub() {
         </div>
       </div>
 
-      <GlassModalShell open={folderModalOpen} onClose={() => setFolderModalOpen(false)} title={t('newFolder')} size="sm">
+      <GlassModalShell
+        open={folderModalOpen}
+        onClose={() => {
+          setFolderModalOpen(false);
+          setEditingFolderId(null);
+          setFolderForm(EMPTY_FOLDER);
+        }}
+        title={editingFolderId ? t('editFolder') : t('newFolder')}
+        size="sm"
+      >
         <form className="space-y-4" onSubmit={onCreateFolder}>
           <GlassField id="folder-name" label={t('folderName')} required>
             <GlassInput
@@ -331,8 +717,12 @@ export function AssetHub() {
             <GlassButton type="button" variant="ghost" onClick={() => setFolderModalOpen(false)}>
               {t('cancel')}
             </GlassButton>
-            <GlassButton type="submit" variant="primary" loading={folderMutation.isPending}>
-              {t('create')}
+            <GlassButton
+              type="submit"
+              variant="primary"
+              loading={folderCreateMutation.isPending || folderUpdateMutation.isPending}
+            >
+              {editingFolderId ? t('save') : t('create')}
             </GlassButton>
           </div>
         </form>
@@ -408,7 +798,7 @@ export function AssetHub() {
               onChange={(event) => setVoiceForm((prev) => ({ ...prev, name: event.target.value }))}
             />
           </GlassField>
-          <GlassField id="voice-description" label={t('description')}>
+          <GlassField id="voice-description" label={t('modal.descLabel')}>
             <GlassTextarea
               id="voice-description"
               rows={3}
@@ -420,12 +810,211 @@ export function AssetHub() {
             <GlassButton type="button" variant="ghost" onClick={() => setVoiceModalOpen(false)}>
               {t('cancel')}
             </GlassButton>
-            <GlassButton type="submit" variant="primary" loading={voiceMutation.isPending}>
+            <GlassButton type="submit" variant="primary" loading={voiceCreateMutation.isPending}>
               {t('create')}
             </GlassButton>
           </div>
         </form>
       </GlassModalShell>
+
+      <GlassModalShell
+        open={characterEdit !== null}
+        onClose={() => setCharacterEdit(null)}
+        title={t('common:edit')}
+      >
+        {characterEdit ? (
+          <div className="space-y-4">
+            <GlassField id="character-edit-name" label={t('modal.nameLabel')} required>
+              <GlassInput
+                id="character-edit-name"
+                value={characterEdit.name}
+                onChange={(event) =>
+                  setCharacterEdit((previous) =>
+                    previous
+                      ? {
+                          ...previous,
+                          name: event.target.value,
+                        }
+                      : previous,
+                  )
+                }
+              />
+            </GlassField>
+            <GlassField id="character-edit-description" label={t('modal.descLabel')} required>
+              <GlassTextarea
+                id="character-edit-description"
+                rows={6}
+                value={characterEdit.description}
+                onChange={(event) =>
+                  setCharacterEdit((previous) =>
+                    previous
+                      ? {
+                          ...previous,
+                          description: event.target.value,
+                        }
+                      : previous,
+                  )
+                }
+              />
+            </GlassField>
+            <div className="flex justify-end gap-2">
+              <GlassButton type="button" variant="ghost" onClick={() => setCharacterEdit(null)}>
+                {t('cancel')}
+              </GlassButton>
+              <GlassButton
+                type="button"
+                variant="secondary"
+                loading={isCharacterSaving}
+                onClick={() => {
+                  void submitCharacterEdit(false);
+                }}
+              >
+                {t('save')}
+              </GlassButton>
+              <GlassButton
+                type="button"
+                variant="primary"
+                loading={isCharacterSaving}
+                onClick={() => {
+                  void submitCharacterEdit(true);
+                }}
+              >
+                {t('regenerate')}
+              </GlassButton>
+            </div>
+          </div>
+        ) : null}
+      </GlassModalShell>
+
+      <GlassModalShell
+        open={locationEdit !== null}
+        onClose={() => setLocationEdit(null)}
+        title={t('common:edit')}
+      >
+        {locationEdit ? (
+          <div className="space-y-4">
+            <GlassField id="location-edit-name" label={t('modal.locationNameLabel')} required>
+              <GlassInput
+                id="location-edit-name"
+                value={locationEdit.name}
+                onChange={(event) =>
+                  setLocationEdit((previous) =>
+                    previous
+                      ? {
+                          ...previous,
+                          name: event.target.value,
+                        }
+                      : previous,
+                  )
+                }
+              />
+            </GlassField>
+            <GlassField id="location-edit-summary" label={t('modal.locationSummaryLabel')} required>
+              <GlassTextarea
+                id="location-edit-summary"
+                rows={6}
+                value={locationEdit.summary}
+                onChange={(event) =>
+                  setLocationEdit((previous) =>
+                    previous
+                      ? {
+                          ...previous,
+                          summary: event.target.value,
+                        }
+                      : previous,
+                  )
+                }
+              />
+            </GlassField>
+            <div className="flex justify-end gap-2">
+              <GlassButton type="button" variant="ghost" onClick={() => setLocationEdit(null)}>
+                {t('cancel')}
+              </GlassButton>
+              <GlassButton
+                type="button"
+                variant="secondary"
+                loading={isLocationSaving}
+                onClick={() => {
+                  void submitLocationEdit(false);
+                }}
+              >
+                {t('save')}
+              </GlassButton>
+              <GlassButton
+                type="button"
+                variant="primary"
+                loading={isLocationSaving}
+                onClick={() => {
+                  void submitLocationEdit(true);
+                }}
+              >
+                {t('regenerate')}
+              </GlassButton>
+            </div>
+          </div>
+        ) : null}
+      </GlassModalShell>
+
+      <GlassModalShell
+        open={voiceBind !== null}
+        onClose={() => setVoiceBind(null)}
+        title={t('voicePickerTitle')}
+        size="sm"
+      >
+        {voiceBind ? (
+          <div className="space-y-4">
+            <p className="text-sm text-[var(--glass-text-secondary)]">{voiceBind.characterName}</p>
+            <GlassField id="voice-picker-select" label={t('voiceName')} required>
+              <select
+                id="voice-picker-select"
+                className="glass-input-base h-10 w-full px-3"
+                value={voiceBind.selectedVoiceId}
+                onChange={(event) =>
+                  setVoiceBind((previous) =>
+                    previous
+                      ? {
+                          ...previous,
+                          selectedVoiceId: event.target.value,
+                        }
+                      : previous,
+                  )
+                }
+              >
+                <option value="">{t('voicePickerEmpty')}</option>
+                {allVoices.map((voice) => (
+                  <option key={voice.id} value={voice.id}>
+                    {voice.name}
+                  </option>
+                ))}
+              </select>
+            </GlassField>
+            <div className="flex justify-end gap-2">
+              <GlassButton type="button" variant="ghost" onClick={() => setVoiceBind(null)}>
+                {t('cancel')}
+              </GlassButton>
+              <GlassButton
+                type="button"
+                variant="primary"
+                loading={voiceBindMutation.isPending}
+                disabled={!voiceBind.selectedVoiceId}
+                onClick={() => {
+                  if (!voiceBind.selectedVoiceId) {
+                    return;
+                  }
+                  voiceBindMutation.mutate({
+                    characterId: voiceBind.characterId,
+                    voiceId: voiceBind.selectedVoiceId,
+                  });
+                }}
+              >
+                {t('voicePickerConfirm')}
+              </GlassButton>
+            </div>
+          </div>
+        ) : null}
+      </GlassModalShell>
+
+      <ImagePreviewModal imageUrl={previewImageUrl} onClose={() => setPreviewImageUrl(null)} />
     </main>
   );
 }

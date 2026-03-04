@@ -12,6 +12,8 @@ export const queryKeys = {
     episode: (projectId: string, episodeId: string) => ['novel', 'episode', projectId, episodeId] as const,
     storyboards: (projectId: string, episodeId: string) =>
       ['novel', 'storyboards', projectId, episodeId] as const,
+    voiceLines: (projectId: string, episodeId: string) => ['novel', 'voice-lines', projectId, episodeId] as const,
+    videoUrls: (projectId: string, episodeId: string) => ['novel', 'video-urls', projectId, episodeId] as const,
     editor: (projectId: string, episodeId: string) => ['novel', 'editor', projectId, episodeId] as const,
   },
   assetHub: {

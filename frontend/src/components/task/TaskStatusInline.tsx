@@ -33,3 +33,5 @@ export function TaskStatusInline({ state, className }: TaskStatusInlineProps) {
     </div>
   );
 }
+
+export default TaskStatusInline;

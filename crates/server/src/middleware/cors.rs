@@ -43,10 +43,12 @@ pub fn build_cors(config: &AppConfig) -> CorsLayer {
             header::CONTENT_TYPE,
             header::ACCEPT,
             header::ORIGIN,
+            HeaderName::from_static("x-request-id"),
             HeaderName::from_static("x-internal-task-token"),
             HeaderName::from_static("x-internal-user-id"),
             HeaderName::from_static("last-event-id"),
         ])
+        .expose_headers([HeaderName::from_static("x-request-id")])
         .allow_origin(origins)
         .allow_credentials(true)
 }

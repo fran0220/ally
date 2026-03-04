@@ -76,6 +76,10 @@ impl AppError {
     pub fn internal(message: impl Into<String>) -> Self {
         Self::new(ErrorCode::InternalError, message)
     }
+
+    pub fn insufficient_balance(message: impl Into<String>) -> Self {
+        Self::new(ErrorCode::InsufficientBalance, message)
+    }
 }
 
 impl From<sqlx::Error> for AppError {

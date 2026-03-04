@@ -1,6 +1,6 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use serde_json::{Map, Value};
+use serde_json::{Map, Value, json};
 use sqlx::FromRow;
 use waoowaoo_core::errors::{AppError, ErrorCode};
 use waoowaoo_core::llm::{self, ChatMessage};
@@ -568,6 +568,27 @@ pub async fn chat(_task: &WorkerTask, model: &str, prompt: &str) -> Result<Strin
     .await
 }
 
+fn read_reasoning_enabled(payload: &Value) -> bool {
+    payload
+        .get("reasoning")
+        .and_then(|value| {
+            value.as_bool().or_else(|| {
+                value.as_str().map(|raw| {
+                    let normalized = raw.trim().to_lowercase();
+                    matches!(normalized.as_str(), "1" | "true" | "yes" | "on")
+                })
+            })
+        })
+        .unwrap_or(true)
+}
+
+fn read_reasoning_effort(payload: &Value) -> Option<String> {
+    read_string(payload, "reasoningEffort")
+        .or_else(|| read_string(payload, "reasoning_effort"))
+        .map(|raw| raw.trim().to_ascii_lowercase())
+        .filter(|raw| matches!(raw.as_str(), "minimal" | "low" | "medium" | "high"))
+}
+
 fn push_stream_chunk(payload: &mut Map<String, Value>, meta: &LlmStepMeta) {
     if let Some(run_id) = meta.run_id.as_ref() {
         payload.insert("runId".to_string(), Value::String(run_id.clone()));
@@ -620,7 +641,31 @@ fn split_stream_chunks(text: &str, max_chars: usize) -> Vec<String> {
     chunks
 }
 
-pub async fn chat_with_step(
+async fn report_stream_done(
+    task: &TaskContext,
+    meta: &LlmStepMeta,
+    kind: llm::ChatStreamChunkKind,
+    usage: Option<&llm::ChatStreamUsage>,
+) -> Result<(), AppError> {
+    let mut payload = Map::new();
+    payload.insert("kind".to_string(), Value::String(kind.as_str().to_string()));
+    payload.insert("lane".to_string(), Value::String(kind.lane().to_string()));
+    payload.insert("delta".to_string(), Value::String(String::new()));
+    payload.insert("done".to_string(), Value::Bool(true));
+    if let Some(usage) = usage {
+        payload.insert(
+            "usage".to_string(),
+            json!({
+                "promptTokens": usage.prompt_tokens,
+                "completionTokens": usage.completion_tokens,
+            }),
+        );
+    }
+    push_stream_chunk(&mut payload, meta);
+    task.report_stream_chunk(Value::Object(payload)).await
+}
+
+pub async fn chat_with_stream_reporting(
     task: &TaskContext,
     model: &str,
     prompt: &str,
@@ -630,33 +675,60 @@ pub async fn chat_with_step(
         .report_progress(65, Some("progress.runtime.stage.llmSubmit"))
         .await?;
 
-    let response = chat(task.task(), model, prompt).await;
-    match response {
-        Ok(text) => {
-            let chunks = split_stream_chunks(&text, MAX_LLM_STREAM_CHUNK_CHARS);
-            for chunk in chunks {
+    let mysql = runtime::mysql()?;
+    let reasoning_enabled = read_reasoning_enabled(&task.payload);
+    let reasoning_effort = read_reasoning_effort(&task.payload);
+    let stream_result = llm::chat_completion_stream(
+        mysql,
+        model,
+        &[ChatMessage {
+            role: "user".to_string(),
+            content: prompt.to_string(),
+        }],
+        llm::ChatStreamOptions {
+            temperature: Some(0.7),
+            reasoning: reasoning_enabled,
+            reasoning_effort,
+            chunk_timeout: None,
+        },
+        |chunk| async move {
+            for piece in split_stream_chunks(&chunk.delta, MAX_LLM_STREAM_CHUNK_CHARS) {
                 let mut payload = Map::new();
-                payload.insert("kind".to_string(), Value::String("text".to_string()));
-                payload.insert("lane".to_string(), Value::String("main".to_string()));
-                payload.insert("delta".to_string(), Value::String(chunk));
+                payload.insert(
+                    "kind".to_string(),
+                    Value::String(chunk.kind.as_str().to_string()),
+                );
+                payload.insert(
+                    "lane".to_string(),
+                    Value::String(chunk.kind.lane().to_string()),
+                );
+                payload.insert("delta".to_string(), Value::String(piece));
                 payload.insert("done".to_string(), Value::Bool(false));
                 push_stream_chunk(&mut payload, meta);
                 task.report_stream_chunk(Value::Object(payload)).await?;
             }
+            Ok(())
+        },
+    )
+    .await;
 
-            let mut done_payload = Map::new();
-            done_payload.insert("kind".to_string(), Value::String("text".to_string()));
-            done_payload.insert("lane".to_string(), Value::String("main".to_string()));
-            done_payload.insert("delta".to_string(), Value::String(String::new()));
-            done_payload.insert("done".to_string(), Value::Bool(true));
-            push_stream_chunk(&mut done_payload, meta);
-            task.report_stream_chunk(Value::Object(done_payload))
-                .await?;
+    match stream_result {
+        Ok(result) => {
+            if !result.reasoning.trim().is_empty() {
+                report_stream_done(task, meta, llm::ChatStreamChunkKind::Reasoning, None).await?;
+            }
+            report_stream_done(
+                task,
+                meta,
+                llm::ChatStreamChunkKind::Text,
+                Some(&result.usage),
+            )
+            .await?;
 
             let _ = task
                 .report_progress(90, Some("progress.runtime.stage.llmCompleted"))
                 .await?;
-            Ok(text)
+            Ok(result.text)
         }
         Err(err) => {
             let _ = task
@@ -665,6 +737,15 @@ pub async fn chat_with_step(
             Err(err)
         }
     }
+}
+
+pub async fn chat_with_step(
+    task: &TaskContext,
+    model: &str,
+    prompt: &str,
+    meta: &LlmStepMeta,
+) -> Result<String, AppError> {
+    chat_with_stream_reporting(task, model, prompt, meta).await
 }
 
 fn normalize_char(ch: char) -> String {
@@ -827,11 +908,13 @@ pub fn read_episode_id(task: &WorkerTask) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
     use waoowaoo_core::prompt_i18n::PromptLocale;
 
     use super::{
         build_characters_introduction, count_words_like_word, match_text_boundary,
-        parse_json_array_response, parse_json_object_response, resolve_art_style_prompt,
+        parse_json_array_response, parse_json_object_response, read_reasoning_effort,
+        read_reasoning_enabled, resolve_art_style_prompt,
     };
 
     #[test]
@@ -880,5 +963,28 @@ mod tests {
         let en = resolve_art_style_prompt(Some("realistic"), PromptLocale::En);
         assert!(zh.contains("真实电影级"));
         assert!(en.contains("Realistic cinematic"));
+    }
+
+    #[test]
+    fn read_reasoning_enabled_defaults_to_true() {
+        assert!(read_reasoning_enabled(&json!({})));
+        assert!(read_reasoning_enabled(&json!({ "reasoning": "true" })));
+        assert!(!read_reasoning_enabled(&json!({ "reasoning": false })));
+    }
+
+    #[test]
+    fn read_reasoning_effort_accepts_only_valid_values() {
+        assert_eq!(
+            read_reasoning_effort(&json!({ "reasoningEffort": "MEDIUM" })),
+            Some("medium".to_string())
+        );
+        assert_eq!(
+            read_reasoning_effort(&json!({ "reasoning_effort": "minimal" })),
+            Some("minimal".to_string())
+        );
+        assert_eq!(
+            read_reasoning_effort(&json!({ "reasoningEffort": "extreme" })),
+            None
+        );
     }
 }

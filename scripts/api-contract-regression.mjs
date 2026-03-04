@@ -5,11 +5,17 @@ import path from 'node:path'
 import process from 'node:process'
 
 const SCRIPT_DIR = path.dirname(new URL(import.meta.url).pathname)
-const RUST_ROOT = path.resolve(SCRIPT_DIR, '..')
-const REPO_ROOT = path.resolve(RUST_ROOT, '..')
-const TS_API_ROOT = path.join(REPO_ROOT, 'src', 'app', 'api')
-const RUST_ROUTES_ROOT = path.join(RUST_ROOT, 'crates', 'server', 'src', 'routes')
-const REPORT_PATH = path.join(REPO_ROOT, 'docs', 'rust-api-contract-regression-report.md')
+const WORKSPACE_ROOT = path.resolve(SCRIPT_DIR, '..')
+const REPO_ROOT = WORKSPACE_ROOT
+const LEGACY_ROOT = fs.existsSync(path.join(WORKSPACE_ROOT, 'allyvideo'))
+  ? path.join(WORKSPACE_ROOT, 'allyvideo')
+  : WORKSPACE_ROOT
+const TS_API_ROOT = path.join(LEGACY_ROOT, 'src', 'app', 'api')
+const RUST_ROUTES_ROOT = path.join(WORKSPACE_ROOT, 'crates', 'server', 'src', 'routes')
+const REPORT_DIR = fs.existsSync(path.join(LEGACY_ROOT, 'docs'))
+  ? path.join(LEGACY_ROOT, 'docs')
+  : path.join(WORKSPACE_ROOT, 'docs')
+const REPORT_PATH = path.join(REPORT_DIR, 'rust-api-contract-regression-report.md')
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 const SUBMIT_TASK_KEYS = ['async', 'deduped', 'status', 'success', 'taskId']
@@ -83,12 +89,13 @@ function normalizePath(raw) {
 }
 
 function tsRoutePathFromFile(filePath) {
-  const rel = path.relative(REPO_ROOT, filePath).replace(/\\/g, '/')
+  const rel = path.relative(TS_API_ROOT, filePath).replace(/\\/g, '/')
   const base = rel
-    .replace(/^src\/app/, '')
+    .replace(/^route\.ts$/, '')
     .replace(/\/route\.ts$/, '')
     .replace(/\[\.\.\.[^\]]+\]/g, '*')
-  return normalizePath(base)
+  const withApiPrefix = base.length > 0 ? `/api/${base}` : '/api'
+  return normalizePath(withApiPrefix)
 }
 
 function rustPathFromLiteral(raw) {
@@ -924,6 +931,11 @@ function formatReport(rows, summary) {
 }
 
 function main() {
+  if (!fs.existsSync(TS_API_ROOT)) {
+    throw new Error(`TS API root not found: ${TS_API_ROOT}`)
+  }
+  fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true })
+
   const tsContracts = extractTsContracts()
   const rustContracts = extractRustContracts()
   const rows = compareContracts(tsContracts, rustContracts)

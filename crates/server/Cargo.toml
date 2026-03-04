@@ -26,3 +26,4 @@ rust_decimal.workspace = true
 urlencoding = "2.1.3"
 uuid.workspace = true
 waoowaoo-core = { path = "../core" }
+zip = { version = "2.2.0", default-features = false, features = ["deflate"] }

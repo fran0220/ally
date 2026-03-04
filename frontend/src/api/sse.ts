@@ -111,7 +111,8 @@ function parseHeartbeat(raw: string): HeartbeatPayload | null {
 }
 
 function buildSseUrl(projectId: string, episodeId?: string | null): string {
-  const url = new URL('/api/sse', API_BASE_URL);
+  const base = API_BASE_URL || window.location.origin;
+  const url = new URL('/api/sse', base);
   url.searchParams.set('projectId', projectId);
   if (episodeId) {
     url.searchParams.set('episodeId', episodeId);

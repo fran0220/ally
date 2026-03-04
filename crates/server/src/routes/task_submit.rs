@@ -1,6 +1,9 @@
 use axum::Json;
 use serde_json::{Value, json};
 use uuid::Uuid;
+use waoowaoo_core::billing::{
+    TaskBillingInfo, prepare_task_billing, rollback_task_billing, serialize_task_billing_info,
+};
 use waoowaoo_core::runtime::publisher::{
     TaskLifecycleMessageInput, build_task_lifecycle_message, publish_task_message,
 };
@@ -142,6 +145,14 @@ fn is_unique_violation(error: &sqlx::Error) -> bool {
     }
 }
 
+async fn rollback_prepared_billing(
+    state: &AppState,
+    billing_info: Option<&TaskBillingInfo>,
+) -> Result<(), AppError> {
+    let _ = rollback_task_billing(&state.mysql, billing_info).await?;
+    Ok(())
+}
+
 pub async fn verify_project_access(
     state: &AppState,
     project_id: &str,
@@ -221,6 +232,17 @@ pub async fn submit_task(
 
     let task_id = Uuid::new_v4().to_string();
     let payload = normalize_payload_locale(payload, accept_language);
+    let prepared_billing = prepare_task_billing(
+        &state.mysql,
+        state.config.billing_mode,
+        &task_id,
+        &user.id,
+        project_id,
+        task_type,
+        &payload,
+    )
+    .await?;
+    let billing_info_json = serialize_task_billing_info(prepared_billing.as_ref())?;
     let event_payload = payload.clone();
     let normalized_episode_id = normalize_optional_string(episode_id);
 
@@ -233,7 +255,7 @@ pub async fn submit_task(
     .await?;
 
     let insert_result = sqlx::query(
-        "INSERT INTO tasks (id, userId, projectId, episodeId, type, targetType, targetId, status, progress, attempt, maxAttempts, priority, dedupeKey, payload, queuedAt, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, 'queued', 0, 0, ?, ?, ?, ?, NOW(3), NOW(3), NOW(3))",
+        "INSERT INTO tasks (id, userId, projectId, episodeId, type, targetType, targetId, status, progress, attempt, maxAttempts, priority, dedupeKey, payload, billingInfo, queuedAt, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, 'queued', 0, 0, ?, ?, ?, ?, ?, NOW(3), NOW(3), NOW(3))",
     )
     .bind(&task_id)
     .bind(&user.id)
@@ -246,6 +268,7 @@ pub async fn submit_task(
     .bind(priority)
     .bind(&dedupe_key)
     .bind(sqlx::types::Json(payload))
+    .bind(billing_info_json.clone().map(sqlx::types::Json))
     .execute(&mut *tx)
     .await;
 
@@ -253,6 +276,7 @@ pub async fn submit_task(
         if is_unique_violation(&error) {
             tx.rollback().await?;
             if let Some(active_task) = find_active_task_by_dedupe_key(state, &dedupe_key).await? {
+                rollback_prepared_billing(state, prepared_billing.as_ref()).await?;
                 return Ok(Json(json!({
                   "success": true,
                   "async": true,
@@ -262,6 +286,7 @@ pub async fn submit_task(
                 })));
             }
         }
+        rollback_prepared_billing(state, prepared_billing.as_ref()).await?;
         return Err(error.into());
     }
 
@@ -273,7 +298,16 @@ pub async fn submit_task(
     .bind(&user.id)
     .bind(sqlx::types::Json(event_payload.clone()))
     .execute(&mut *tx)
-    .await?;
+    .await;
+
+    let insert_event_result = match insert_event_result {
+        Ok(result) => result,
+        Err(error) => {
+            tx.rollback().await?;
+            rollback_prepared_billing(state, prepared_billing.as_ref()).await?;
+            return Err(error.into());
+        }
+    };
 
     let event_id = i64::try_from(insert_event_result.last_insert_id())
         .map_err(|error| AppError::internal(format!("task event id overflow: {error}")))?;

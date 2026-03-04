@@ -125,5 +125,7 @@ pub async fn image(
 }
 
 pub fn router() -> axum::Router<AppState> {
-    axum::Router::new().route("/api/cos/image", axum::routing::get(image))
+    axum::Router::new()
+        .route("/api/cos/image", axum::routing::get(image))
+        .route("/api/cos/sign", axum::routing::get(image))
 }

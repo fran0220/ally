@@ -36,3 +36,5 @@ export function TaskStatusOverlay({ state, className }: TaskStatusOverlayProps) 
     </div>
   );
 }
+
+export default TaskStatusOverlay;
