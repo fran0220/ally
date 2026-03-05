@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import { AppIcon } from '../../components/ui/icons';
 import {
   type ProjectSummary,
   createProject,
@@ -152,16 +153,12 @@ export function WorkspaceList() {
           <h1 className="glass-page-title">{t('workspace:title')}</h1>
           <p className="glass-page-subtitle">{t('workspace:subtitle')}</p>
         </div>
-        <GlassButton variant="primary" onClick={openCreateModal}>
-          + {t('workspace:newProject')}
-        </GlassButton>
-      </header>
-
-      <GlassSurface className="mb-6" density="compact">
-        <div className="flex flex-wrap items-end gap-3">
-          <GlassField className="min-w-72 flex-1" id="workspace-search" label={t('workspace:searchPlaceholder')}>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <AppIcon name="search" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--glass-text-tertiary)]" />
             <GlassInput
-              id="workspace-search"
+              density="compact"
+              className="w-56 pl-9"
               value={searchInput}
               placeholder={t('workspace:searchPlaceholder')}
               onChange={(event) => setSearchInput(event.target.value)}
@@ -171,24 +168,25 @@ export function WorkspaceList() {
                 }
               }}
             />
-          </GlassField>
-          <GlassButton variant="secondary" onClick={submitSearch}>
-            {t('workspace:searchButton')}
+            {search ? (
+              <button
+                type="button"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--glass-text-tertiary)] hover:text-[var(--glass-text-primary)]"
+                onClick={() => {
+                  setSearch('');
+                  setSearchInput('');
+                  setPage(1);
+                }}
+              >
+                <AppIcon name="close" className="h-3.5 w-3.5" />
+              </button>
+            ) : null}
+          </div>
+          <GlassButton variant="primary" onClick={openCreateModal}>
+            + {t('workspace:newProject')}
           </GlassButton>
-          {search ? (
-            <GlassButton
-              variant="ghost"
-              onClick={() => {
-                setSearch('');
-                setSearchInput('');
-                setPage(1);
-              }}
-            >
-              {t('workspace:clearButton')}
-            </GlassButton>
-          ) : null}
         </div>
-      </GlassSurface>
+      </header>
 
       {projectsQuery.error instanceof Error ? (
         <p className="mb-6 text-sm text-[var(--glass-tone-danger-fg)]">{projectsQuery.error.message}</p>

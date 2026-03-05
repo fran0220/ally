@@ -360,7 +360,7 @@ export function ProjectWorkbench() {
     <main className="page-shell py-8 md:py-10">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="glass-page-title">{rootQuery.data?.project.id ?? projectId}</h1>
+          <h1 className="glass-page-title">{rootQuery.data?.project.name ?? projectId}</h1>
           <p className="glass-page-subtitle">
             {t('workspaceDetail:episode')}: {selectedEpisode?.name ?? 'N/A'}
           </p>

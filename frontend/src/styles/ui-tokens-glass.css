@@ -32,11 +32,11 @@
   --glass-blur-nav: 0px;
 
   /* Radius */
-  --glass-radius-xs: 8px;
-  --glass-radius-sm: 10px;
-  --glass-radius-md: 12px;
-  --glass-radius-lg: 16px;
-  --glass-radius-xl: 20px;
+  --glass-radius-xs: 4px;
+  --glass-radius-sm: 6px;
+  --glass-radius-md: 8px;
+  --glass-radius-lg: 10px;
+  --glass-radius-xl: 12px;
 
   /* Spacing + density */
   --glass-space-1: 4px;

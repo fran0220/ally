@@ -1,7 +1,6 @@
 import { type FormEvent, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 
 import { apiRequest } from '../../api/client';
 import {
@@ -95,6 +94,7 @@ export function AssetHub() {
   const queryClient = useQueryClient();
 
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'characters' | 'locations' | 'voices'>('characters');
   const [folderForm, setFolderForm] = useState<FolderFormState>(EMPTY_FOLDER);
   const [characterForm, setCharacterForm] = useState<AssetFormState>(EMPTY_ASSET);
   const [locationForm, setLocationForm] = useState<AssetFormState>(EMPTY_ASSET);
@@ -380,13 +380,6 @@ export function AssetHub() {
         <div>
           <h1 className="glass-page-title">{t('title')}</h1>
           <p className="glass-page-subtitle">{t('description')}</p>
-          <p className="mt-2 text-xs text-[var(--glass-text-tertiary)]">
-            {t('modelHint')}{' '}
-            <Link className="text-[var(--glass-tone-info-fg)] hover:underline" to="/profile">
-              {t('modelHintLink')}
-            </Link>
-            {t('modelHintSuffix')}
-          </p>
         </div>
         <div className="flex items-center gap-2 text-xs">
           <GlassChip tone={connected ? 'success' : 'warning'}>{connected ? 'SSE Connected' : 'SSE Reconnecting'}</GlassChip>
@@ -444,10 +437,7 @@ export function AssetHub() {
         <div className="space-y-4">
           <GlassSurface>
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <h2 className="text-lg font-semibold">{activeFolderName}</h2>
-                <p className="text-sm text-[var(--glass-text-secondary)]">{t('emptyStateHint')}</p>
-              </div>
+              <h2 className="text-lg font-semibold">{activeFolderName}</h2>
               <div className="flex flex-wrap gap-2">
                 <GlassButton size="sm" variant="soft" onClick={() => setCharacterModalOpen(true)}>
                   {t('addCharacter')}
@@ -461,24 +451,22 @@ export function AssetHub() {
               </div>
             </div>
 
-            <div className="grid gap-3 md:grid-cols-3">
-              <article className="glass-kpi p-4">
-                <p className="text-xs uppercase tracking-wide text-[var(--glass-text-tertiary)]">{t('characters')}</p>
-                <p className="mt-2 text-2xl font-semibold">{characters.length}</p>
-              </article>
-              <article className="glass-kpi p-4">
-                <p className="text-xs uppercase tracking-wide text-[var(--glass-text-tertiary)]">{t('locations')}</p>
-                <p className="mt-2 text-2xl font-semibold">{locations.length}</p>
-              </article>
-              <article className="glass-kpi p-4">
-                <p className="text-xs uppercase tracking-wide text-[var(--glass-text-tertiary)]">{t('voices')}</p>
-                <p className="mt-2 text-2xl font-semibold">{voices.length}</p>
-              </article>
+            <div className="flex flex-wrap items-center gap-2">
+              {(['characters', 'locations', 'voices'] as const).map((tab) => (
+                <GlassButton
+                  key={tab}
+                  size="sm"
+                  variant={activeTab === tab ? 'primary' : 'soft'}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {t(tab)} ({tab === 'characters' ? characters.length : tab === 'locations' ? locations.length : voices.length})
+                </GlassButton>
+              ))}
             </div>
           </GlassSurface>
 
+          {activeTab === 'characters' ? (
           <GlassSurface>
-            <h3 className="mb-3 text-sm font-semibold text-[var(--glass-text-secondary)]">{t('characters')}</h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {characters.map((character) => {
                 const appearance = character.appearances[0];
@@ -578,9 +566,10 @@ export function AssetHub() {
               ) : null}
             </div>
           </GlassSurface>
+          ) : null}
 
+          {activeTab === 'locations' ? (
           <GlassSurface>
-            <h3 className="mb-3 text-sm font-semibold text-[var(--glass-text-secondary)]">{t('locations')}</h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {locations.map((location) => {
                 const preview = getLocationPreview(location);
@@ -662,9 +651,10 @@ export function AssetHub() {
               ) : null}
             </div>
           </GlassSurface>
+          ) : null}
 
+          {activeTab === 'voices' ? (
           <GlassSurface>
-            <h3 className="mb-3 text-sm font-semibold text-[var(--glass-text-secondary)]">{t('voices')}</h3>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {voices.map((voice) => (
                 <article key={voice.id} className="glass-list-row flex-col items-start gap-1">
@@ -691,6 +681,7 @@ export function AssetHub() {
               ) : null}
             </div>
           </GlassSurface>
+          ) : null}
         </div>
       </div>
 
