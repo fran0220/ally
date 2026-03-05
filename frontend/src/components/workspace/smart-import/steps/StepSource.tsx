@@ -50,7 +50,7 @@ export default function StepSource({
 
             <div className="mb-6">
               <p className="text-sm font-medium text-[var(--glass-text-tertiary)] mb-3">{t('markerDetected.preview')}</p>
-              <div className="bg-[var(--glass-bg-muted)] rounded-xl p-4 max-h-64 overflow-y-auto space-y-2">
+              <div className="bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-lg)] p-4 max-h-64 overflow-y-auto space-y-2">
                 {markerResult.previewSplits.map((split, idx) => (
                   <div key={idx} className="flex items-start gap-3 text-sm">
                     <span className="flex-shrink-0 w-16 font-medium text-[var(--glass-tone-info-fg)]">
@@ -70,14 +70,14 @@ export default function StepSource({
             <div className="grid grid-cols-2 gap-4 mb-4">
               <button
                 onClick={onUseMarkerSplit}
-                className="glass-btn-base glass-btn-primary py-4 px-3 rounded-xl font-bold transition-all flex flex-col items-center gap-1"
+                className="glass-btn-base glass-btn-primary py-4 px-3 rounded-[var(--glass-radius-lg)] font-bold transition-all flex flex-col items-center gap-1"
               >
                 <span>{t('markerDetected.useMarker')}</span>
                 <span className="text-xs font-normal opacity-80">{t('markerDetected.useMarkerDesc')}</span>
               </button>
               <button
                 onClick={onUseAiSplit}
-                className="py-4 bg-[var(--glass-bg-surface)] border-2 border-[var(--glass-stroke-base)] text-[var(--glass-text-secondary)] rounded-xl font-bold hover:border-[var(--glass-stroke-focus)] hover:bg-[var(--glass-tone-info-bg)] transition-all flex flex-col items-center gap-1"
+                className="py-4 bg-[var(--glass-bg-surface)] border-2 border-[var(--glass-stroke-base)] text-[var(--glass-text-secondary)] rounded-[var(--glass-radius-lg)] font-bold hover:border-[var(--glass-stroke-focus)] hover:bg-[var(--glass-tone-info-bg)] transition-all flex flex-col items-center gap-1"
               >
                 <span>{t('markerDetected.useAI')}</span>
                 <span className="text-xs font-normal text-[var(--glass-text-tertiary)]">{t('markerDetected.useAIDesc')}</span>
@@ -112,9 +112,9 @@ export default function StepSource({
         <div className="grid md:grid-cols-2 gap-8 items-stretch">
           <button
             onClick={onManualCreate}
-            className="group bg-[var(--glass-bg-surface)] border-2 border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)] rounded-2xl p-8 text-left transition-all duration-200 hover:shadow-xl cursor-pointer flex flex-col justify-center"
+            className="group bg-[var(--glass-bg-surface)] border-2 border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)] rounded-[var(--glass-radius-xl)] p-8 text-left transition-all duration-200 hover:shadow-xl cursor-pointer flex flex-col justify-center"
           >
-            <div className="w-16 h-16 bg-[var(--glass-bg-muted)] rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[var(--glass-tone-info-bg)] transition-colors duration-200">
+            <div className="w-16 h-16 bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-xl)] flex items-center justify-center mb-6 group-hover:bg-[var(--glass-tone-info-bg)] transition-colors duration-200">
               <AppIcon name="edit" className="w-8 h-8 text-[var(--glass-text-secondary)] group-hover:text-[var(--glass-tone-info-fg)] transition-colors duration-200" />
             </div>
             <h3 className="text-2xl font-bold mb-3 text-[var(--glass-text-primary)]">{t('manualCreate.title')}</h3>
@@ -125,9 +125,9 @@ export default function StepSource({
             </div>
           </button>
 
-          <div className="relative rounded-2xl border-2 border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface)] p-6 flex flex-col">
+          <div className="relative rounded-[var(--glass-radius-xl)] border-2 border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface)] p-6 flex flex-col">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-[var(--glass-tone-info-bg)] rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-[var(--glass-tone-info-bg)] rounded-[var(--glass-radius-lg)] flex items-center justify-center">
                 <AppIcon name="bolt" className="w-6 h-6 text-[var(--glass-tone-info-fg)]" />
               </div>
               <div>
@@ -140,7 +140,7 @@ export default function StepSource({
               <textarea
                 value={rawContent}
                 onChange={(e) => onRawContentChange(e.target.value)}
-                className="flex-grow w-full bg-[var(--glass-bg-muted)] border-2 border-[var(--glass-stroke-base)] rounded-xl p-4 text-sm text-[var(--glass-text-primary)] placeholder:text-[var(--glass-text-tertiary)] focus:bg-[var(--glass-bg-surface)] focus:border-[var(--glass-stroke-focus)] focus:ring-4 focus:ring-[var(--glass-tone-info-fg)]/10 outline-none transition-all resize-none leading-relaxed min-h-[180px]"
+                className="flex-grow w-full bg-[var(--glass-bg-muted)] border-2 border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-lg)] p-4 text-sm text-[var(--glass-text-primary)] placeholder:text-[var(--glass-text-tertiary)] focus:bg-[var(--glass-bg-surface)] focus:border-[var(--glass-stroke-focus)] focus:ring-4 focus:ring-[var(--glass-tone-info-fg)]/10 outline-none transition-all resize-none leading-relaxed min-h-[180px]"
                 placeholder={t('upload.placeholder')}
               />
 
@@ -151,7 +151,7 @@ export default function StepSource({
                 <button
                   onClick={onAnalyze}
                   disabled={!rawContent.trim() || rawContent.length < 100}
-                  className="glass-btn-base glass-btn-primary px-5 py-2 rounded-xl font-bold active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+                  className="glass-btn-base glass-btn-primary px-5 py-2 rounded-[var(--glass-radius-lg)] font-bold active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
                 >
                   <span>{t('upload.startAnalysis')}</span>
                   <AppIcon name="arrowRightWide" className="w-4 h-4" />
@@ -160,7 +160,7 @@ export default function StepSource({
             </div>
 
             {error && (
-              <div className="mt-4 p-3 bg-[var(--glass-tone-danger-bg)] border border-[var(--glass-stroke-danger)] rounded-lg text-[var(--glass-tone-danger-fg)] text-sm">
+              <div className="mt-4 p-3 bg-[var(--glass-tone-danger-bg)] border border-[var(--glass-stroke-danger)] rounded-[var(--glass-radius-md)] text-[var(--glass-tone-danger-fg)] text-sm">
                 {error}
               </div>
             )}

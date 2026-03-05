@@ -52,7 +52,7 @@ export default function StoryboardToolbar({
         <button
           onClick={onAddStoryboardGroupAtStart}
           disabled={addingStoryboardGroup}
-          className="group flex items-center gap-2 px-4 py-2 border-2 border-dashed border-[var(--glass-stroke-strong)] hover:border-[var(--glass-stroke-success)] hover:bg-[var(--glass-tone-success-bg)] rounded-lg text-[var(--glass-text-tertiary)] hover:text-[var(--glass-tone-success-fg)] transition-all"
+          className="group flex items-center gap-2 px-4 py-2 border-2 border-dashed border-[var(--glass-stroke-strong)] hover:border-[var(--glass-stroke-success)] hover:bg-[var(--glass-tone-success-bg)] rounded-[var(--glass-radius-md)] text-[var(--glass-text-tertiary)] hover:text-[var(--glass-tone-success-fg)] transition-all"
         >
           {addingStoryboardGroup ? (
             <TaskStatusInline state={addingStoryboardGroupState} />

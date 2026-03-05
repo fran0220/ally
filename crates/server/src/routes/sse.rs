@@ -24,8 +24,6 @@ const REDIS_RECONNECT_DELAY_SECS: u64 = 1;
 pub struct SseQuery {
     #[serde(default, rename = "projectId")]
     project_id: Option<String>,
-    #[serde(default, rename = "project_id")]
-    project_id_alias: Option<String>,
     #[serde(default, rename = "episodeId")]
     episode_id: Option<String>,
 }
@@ -309,12 +307,7 @@ pub async fn handler(
     Query(query): Query<SseQuery>,
     headers: axum::http::HeaderMap,
 ) -> Result<Sse<impl futures::Stream<Item = Result<Event, Infallible>>>, AppError> {
-    let project_id = query
-        .project_id
-        .or(query.project_id_alias)
-        .unwrap_or_default()
-        .trim()
-        .to_string();
+    let project_id = query.project_id.unwrap_or_default().trim().to_string();
     if project_id.is_empty() {
         return Err(AppError::invalid_params("projectId is required"));
     }
@@ -357,6 +350,12 @@ pub async fn handler(
             if tx.send(to_snapshot_event(item)).await.is_err() {
                 return;
             }
+        }
+
+        // Send an immediate heartbeat so the client marks the connection as open
+        // without waiting for the first interval tick.
+        if tx.send(heartbeat_event()).await.is_err() {
+            return;
         }
 
         let mut ticker = tokio::time::interval(Duration::from_secs(HEARTBEAT_INTERVAL_SECS));
@@ -440,7 +439,31 @@ pub fn router() -> axum::Router<AppState> {
 mod tests {
     use serde_json::json;
 
-    use super::{parse_last_event_id, parse_pubsub_event_meta, with_lifecycle_type};
+    use super::{SseQuery, parse_last_event_id, parse_pubsub_event_meta, with_lifecycle_type};
+
+    #[test]
+    fn sse_query_accepts_camel_case_project_id() {
+        let parsed: SseQuery = serde_json::from_value(json!({
+            "projectId": "project-1",
+            "episodeId": "episode-9"
+        }))
+        .expect("camelCase query payload should deserialize");
+
+        assert_eq!(parsed.project_id.as_deref(), Some("project-1"));
+        assert_eq!(parsed.episode_id.as_deref(), Some("episode-9"));
+    }
+
+    #[test]
+    fn sse_query_ignores_legacy_snake_case_alias() {
+        let parsed: SseQuery = serde_json::from_value(json!({
+            "project_id": "legacy-project",
+            "episode_id": "legacy-episode"
+        }))
+        .expect("unknown query keys should be ignored");
+
+        assert_eq!(parsed.project_id, None);
+        assert_eq!(parsed.episode_id, None);
+    }
 
     #[test]
     fn parse_pubsub_event_meta_extracts_lifecycle_event() {

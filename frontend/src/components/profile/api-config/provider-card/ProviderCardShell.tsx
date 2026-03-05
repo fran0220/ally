@@ -32,10 +32,10 @@ export function ProviderCardShell({
   const compatibilityLayerLabel = getCompatibilityLayerBadgeLabel(provider.id, t)
 
   return (
-    <div className="glass-surface overflow-hidden rounded-2xl">
+    <div className="glass-surface overflow-hidden rounded-[var(--glass-radius-xl)]">
       <div className="flex items-center justify-between px-3.5 py-2.5">
         <div className="flex items-center gap-2">
-          <div className="glass-surface-soft flex h-6 w-6 items-center justify-center rounded-lg text-xs font-bold text-[var(--glass-text-secondary)]">
+          <div className="glass-surface-soft flex h-6 w-6 items-center justify-center rounded-[var(--glass-radius-md)] text-xs font-bold text-[var(--glass-text-secondary)]">
             {provider.name.charAt(0)}
           </div>
           <h3 className="text-[15px] font-bold text-[var(--glass-text-primary)]">{provider.name}</h3>
@@ -63,7 +63,7 @@ export function ProviderCardShell({
           {state.tutorial && (
             <button
               onClick={() => state.setShowTutorial(true)}
-              className="glass-btn-base cursor-pointer flex items-center gap-1 rounded-lg border border-[var(--glass-stroke-base)] bg-transparent px-2 py-1 text-[12px] font-medium text-[var(--glass-text-primary)] hover:border-[var(--glass-stroke-strong)] hover:bg-[var(--glass-bg-muted)] hover:text-[var(--glass-text-primary)]"
+              className="glass-btn-base cursor-pointer flex items-center gap-1 rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)] bg-transparent px-2 py-1 text-[12px] font-medium text-[var(--glass-text-primary)] hover:border-[var(--glass-stroke-strong)] hover:bg-[var(--glass-bg-muted)] hover:text-[var(--glass-text-primary)]"
             >
               <AppIcon name="bookOpen" className="h-3 w-3" />
               {t('tutorial.button')}
@@ -78,12 +78,12 @@ export function ProviderCardShell({
           onClick={() => state.setShowTutorial(false)}
         >
           <div
-            className="glass-surface-modal mx-4 w-full max-w-lg overflow-hidden rounded-xl"
+            className="glass-surface-modal mx-4 w-full max-w-lg overflow-hidden rounded-[var(--glass-radius-lg)]"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-[var(--glass-stroke-base)] px-5 py-4">
               <div className="flex items-center gap-3">
-                <div className="glass-btn-base glass-btn-primary flex h-8 w-8 items-center justify-center rounded-lg text-white">
+                <div className="glass-btn-base glass-btn-primary flex h-8 w-8 items-center justify-center rounded-[var(--glass-radius-md)] text-white">
                   <AppIcon name="bookOpen" className="w-4 h-4" />
                 </div>
                 <div>
@@ -95,7 +95,7 @@ export function ProviderCardShell({
               </div>
               <button
                 onClick={() => state.setShowTutorial(false)}
-                className="glass-btn-base glass-btn-soft rounded-lg p-1.5"
+                className="glass-btn-base glass-btn-soft rounded-[var(--glass-radius-md)] p-1.5"
               >
                 <AppIcon name="close" className="w-5 h-5" />
               </button>
@@ -128,7 +128,7 @@ export function ProviderCardShell({
             <div className="flex justify-end border-t border-[var(--glass-stroke-base)] px-5 py-3">
               <button
                 onClick={() => state.setShowTutorial(false)}
-                className="glass-btn-base glass-btn-secondary rounded-lg px-4 py-2 text-sm font-medium"
+                className="glass-btn-base glass-btn-secondary rounded-[var(--glass-radius-md)] px-4 py-2 text-sm font-medium"
               >
                 {t('tutorial.close')}
               </button>

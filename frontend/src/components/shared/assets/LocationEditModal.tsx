@@ -234,7 +234,7 @@ export function LocationEditModal({
                 <button
                   onClick={() => { void handleSaveName(); }}
                   disabled={updateNameMutation.isPending || !editingName.trim()}
-                  className="glass-btn-base glass-btn-tone-success px-3 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm whitespace-nowrap"
+                  className="glass-btn-base glass-btn-tone-success px-3 py-2 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed text-sm whitespace-nowrap"
                 >
                   {updateNameMutation.isPending
                     ? t('assets.smartImport.preview.saving')
@@ -244,7 +244,7 @@ export function LocationEditModal({
             </div>
           </div>
 
-          <div className="space-y-2 glass-surface-soft p-4 rounded-lg border border-[var(--glass-stroke-base)]">
+          <div className="space-y-2 glass-surface-soft p-4 rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)]">
             <label className="block text-sm font-medium text-[var(--glass-tone-info-fg)] flex items-center gap-2">
               <AppIcon name="bolt" className="w-4 h-4" />
               {t('assets.modal.smartModify')}
@@ -267,7 +267,7 @@ export function LocationEditModal({
               <button
                 onClick={() => { void handleAiModify(); }}
                 disabled={isAiModifying || !aiModifyInstruction.trim()}
-                className="glass-btn-base glass-btn-tone-info px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+                className="glass-btn-base glass-btn-tone-info px-4 py-2 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
               >
                 {isAiModifying ? (
                   <TaskStatusInline state={aiModifyingState} className="text-white [&>span]:text-white [&_svg]:text-white" />
@@ -301,7 +301,7 @@ export function LocationEditModal({
         <div className="flex gap-3 justify-end p-4 border-t border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface-strong)] rounded-b-lg flex-shrink-0">
           <button
             onClick={onClose}
-            className="glass-btn-base glass-btn-secondary px-4 py-2 rounded-lg"
+            className="glass-btn-base glass-btn-secondary px-4 py-2 rounded-[var(--glass-radius-md)]"
             disabled={isSaving}
           >
             {t('assets.common.cancel')}
@@ -309,7 +309,7 @@ export function LocationEditModal({
           <button
             onClick={() => { void handleSaveOnly(); }}
             disabled={isSaving || !editingDescription.trim()}
-            className="glass-btn-base glass-btn-tone-info px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="glass-btn-base glass-btn-tone-info px-4 py-2 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isSaving ? (
               <TaskStatusInline state={savingState} className="text-white [&>span]:text-white [&_svg]:text-white" />
@@ -320,7 +320,7 @@ export function LocationEditModal({
           <button
             onClick={() => { void handleSaveAndGenerate(); }}
             disabled={isSaving || isTaskRunning || !editingDescription.trim()}
-            className="glass-btn-base glass-btn-primary px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="glass-btn-base glass-btn-primary px-4 py-2 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isTaskRunning ? (
               <TaskStatusInline state={taskRunningState} className="text-white [&>span]:text-white [&_svg]:text-white" />

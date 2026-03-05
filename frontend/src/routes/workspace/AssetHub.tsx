@@ -482,7 +482,7 @@ export function AssetHub() {
                         }
                       }}
                     >
-                      <div className="mb-2 overflow-hidden rounded-lg bg-[var(--glass-bg-muted)]">
+                      <div className="mb-2 overflow-hidden rounded-[var(--glass-radius-md)] bg-[var(--glass-bg-muted)]">
                         {preview ? (
                           <MediaImageWithLoading
                             src={preview}
@@ -584,7 +584,7 @@ export function AssetHub() {
                         }
                       }}
                     >
-                      <div className="mb-2 overflow-hidden rounded-lg bg-[var(--glass-bg-muted)]">
+                      <div className="mb-2 overflow-hidden rounded-[var(--glass-radius-md)] bg-[var(--glass-bg-muted)]">
                         {preview ? (
                           <MediaImageWithLoading
                             src={preview}

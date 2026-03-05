@@ -148,7 +148,7 @@ export default function StoryboardGroup({
       {(isSubmittingStoryboardTask || isSelectingCandidate) && (
         <TaskStatusOverlay
           state={groupOverlayState}
-          className="z-10 rounded-lg bg-[var(--glass-bg-surface-modal)]/90"
+          className="z-10 rounded-[var(--glass-radius-md)] bg-[var(--glass-bg-surface-modal)]/90"
         />
       )}
 
@@ -180,7 +180,7 @@ export default function StoryboardGroup({
         <div className="mb-4">
           <button
             onClick={onToggleExpand}
-            className="glass-btn-base glass-btn-soft rounded-xl px-3 py-2 text-sm"
+            className="glass-btn-base glass-btn-soft rounded-[var(--glass-radius-lg)] px-3 py-2 text-sm"
           >
             <AppIcon name="chevronRightMd" className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
             <span>{clip.screenplay ? t('panel.stylePrompt') : t('panel.sourceText')}</span>

@@ -89,7 +89,7 @@ export default function VideoPanelCardBody({ runtime }: VideoPanelCardBodyProps)
                   value={promptEditor.editingPrompt}
                   onChange={(event) => promptEditor.setEditingPrompt(event.target.value)}
                   autoFocus
-                  className="w-full text-xs p-2 pr-16 border border-[var(--glass-stroke-focus)] rounded-lg bg-[var(--glass-bg-surface)] text-[var(--glass-text-secondary)] focus:outline-none focus:ring-1 focus:ring-[var(--glass-tone-info-fg)] resize-none"
+                  className="w-full text-xs p-2 pr-16 border border-[var(--glass-stroke-focus)] rounded-[var(--glass-radius-md)] bg-[var(--glass-bg-surface)] text-[var(--glass-text-secondary)] focus:outline-none focus:ring-1 focus:ring-[var(--glass-tone-info-fg)] resize-none"
                   rows={3}
                   placeholder={t('promptModal.placeholder')}
                 />
@@ -99,7 +99,7 @@ export default function VideoPanelCardBody({ runtime }: VideoPanelCardBodyProps)
                 </div>
               </div>
             ) : (
-              <div onClick={promptEditor.handleStartEdit} className="text-xs p-2 border border-[var(--glass-stroke-base)] rounded-lg bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] cursor-pointer">
+              <div onClick={promptEditor.handleStartEdit} className="text-xs p-2 border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-md)] bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] cursor-pointer">
                 {promptEditor.localPrompt || <span className="text-[var(--glass-text-tertiary)] italic">{t('panelCard.clickToEditPrompt')}</span>}
               </div>
             )}
@@ -125,7 +125,7 @@ export default function VideoPanelCardBody({ runtime }: VideoPanelCardBodyProps)
                       || !layout.flModel
                       || layout.flMissingCapabilityFields.length > 0
                     }
-                    className="flex-shrink-0 min-w-[120px] py-2 px-3 text-sm font-medium rounded-lg shadow-sm transition-all disabled:opacity-50 bg-[var(--glass-accent-from)] text-white"
+                    className="flex-shrink-0 min-w-[120px] py-2 px-3 text-sm font-medium rounded-[var(--glass-radius-md)] shadow-sm transition-all disabled:opacity-50 bg-[var(--glass-accent-from)] text-white"
                   >
                     {isFirstLastFrameGenerated ? t('firstLastFrame.generated') : taskStatus.isVideoTaskRunning ? taskStatus.taskRunningVideoLabel : t('firstLastFrame.generate')}
                   </button>
@@ -167,7 +167,7 @@ export default function VideoPanelCardBody({ runtime }: VideoPanelCardBodyProps)
                       || !videoModel.selectedModel
                       || videoModel.missingCapabilityFields.length > 0
                     }
-                    className="flex-shrink-0 min-w-[90px] py-2 px-3 text-sm font-medium rounded-lg shadow-sm transition-all disabled:opacity-50 bg-[var(--glass-accent-from)] text-white"
+                    className="flex-shrink-0 min-w-[90px] py-2 px-3 text-sm font-medium rounded-[var(--glass-radius-md)] shadow-sm transition-all disabled:opacity-50 bg-[var(--glass-accent-from)] text-white"
                   >
                     {panel.videoUrl ? t('stage.hasSynced') : taskStatus.isVideoTaskRunning ? taskStatus.taskRunningVideoLabel : t('panelCard.generateVideo')}
                   </button>
@@ -198,7 +198,7 @@ export default function VideoPanelCardBody({ runtime }: VideoPanelCardBodyProps)
                       <button
                         onClick={computed.canLipSync ? lipSync.handleStartLipSync : undefined}
                         disabled={!computed.canLipSync || taskStatus.isLipSyncTaskRunning || lipSync.executingLipSync}
-                        className="flex-1 py-1.5 text-xs rounded-lg transition-all flex items-center justify-center gap-1 bg-[var(--glass-accent-from)] text-white disabled:opacity-50"
+                        className="flex-1 py-1.5 text-xs rounded-[var(--glass-radius-md)] transition-all flex items-center justify-center gap-1 bg-[var(--glass-accent-from)] text-white disabled:opacity-50"
                       >
                         {taskStatus.isLipSyncTaskRunning || lipSync.executingLipSync ? (
                           <TaskStatusInline state={taskStatus.lipSyncInlineState} className="text-white [&>span]:text-white [&_svg]:text-white" />
@@ -208,7 +208,7 @@ export default function VideoPanelCardBody({ runtime }: VideoPanelCardBodyProps)
                       </button>
 
                       {(taskStatus.isLipSyncTaskRunning || panel.lipSyncVideoUrl) && voiceManager.hasMatchedAudio && (
-                        <button onClick={lipSync.handleStartLipSync} disabled={lipSync.executingLipSync} className="flex-shrink-0 px-3 py-1.5 text-xs rounded-lg bg-[var(--glass-tone-warning-fg)] text-white">
+                        <button onClick={lipSync.handleStartLipSync} disabled={lipSync.executingLipSync} className="flex-shrink-0 px-3 py-1.5 text-xs rounded-[var(--glass-radius-md)] bg-[var(--glass-tone-warning-fg)] text-white">
                           {t('panelCard.redo')}
                         </button>
                       )}

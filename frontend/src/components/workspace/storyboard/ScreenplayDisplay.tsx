@@ -51,7 +51,7 @@ export default function ScreenplayDisplay({ screenplay, originalContent }: Scree
             <div className="flex items-center gap-2">
                 <button
                     onClick={() => setActiveTab('screenplay')}
-                    className={`glass-btn-base rounded-xl px-3 py-1.5 text-sm ${activeTab === 'screenplay'
+                    className={`glass-btn-base rounded-[var(--glass-radius-lg)] px-3 py-1.5 text-sm ${activeTab === 'screenplay'
                         ? 'glass-btn-secondary text-[var(--glass-text-secondary)]'
                         : 'glass-btn-soft'
                         }`}
@@ -60,7 +60,7 @@ export default function ScreenplayDisplay({ screenplay, originalContent }: Scree
                 </button>
                 <button
                     onClick={() => setActiveTab('original')}
-                    className={`glass-btn-base rounded-xl px-3 py-1.5 text-sm ${activeTab === 'original'
+                    className={`glass-btn-base rounded-[var(--glass-radius-lg)] px-3 py-1.5 text-sm ${activeTab === 'original'
                         ? 'glass-btn-secondary text-[var(--glass-text-secondary)]'
                         : 'glass-btn-soft'
                         }`}

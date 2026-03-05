@@ -36,7 +36,7 @@ export const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(funct
             : 'glass-btn-secondary';
 
   const sizeClass =
-    size === 'sm' ? 'h-8 px-3 text-xs' : size === 'lg' ? 'h-11 px-5 text-base' : 'h-9 px-4 text-sm';
+    size === 'sm' ? 'h-7 px-2.5 text-xs' : size === 'lg' ? 'h-10 px-5 text-sm' : 'h-8 px-3 text-sm';
 
   return (
     <button

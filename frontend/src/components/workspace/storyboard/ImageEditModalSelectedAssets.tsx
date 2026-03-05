@@ -33,7 +33,7 @@ export default function ImageEditModalSelectedAssets({
         </button>
       </div>
 
-      <div className="flex flex-wrap gap-2 min-h-[64px] p-2 bg-[var(--glass-bg-muted)] rounded-lg">
+      <div className="flex flex-wrap gap-2 min-h-[64px] p-2 bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-md)]">
         {selectedAssets.length === 0 ? (
           <p className="text-sm text-[var(--glass-text-tertiary)] w-full text-center py-4">{t('imageEdit.noAssets')}</p>
         ) : (
@@ -45,12 +45,12 @@ export default function ImageEditModalSelectedAssets({
                   <MediaImageWithLoading
                     src={displayImageUrl}
                     alt={asset.name}
-                    containerClassName="w-full h-full rounded-lg"
-                    className="w-full h-full object-cover rounded-lg border cursor-zoom-in"
+                    containerClassName="w-full h-full rounded-[var(--glass-radius-md)]"
+                    className="w-full h-full object-cover rounded-[var(--glass-radius-md)] border cursor-zoom-in"
                     onClick={() => onPreviewImage(asset.imageUrl || null)}
                   />
                 ) : (
-                  <div className="w-full h-full bg-[var(--glass-bg-muted)] rounded-lg flex items-center justify-center text-[var(--glass-text-tertiary)] text-xs">
+                  <div className="w-full h-full bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-md)] flex items-center justify-center text-[var(--glass-text-tertiary)] text-xs">
                     {asset.type === 'character' ? (
                       <AppIcon name="user" className="h-4 w-4" />
                     ) : (

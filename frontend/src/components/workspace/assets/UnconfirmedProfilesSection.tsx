@@ -40,7 +40,7 @@ export default function UnconfirmedProfilesSection({
   }
 
   return (
-    <div className="bg-[var(--glass-tone-warning-bg)] border border-[var(--glass-stroke-warning)] rounded-xl p-4">
+    <div className="bg-[var(--glass-tone-warning-bg)] border border-[var(--glass-stroke-warning)] rounded-[var(--glass-radius-lg)] p-4">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-lg font-semibold text-[var(--glass-text-primary)]">{confirmTitle}</h3>

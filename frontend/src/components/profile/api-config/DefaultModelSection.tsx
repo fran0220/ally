@@ -39,9 +39,9 @@ export function DefaultModelSection({
                 : [{ field: 'lipSyncModel', label: t('lipsyncDefault') }]
 
     return (
-        <div className="glass-surface rounded-2xl p-5">
+        <div className="glass-surface rounded-[var(--glass-radius-xl)] p-5">
             <div className="flex items-center gap-2 mb-4">
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)]">
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)]">
                     <AppIcon name="sparklesAlt" className="w-4 h-4" />
                 </span>
                 <h3 className="text-sm font-semibold text-[var(--glass-text-primary)]">{t('defaultModel.title')}</h3>

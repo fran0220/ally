@@ -24,7 +24,7 @@ export default function EmptyVoiceState({
 
     return (
         <div className="glass-surface-elevated p-10 text-center">
-            <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--glass-tone-info-bg)] text-[var(--glass-tone-info-fg)]">
+            <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-[var(--glass-radius-xl)] bg-[var(--glass-tone-info-bg)] text-[var(--glass-tone-info-fg)]">
                 <AppIcon name="micOutline" className="h-7 w-7" />
             </div>
             <h3 className="text-xl font-bold text-[var(--glass-text-secondary)] mb-2">{t("empty.title")}</h3>

@@ -17,6 +17,7 @@ type SharedListener = {
 type SharedChannel = {
   listeners: Set<SharedListener>;
   unsubscribe: () => void;
+  isOpen: boolean;
 };
 
 const channels = new Map<string, SharedChannel>();
@@ -31,6 +32,14 @@ export function subscribeSharedTaskEvents(options: TaskEventSubscriptionOptions)
 
   if (!channel) {
     const listeners = new Set<SharedListener>();
+    const nextChannel: SharedChannel = {
+      listeners,
+      unsubscribe: () => {
+        // Assign after subscribeTaskEvents returns.
+      },
+      isOpen: false,
+    };
+
     const unsubscribe = subscribeTaskEvents({
       projectId: options.projectId,
       episodeId: options.episodeId,
@@ -52,18 +61,21 @@ export function subscribeSharedTaskEvents(options: TaskEventSubscriptionOptions)
         }
       },
       onOpen: () => {
+        nextChannel.isOpen = true;
         for (const listener of listeners) {
           listener.onOpen?.();
         }
       },
       onError: (error) => {
+        nextChannel.isOpen = false;
         for (const listener of listeners) {
           listener.onError?.(error);
         }
       },
     });
 
-    channel = { listeners, unsubscribe };
+    nextChannel.unsubscribe = unsubscribe;
+    channel = nextChannel;
     channels.set(key, channel);
   }
 
@@ -76,6 +88,9 @@ export function subscribeSharedTaskEvents(options: TaskEventSubscriptionOptions)
   };
 
   channel.listeners.add(listener);
+  if (channel.isOpen) {
+    listener.onOpen?.();
+  }
 
   return () => {
     const current = channels.get(key);

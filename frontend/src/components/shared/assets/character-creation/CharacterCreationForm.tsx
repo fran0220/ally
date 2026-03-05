@@ -91,10 +91,10 @@ export default function CharacterCreationForm({
           const tabs = ['description', 'reference'] as const;
           const activeIdx = tabs.indexOf(createMode);
           return (
-            <div className="rounded-lg p-0.5" style={{ background: 'rgba(0,0,0,0.04)' }}>
+            <div className="rounded-[var(--glass-radius-md)] p-0.5" style={{ background: 'rgba(0,0,0,0.04)' }}>
               <div className="relative grid gap-1" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                 <div
-                  className="absolute bottom-0.5 top-0.5 rounded-md bg-white transition-transform duration-200"
+                  className="absolute bottom-0.5 top-0.5 rounded-[var(--glass-radius-sm)] bg-white transition-transform duration-200"
                   style={{
                     boxShadow: '0 1px 4px rgba(0,0,0,0.15), 0 0 0 0.5px rgba(0,0,0,0.06)',
                     width: 'calc(100% / 2)',
@@ -103,14 +103,14 @@ export default function CharacterCreationForm({
                 />
                 <button
                   onClick={() => setCreateMode('description')}
-                  className={`relative z-[1] flex items-center justify-center gap-2 rounded-md py-2 px-4 text-sm font-medium transition-colors cursor-pointer ${createMode === 'description' ? 'text-[var(--glass-text-primary)]' : 'text-[var(--glass-text-tertiary)] hover:text-[var(--glass-text-secondary)]'}`}
+                  className={`relative z-[1] flex items-center justify-center gap-2 rounded-[var(--glass-radius-sm)] py-2 px-4 text-sm font-medium transition-colors cursor-pointer ${createMode === 'description' ? 'text-[var(--glass-text-primary)]' : 'text-[var(--glass-text-tertiary)] hover:text-[var(--glass-text-secondary)]'}`}
                 >
                   <AppIcon name="sparklesAlt" className="w-4 h-4" />
                   <span>{t('assetModal.character.modeDescription')}</span>
                 </button>
                 <button
                   onClick={() => setCreateMode('reference')}
-                  className={`relative z-[1] flex items-center justify-center gap-2 rounded-md py-2 px-4 text-sm font-medium transition-colors cursor-pointer ${createMode === 'reference' ? 'text-[var(--glass-text-primary)]' : 'text-[var(--glass-text-tertiary)] hover:text-[var(--glass-text-secondary)]'}`}
+                  className={`relative z-[1] flex items-center justify-center gap-2 rounded-[var(--glass-radius-sm)] py-2 px-4 text-sm font-medium transition-colors cursor-pointer ${createMode === 'reference' ? 'text-[var(--glass-text-primary)]' : 'text-[var(--glass-text-tertiary)] hover:text-[var(--glass-text-secondary)]'}`}
                 >
                   <AppIcon name="image" className="w-4 h-4" />
                   <span>{t('assetModal.character.modeReference')}</span>
@@ -122,7 +122,7 @@ export default function CharacterCreationForm({
       </div>
 
       {mode === 'project' && availableCharacters.length > 0 && (
-        <div className="flex items-start gap-3 p-3 glass-surface-soft rounded-lg border border-[var(--glass-stroke-base)]">
+        <div className="flex items-start gap-3 p-3 glass-surface-soft rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)]">
           <input
             type="checkbox"
             id="isSubAppearance"
@@ -198,7 +198,7 @@ export default function CharacterCreationForm({
                 key={style.value}
                 type="button"
                 onClick={() => setArtStyle(style.value)}
-                className={`glass-btn-base px-3 py-2 rounded-lg text-sm border transition-all justify-start ${artStyle === style.value
+                className={`glass-btn-base px-3 py-2 rounded-[var(--glass-radius-md)] text-sm border transition-all justify-start ${artStyle === style.value
                   ? 'glass-btn-tone-info border-[var(--glass-stroke-focus)]'
                   : 'glass-btn-soft border-[var(--glass-stroke-base)] text-[var(--glass-text-secondary)]'
                   }`}
@@ -212,7 +212,7 @@ export default function CharacterCreationForm({
       )}
 
       {createMode === 'reference' && (
-        <div className="glass-surface-soft rounded-xl p-4 space-y-3 border border-[var(--glass-stroke-base)]">
+        <div className="glass-surface-soft rounded-[var(--glass-radius-lg)] p-4 space-y-3 border border-[var(--glass-stroke-base)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm font-medium text-[var(--glass-tone-info-fg)]">
               <AppIcon name="image" className="w-4 h-4" />
@@ -221,13 +221,13 @@ export default function CharacterCreationForm({
             <span className="text-xs text-[var(--glass-text-tertiary)]">{t('assetModal.character.pasteHint')}</span>
           </div>
 
-          <div className="glass-surface flex items-center gap-2 p-2 rounded-lg">
+          <div className="glass-surface flex items-center gap-2 p-2 rounded-[var(--glass-radius-md)]">
             <span className="text-xs text-[var(--glass-text-secondary)] shrink-0">{t('assetModal.character.generationMode')}：</span>
             {(() => {
               const subTabs = ['direct', 'extract'] as const;
               const subIdx = subTabs.indexOf(referenceSubMode);
               return (
-                <div className="flex-1 rounded-md p-0.5" style={{ background: 'rgba(0,0,0,0.04)' }}>
+                <div className="flex-1 rounded-[var(--glass-radius-sm)] p-0.5" style={{ background: 'rgba(0,0,0,0.04)' }}>
                   <div className="relative grid gap-1" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                     <div
                       className="absolute bottom-0.5 top-0.5 rounded-sm bg-white transition-transform duration-200"
@@ -259,7 +259,7 @@ export default function CharacterCreationForm({
             <button
               onClick={handleExtractDescription}
               disabled={isExtracting || referenceImagesBase64.length === 0}
-              className="glass-btn-base glass-btn-tone-info w-full px-3 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              className="glass-btn-base glass-btn-tone-info w-full px-3 py-2 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {isExtracting ? t('assetModal.aiDesign.generating') : t('assetModal.character.extractFirst')}
             </button>
@@ -276,7 +276,7 @@ export default function CharacterCreationForm({
           <button
             onClick={handleCreateWithReference}
             disabled={isSubmitting || !name.trim() || referenceImagesBase64.length === 0}
-            className={`glass-btn-base w-full px-4 py-2.5 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm ${referenceSubMode === 'extract'
+            className={`glass-btn-base w-full px-4 py-2.5 rounded-[var(--glass-radius-md)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm ${referenceSubMode === 'extract'
               ? 'glass-btn-tone-info'
               : 'glass-btn-primary'
               }`}
@@ -289,7 +289,7 @@ export default function CharacterCreationForm({
       {createMode === 'description' && (
         <>
           {!isSubAppearance && (
-            <div className="glass-surface-soft rounded-xl p-4 space-y-3 border border-[var(--glass-stroke-base)]">
+            <div className="glass-surface-soft rounded-[var(--glass-radius-lg)] p-4 space-y-3 border border-[var(--glass-stroke-base)]">
               <div className="flex items-center gap-2 text-sm font-medium text-[var(--glass-tone-info-fg)]">
                 <AppIcon name="sparklesAlt" className="w-4 h-4" />
                 <span>{t('assetModal.aiDesign.title')}</span>
@@ -312,7 +312,7 @@ export default function CharacterCreationForm({
                 <button
                   onClick={handleAiDesign}
                   disabled={isAiDesigning || !aiInstruction.trim()}
-                  className="glass-btn-base glass-btn-tone-info px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm whitespace-nowrap"
+                  className="glass-btn-base glass-btn-tone-info px-4 py-2 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed text-sm whitespace-nowrap"
                 >
                   {isAiDesigning ? t('assetModal.aiDesign.generating') : t('assetModal.aiDesign.generate')}
                 </button>
@@ -340,7 +340,7 @@ export default function CharacterCreationForm({
             disabled={isSubmitting || (isSubAppearance
               ? !selectedCharacterId.trim() || !changeReason.trim() || !description.trim()
               : !name.trim() || !description.trim())}
-            className="glass-btn-base glass-btn-primary w-full px-4 py-2.5 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed text-sm"
+            className="glass-btn-base glass-btn-primary w-full px-4 py-2.5 rounded-[var(--glass-radius-md)] disabled:opacity-40 disabled:cursor-not-allowed text-sm"
           >
             {isSubmitting ? t('assetModal.common.adding') : t('assetModal.common.add')}
           </button>

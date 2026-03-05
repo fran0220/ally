@@ -61,8 +61,8 @@ export function GlassModalShell({
         }
       }}
     >
-      <div className="glass-overlay absolute inset-0" />
-      <div className={`glass-surface-modal relative z-10 w-full overflow-hidden ${maxWidthClass}`}>
+      <div className="glass-overlay animate-backdrop-in absolute inset-0" />
+      <div className={`glass-surface-modal animate-modal-in relative z-10 w-full overflow-hidden ${maxWidthClass}`}>
         {(title || description || showCloseButton) && (
           <div className="flex items-start justify-between gap-4 px-5 py-4 sm:px-6">
             <div>

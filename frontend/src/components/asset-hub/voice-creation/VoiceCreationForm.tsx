@@ -42,10 +42,10 @@ export default function VoiceCreationForm({ runtime, children }: VoiceCreationFo
           const activeIdx = tabs.findIndex(t => t.id === mode)
           return (
             <div className="flex-1 px-5 py-2.5">
-              <div className="rounded-lg p-0.5" style={{ background: 'rgba(0,0,0,0.04)' }}>
+              <div className="rounded-[var(--glass-radius-md)] p-0.5" style={{ background: 'rgba(0,0,0,0.04)' }}>
                 <div className="relative grid grid-cols-2 gap-1">
                   <div
-                    className="absolute bottom-0.5 top-0.5 rounded-md bg-white transition-transform duration-200"
+                    className="absolute bottom-0.5 top-0.5 rounded-[var(--glass-radius-sm)] bg-white transition-transform duration-200"
                     style={{
                       boxShadow: '0 1px 4px rgba(0,0,0,0.15), 0 0 0 0.5px rgba(0,0,0,0.06)',
                       width: '50%',
@@ -56,7 +56,7 @@ export default function VoiceCreationForm({ runtime, children }: VoiceCreationFo
                     <button
                       key={tab.id}
                       onClick={() => handleModeChange(tab.id)}
-                      className={`relative z-[1] px-4 py-1.5 text-sm rounded-md transition-colors cursor-pointer ${mode === tab.id
+                      className={`relative z-[1] px-4 py-1.5 text-sm rounded-[var(--glass-radius-sm)] transition-colors cursor-pointer ${mode === tab.id
                         ? 'text-[var(--glass-text-primary)] font-medium'
                         : 'text-[var(--glass-text-tertiary)] hover:text-[var(--glass-text-secondary)]'
                         }`}

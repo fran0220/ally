@@ -19,7 +19,7 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--glass-text-primary);
-  background: #faf9f7;
+  background: #f8f7f5;
 }
 
 #root {
@@ -64,4 +64,5 @@ a {
   background: var(--glass-bg-nav);
   border-bottom: 0;
   box-shadow: var(--glass-shadow-nav);
+  border-radius: 0;
 }

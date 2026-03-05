@@ -135,10 +135,10 @@ export default function SpeakerVoiceBindingDialog({
                         ]
                         const activeIdx = tabs.findIndex(tab => tab.id === activeTab)
                         return (
-                            <div className="rounded-lg p-0.5" style={{ background: 'rgba(0,0,0,0.04)' }}>
+                            <div className="rounded-[var(--glass-radius-md)] p-0.5" style={{ background: 'rgba(0,0,0,0.04)' }}>
                                 <div className="relative grid gap-1" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
                                     <div
-                                        className="absolute bottom-0.5 top-0.5 rounded-md bg-white transition-transform duration-200"
+                                        className="absolute bottom-0.5 top-0.5 rounded-[var(--glass-radius-sm)] bg-white transition-transform duration-200"
                                         style={{
                                             boxShadow: '0 1px 4px rgba(0,0,0,0.15), 0 0 0 0.5px rgba(0,0,0,0.06)',
                                             width: `calc(100% / ${tabs.length})`,
@@ -149,7 +149,7 @@ export default function SpeakerVoiceBindingDialog({
                                         <button
                                             key={tab.id}
                                             onClick={() => handleTabClick(tab.id)}
-                                            className={`relative z-[1] px-3 py-1.5 text-sm rounded-md transition-colors cursor-pointer ${activeTab === tab.id
+                                            className={`relative z-[1] px-3 py-1.5 text-sm rounded-[var(--glass-radius-sm)] transition-colors cursor-pointer ${activeTab === tab.id
                                                 ? 'text-[var(--glass-text-primary)] font-medium'
                                                 : 'text-[var(--glass-text-tertiary)] hover:text-[var(--glass-text-secondary)]'
                                                 }`}
@@ -185,7 +185,7 @@ export default function SpeakerVoiceBindingDialog({
                         </p>
                         <button
                             onClick={() => setSubDialogOpen(true)}
-                            className="glass-btn-base glass-btn-primary px-8 py-2.5 rounded-lg text-sm font-medium"
+                            className="glass-btn-base glass-btn-primary px-8 py-2.5 rounded-[var(--glass-radius-md)] text-sm font-medium"
                         >
                             {activeTab === 'select' && t('selectFromLibrary')}
                             {activeTab === 'upload' && t('uploadAudio')}

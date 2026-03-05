@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { type TaskLifecycleEvent, subscribeTaskEvents } from '../api/sse';
+import { type TaskLifecycleEvent } from '../api/sse';
 import { queryKeys } from '../lib/query-keys';
+import { subscribeSharedTaskEvents } from '../lib/sse/shared-subscriber';
 
 interface UseTaskSseOptions {
   projectId: string | null;
@@ -30,7 +31,7 @@ export function useTaskSse({ projectId, episodeId, enabled = true }: UseTaskSseO
       return;
     }
 
-    const unsubscribe = subscribeTaskEvents({
+    const unsubscribe = subscribeSharedTaskEvents({
       projectId,
       episodeId,
       onOpen: () => setConnected(true),

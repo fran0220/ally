@@ -90,7 +90,7 @@ export default function PromptListCardView({ runtime }: PromptListCardViewProps)
               {shot.imagePrompt && (
                 <div className="space-y-2 border-b pb-4">
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--glass-tone-info-bg)] text-[var(--glass-tone-info-fg)] rounded-md text-sm font-medium">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--glass-tone-info-bg)] text-[var(--glass-tone-info-fg)] rounded-[var(--glass-radius-sm)] text-sm font-medium">
                       <AppIcon name="imageEdit" className="w-4 h-4" />
                       {styleLabel}
                     </span>
@@ -117,7 +117,7 @@ export default function PromptListCardView({ runtime }: PromptListCardViewProps)
                           <textarea
                             value={editValue}
                             onChange={(event) => handleEditValueChange(event.target.value)}
-                            className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)] text-sm resize-none"
+                            className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)] text-sm resize-none"
                             rows={4}
                             autoFocus
                           />
@@ -133,12 +133,12 @@ export default function PromptListCardView({ runtime }: PromptListCardViewProps)
                               value={aiModifyInstruction}
                               onChange={(event) => handleModifyInstructionChange(event.target.value)}
                               placeholder={t('prompts.instructionPlaceholder')}
-                              className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)] text-sm resize-none"
+                              className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)] text-sm resize-none"
                               rows={2}
                             />
 
                             {showAssetPicker && (
-                              <div className="absolute z-10 mt-1 w-full bg-[var(--glass-bg-surface)] border border-[var(--glass-stroke-strong)] rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                              <div className="absolute z-10 mt-1 w-full bg-[var(--glass-bg-surface)] border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] shadow-lg max-h-48 overflow-y-auto">
                                 <div className="p-2">
                                   <div className="text-xs font-medium text-[var(--glass-text-tertiary)] mb-2">{t('prompts.selectAsset')}</div>
 
@@ -185,12 +185,12 @@ export default function PromptListCardView({ runtime }: PromptListCardViewProps)
                           </div>
 
                           {selectedAssets.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-3 p-2.5 bg-[var(--glass-bg-muted)]/50 rounded-lg border border-[var(--glass-stroke-base)]">
+                            <div className="flex flex-wrap gap-2 mt-3 p-2.5 bg-[var(--glass-bg-muted)]/50 rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)]">
                               <div className="text-xs text-[var(--glass-text-tertiary)] font-medium w-full mb-1">{t('prompts.referencedAssets')}</div>
                               {selectedAssets.map((asset, index) => (
                                 <span
                                   key={asset.id}
-                                  className={`group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${asset.type === 'character'
+                                  className={`group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--glass-radius-sm)] text-xs font-medium transition-all ${asset.type === 'character'
                                     ? 'bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] border border-[var(--glass-stroke-strong)] hover:bg-[var(--glass-bg-muted)] hover:border-[var(--glass-stroke-focus)]'
                                     : 'bg-[var(--glass-tone-info-bg)] text-[var(--glass-tone-info-fg)] border border-[var(--glass-stroke-focus)] hover:bg-[var(--glass-tone-info-bg)] hover:border-[var(--glass-stroke-focus)]'
                                     }`}
@@ -228,13 +228,13 @@ export default function PromptListCardView({ runtime }: PromptListCardViewProps)
                         <div className="flex gap-2 pt-2 border-t">
                           <button
                             onClick={handleSaveEdit}
-                            className="flex-1 px-4 py-2 bg-[var(--glass-accent-from)] text-white rounded-lg text-sm font-medium hover:bg-[var(--glass-accent-to)] transition-colors"
+                            className="flex-1 px-4 py-2 bg-[var(--glass-accent-from)] text-white rounded-[var(--glass-radius-md)] text-sm font-medium hover:bg-[var(--glass-accent-to)] transition-colors"
                           >
                             {t('prompts.save')}
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className="flex-1 px-4 py-2 bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] rounded-lg text-sm font-medium hover:bg-[var(--glass-bg-muted)] transition-colors"
+                            className="flex-1 px-4 py-2 bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] rounded-[var(--glass-radius-md)] text-sm font-medium hover:bg-[var(--glass-bg-muted)] transition-colors"
                           >
                             {tCommon('cancel')}
                           </button>

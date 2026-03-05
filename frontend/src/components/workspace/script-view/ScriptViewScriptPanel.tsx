@@ -154,7 +154,7 @@ export default function ScriptViewScriptPanel({
                   key={clip.id}
                   onClick={() => onSelectClip(clip.id)}
                   className={`
-                    group p-5 border-[1.5px] rounded-2xl transition-all cursor-pointer relative bg-[var(--glass-bg-surface)]
+                    group p-5 border-[1.5px] rounded-[var(--glass-radius-xl)] transition-all cursor-pointer relative bg-[var(--glass-bg-surface)]
                     ${selectedClipId === clip.id
                       ? 'border-[var(--glass-stroke-focus)] shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-2 ring-[var(--glass-tone-info-bg)]'
                       : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]/40 hover:shadow-md'
@@ -247,7 +247,7 @@ export default function ScriptViewScriptPanel({
                             {scene.content?.map((item, itemIdx: number) => {
                               if (item.type === 'action') {
                                 return (
-                                  <div key={itemIdx} className="text-sm text-[var(--glass-text-secondary)] bg-[var(--glass-bg-muted)]/60 border border-[var(--glass-stroke-base)] px-2.5 py-1 rounded-lg flex items-start gap-2 w-fit max-w-full leading-[1.5]">
+                                  <div key={itemIdx} className="text-sm text-[var(--glass-text-secondary)] bg-[var(--glass-bg-muted)]/60 border border-[var(--glass-stroke-base)] px-2.5 py-1 rounded-[var(--glass-radius-md)] flex items-start gap-2 w-fit max-w-full leading-[1.5]">
                                     <AppIcon name="clapperboard" className="w-3.5 h-3.5 text-[var(--glass-text-tertiary)] shrink-0 mt-[2px]" />
                                     <EditableText
                                       text={item.text}

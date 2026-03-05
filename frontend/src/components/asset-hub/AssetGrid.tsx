@@ -139,7 +139,7 @@ export function AssetGrid({
                 <button
                     onClick={() => setPage(type, page - 1)}
                     disabled={page <= 1}
-                    className="glass-btn-base glass-btn-secondary px-3 py-1.5 text-xs rounded-md disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="glass-btn-base glass-btn-secondary px-3 py-1.5 text-xs rounded-[var(--glass-radius-sm)] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                     {t('pagination.previous')}
                 </button>
@@ -149,7 +149,7 @@ export function AssetGrid({
                 <button
                     onClick={() => setPage(type, page + 1)}
                     disabled={page >= totalPages}
-                    className="glass-btn-base glass-btn-secondary px-3 py-1.5 text-xs rounded-md disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="glass-btn-base glass-btn-secondary px-3 py-1.5 text-xs rounded-[var(--glass-radius-sm)] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                     {t('pagination.next')}
                 </button>
@@ -183,10 +183,10 @@ export function AssetGrid({
                     const tabIds = tabs.map(t => t.id)
                     const activeIdx = tabIds.indexOf(filter)
                     return (
-                        <div className="rounded-lg p-0.5" style={{ background: 'rgba(0,0,0,0.04)' }}>
+                        <div className="rounded-[var(--glass-radius-md)] p-0.5" style={{ background: 'rgba(0,0,0,0.04)' }}>
                             <div className="relative grid gap-1" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
                                 <div
-                                    className="absolute bottom-0.5 top-0.5 rounded-md bg-white transition-transform duration-200"
+                                    className="absolute bottom-0.5 top-0.5 rounded-[var(--glass-radius-sm)] bg-white transition-transform duration-200"
                                     style={{
                                         boxShadow: '0 1px 4px rgba(0,0,0,0.15), 0 0 0 0.5px rgba(0,0,0,0.06)',
                                         width: `calc(100% / ${tabs.length})`,
@@ -197,7 +197,7 @@ export function AssetGrid({
                                     <button
                                         key={tab.id}
                                         onClick={() => setFilter(tab.id as 'all' | 'character' | 'location' | 'voice')}
-                                        className={`relative z-[1] px-4 py-1.5 text-sm rounded-md transition-colors cursor-pointer ${filter === tab.id ? 'text-[var(--glass-text-primary)] font-medium' : 'text-[var(--glass-text-tertiary)] hover:text-[var(--glass-text-secondary)]'}`}
+                                        className={`relative z-[1] px-4 py-1.5 text-sm rounded-[var(--glass-radius-sm)] transition-colors cursor-pointer ${filter === tab.id ? 'text-[var(--glass-text-primary)] font-medium' : 'text-[var(--glass-text-tertiary)] hover:text-[var(--glass-text-secondary)]'}`}
                                     >
                                         {tab.label}
                                     </button>
@@ -211,21 +211,21 @@ export function AssetGrid({
                 <div className="flex items-center gap-3">
                     <button
                         onClick={onAddCharacter}
-                        className="glass-btn-base glass-btn-primary px-4 py-2 rounded-lg text-sm"
+                        className="glass-btn-base glass-btn-primary px-4 py-2 rounded-[var(--glass-radius-md)] text-sm"
                     >
                         <PlusIcon className="w-4 h-4" />
                         <span>{t('addCharacter')}</span>
                     </button>
                     <button
                         onClick={onAddLocation}
-                        className="glass-btn-base glass-btn-primary px-4 py-2 rounded-lg text-sm"
+                        className="glass-btn-base glass-btn-primary px-4 py-2 rounded-[var(--glass-radius-md)] text-sm"
                     >
                         <PlusIcon className="w-4 h-4" />
                         <span>{t('addLocation')}</span>
                     </button>
                     <button
                         onClick={onAddVoice}
-                        className="glass-btn-base glass-btn-tone-info px-4 py-2 rounded-lg text-sm"
+                        className="glass-btn-base glass-btn-tone-info px-4 py-2 rounded-[var(--glass-radius-md)] text-sm"
                     >
                         <PlusIcon className="w-4 h-4" />
                         <span>{t('addVoice')}</span>
@@ -235,7 +235,7 @@ export function AssetGrid({
 
             {isEmpty ? (
                 /* 空状态 */
-                <div className="glass-surface rounded-xl p-12 text-center">
+                <div className="glass-surface rounded-[var(--glass-radius-lg)] p-12 text-center">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--glass-bg-muted)] flex items-center justify-center">
                         <PlusIcon className="w-8 h-8 text-[var(--glass-text-tertiary)]" />
                     </div>

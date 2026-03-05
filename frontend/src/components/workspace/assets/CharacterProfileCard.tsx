@@ -71,7 +71,7 @@ export default function CharacterProfileCard({
         : 'bg-[var(--glass-bg-muted)] text-[var(--glass-text-primary)]'
 
     return (
-        <div className="bg-[var(--glass-bg-surface)] rounded-xl border border-[var(--glass-stroke-base)] p-4 hover:shadow-md transition-shadow">
+        <div className="bg-[var(--glass-bg-surface)] rounded-[var(--glass-radius-lg)] border border-[var(--glass-stroke-base)] p-4 hover:shadow-md transition-shadow">
             {/* 头部 */}
             <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
@@ -88,7 +88,7 @@ export default function CharacterProfileCard({
                     <button
                         onClick={onDelete}
                         disabled={isConfirming || isDeleting}
-                        className="p-1.5 text-[var(--glass-text-tertiary)] hover:text-[var(--glass-tone-danger-fg)] hover:bg-[var(--glass-tone-danger-bg)] rounded-lg transition-colors disabled:opacity-50"
+                        className="p-1.5 text-[var(--glass-text-tertiary)] hover:text-[var(--glass-tone-danger-fg)] hover:bg-[var(--glass-tone-danger-bg)] rounded-[var(--glass-radius-md)] transition-colors disabled:opacity-50"
                         title={t('characterProfile.delete')}
                     >
                         {isDeleting ? (
@@ -153,7 +153,7 @@ export default function CharacterProfileCard({
                 <button
                     onClick={onEdit}
                     disabled={isConfirming}
-                    className="flex-1 px-3 py-1.5 text-sm border border-[var(--glass-stroke-strong)] rounded-lg hover:bg-[var(--glass-bg-muted)] transition-colors disabled:opacity-50"
+                    className="flex-1 px-3 py-1.5 text-sm border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] hover:bg-[var(--glass-bg-muted)] transition-colors disabled:opacity-50"
                 >
                     {t('characterProfile.editProfile')}
                 </button>
@@ -161,7 +161,7 @@ export default function CharacterProfileCard({
                     <button
                         onClick={onUseExisting}
                         disabled={isConfirming}
-                        className="flex-1 px-3 py-1.5 text-sm border border-[var(--glass-stroke-focus)] text-[var(--glass-tone-info-fg)] rounded-lg hover:bg-[var(--glass-tone-info-bg)] transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
+                        className="flex-1 px-3 py-1.5 text-sm border border-[var(--glass-stroke-focus)] text-[var(--glass-tone-info-fg)] rounded-[var(--glass-radius-md)] hover:bg-[var(--glass-tone-info-bg)] transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
                     >
                         {t('characterProfile.useExisting')}
                     </button>
@@ -169,7 +169,7 @@ export default function CharacterProfileCard({
                 <button
                     onClick={onConfirm}
                     disabled={isConfirming}
-                    className="flex-1 px-3 py-1.5 text-sm bg-[var(--glass-accent-from)] text-white rounded-lg hover:bg-[var(--glass-accent-to)] transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
+                    className="flex-1 px-3 py-1.5 text-sm bg-[var(--glass-accent-from)] text-white rounded-[var(--glass-radius-md)] hover:bg-[var(--glass-accent-to)] transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
                 >
                     {isConfirming ? (
                         <TaskStatusInline state={confirmingState} className="text-white [&>span]:text-white [&_svg]:text-white" />

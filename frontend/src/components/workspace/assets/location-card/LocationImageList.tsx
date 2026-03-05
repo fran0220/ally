@@ -55,7 +55,7 @@ export default function LocationImageList(props: LocationImageListProps) {
             <div key={img.id} className="relative group/thumb">
               <div
                 onClick={() => props.onImageClick(img.imageUrl!)}
-                className={`rounded-lg overflow-hidden border-2 transition-all cursor-pointer relative ${isThisSelected
+                className={`rounded-[var(--glass-radius-md)] overflow-hidden border-2 transition-all cursor-pointer relative ${isThisSelected
                   ? 'border-[var(--glass-stroke-success)] ring-2 ring-[var(--glass-focus-ring)]'
                   : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]'
                   }`}
@@ -111,7 +111,7 @@ export default function LocationImageList(props: LocationImageListProps) {
   })
 
   return (
-    <div className="rounded-lg overflow-hidden border-2 border-[var(--glass-stroke-base)] relative">
+    <div className="rounded-[var(--glass-radius-md)] overflow-hidden border-2 border-[var(--glass-stroke-base)] relative">
       {props.currentImageUrl ? (
         <div className="relative w-full">
           <MediaImageWithLoading

@@ -54,7 +54,7 @@ export default function StoryboardGroupActions({
       <button
         onClick={onRegenerateText}
         disabled={isSubmittingStoryboardTextTask}
-        className={`px-3 py-1.5 text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-sm glass-btn-base ${isSubmittingStoryboardTextTask
+        className={`px-3 py-1.5 text-xs rounded-[var(--glass-radius-lg)] transition-all flex items-center gap-1.5 shadow-sm glass-btn-base ${isSubmittingStoryboardTextTask
           ? 'bg-[var(--glass-bg-muted)] text-[var(--glass-text-tertiary)] cursor-not-allowed'
           : 'glass-btn-tone-warning'
           }`}
@@ -73,7 +73,7 @@ export default function StoryboardGroupActions({
         <button
           onClick={onGenerateAllIndividually}
           disabled={currentRunningCount > 0}
-          className="glass-btn-base glass-btn-tone-info px-3 py-1.5 text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="glass-btn-base glass-btn-tone-info px-3 py-1.5 text-xs rounded-[var(--glass-radius-lg)] transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           title={t('group.generateMissingImages')}
         >
           {currentRunningCount > 0 ? (
@@ -90,7 +90,7 @@ export default function StoryboardGroupActions({
 
       <button
         onClick={onAddPanel}
-        className="glass-btn-base glass-btn-tone-success px-3 py-1.5 text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+        className="glass-btn-base glass-btn-tone-success px-3 py-1.5 text-xs rounded-[var(--glass-radius-lg)] transition-all flex items-center gap-1.5 shadow-sm"
       >
         <AppIcon name="plusMd" className="h-3.5 w-3.5" />
         <span>{t('group.addPanel')}</span>
@@ -99,7 +99,7 @@ export default function StoryboardGroupActions({
       <button
         onClick={onDeleteStoryboard}
         disabled={isSubmittingStoryboardTask}
-        className="glass-btn-base glass-btn-tone-danger px-3 py-1.5 text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        className="glass-btn-base glass-btn-tone-danger px-3 py-1.5 text-xs rounded-[var(--glass-radius-lg)] transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         title={t('common.delete')}
       >
         <AppIcon name="trashAlt" className="h-3.5 w-3.5" />

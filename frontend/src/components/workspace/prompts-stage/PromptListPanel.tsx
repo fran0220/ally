@@ -62,13 +62,13 @@ export default function PromptListPanel({ runtime }: PromptListPanelProps) {
         <div className="flex items-center space-x-2">
           <button
             onClick={() => onViewModeChange('card')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${viewMode === 'card' ? 'bg-[var(--glass-accent-from)] text-white' : 'bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-muted)]'}`}
+            className={`px-4 py-2 rounded-[var(--glass-radius-md)] text-sm font-medium transition-colors ${viewMode === 'card' ? 'bg-[var(--glass-accent-from)] text-white' : 'bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-muted)]'}`}
           >
             {tCommon('preview')}
           </button>
           <button
             onClick={() => onViewModeChange('table')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${viewMode === 'table' ? 'bg-[var(--glass-accent-from)] text-white' : 'bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-muted)]'}`}
+            className={`px-4 py-2 rounded-[var(--glass-radius-md)] text-sm font-medium transition-colors ${viewMode === 'table' ? 'bg-[var(--glass-accent-from)] text-white' : 'bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-muted)]'}`}
           >
             {t('common.status')}
           </button>

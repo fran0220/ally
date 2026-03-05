@@ -48,13 +48,13 @@ export default function StepMapping({
             <div className="flex gap-3">
               <button
                 onClick={onCloseDeleteConfirm}
-                className="flex-1 px-4 py-2.5 border border-[var(--glass-stroke-strong)] rounded-lg font-medium hover:bg-[var(--glass-bg-muted)] transition-colors"
+                className="flex-1 px-4 py-2.5 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] font-medium hover:bg-[var(--glass-bg-muted)] transition-colors"
               >
                 {t('preview.deleteConfirm.cancel')}
               </button>
               <button
                 onClick={onConfirmDeleteEpisode}
-                className="flex-1 px-4 py-2.5 bg-[var(--glass-tone-danger-fg)] text-white rounded-lg font-medium hover:bg-[var(--glass-tone-danger-fg)] transition-colors"
+                className="flex-1 px-4 py-2.5 bg-[var(--glass-tone-danger-fg)] text-white rounded-[var(--glass-radius-md)] font-medium hover:bg-[var(--glass-tone-danger-fg)] transition-colors"
               >
                 {t('preview.deleteConfirm.confirm')}
               </button>
@@ -65,7 +65,7 @@ export default function StepMapping({
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          <div className="bg-[var(--glass-bg-surface)] rounded-2xl border border-[var(--glass-stroke-base)] p-6 sticky top-6">
+          <div className="bg-[var(--glass-bg-surface)] rounded-[var(--glass-radius-xl)] border border-[var(--glass-stroke-base)] p-6 sticky top-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-lg">{t('preview.episodeList')}</h3>
               <span className="text-sm text-[var(--glass-text-tertiary)]">{episodes.length} {t('preview.episodeList')}</span>
@@ -76,7 +76,7 @@ export default function StepMapping({
                 <div
                   key={idx}
                   onClick={() => onSelectEpisode(idx)}
-                  className={`p-4 rounded-xl transition-all duration-200 cursor-pointer relative group ${selectedEpisode === idx
+                  className={`p-4 rounded-[var(--glass-radius-lg)] transition-all duration-200 cursor-pointer relative group ${selectedEpisode === idx
                     ? 'bg-[var(--glass-tone-info-bg)] border-2 border-[var(--glass-stroke-focus)]'
                     : 'bg-[var(--glass-bg-surface)] border border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]'
                     }`}
@@ -136,7 +136,7 @@ export default function StepMapping({
 
             <button
               onClick={onAddEpisode}
-              className="w-full mt-4 py-3 border-2 border-dashed border-[var(--glass-stroke-strong)] rounded-xl text-[var(--glass-text-tertiary)] hover:border-[var(--glass-stroke-focus)] hover:text-[var(--glass-tone-info-fg)] hover:bg-[var(--glass-tone-info-bg)] transition-all duration-200 flex items-center justify-center gap-2"
+              className="w-full mt-4 py-3 border-2 border-dashed border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-lg)] text-[var(--glass-text-tertiary)] hover:border-[var(--glass-stroke-focus)] hover:text-[var(--glass-tone-info-fg)] hover:bg-[var(--glass-tone-info-bg)] transition-all duration-200 flex items-center justify-center gap-2"
             >
               <AppIcon name="plus" className="w-5 h-5" />
               {t('preview.addEpisode')}
@@ -155,7 +155,7 @@ export default function StepMapping({
 
         <div className="lg:col-span-2">
           {episodes[selectedEpisode] && (
-            <div className="bg-[var(--glass-bg-surface)] rounded-2xl border border-[var(--glass-stroke-base)] p-6">
+            <div className="bg-[var(--glass-bg-surface)] rounded-[var(--glass-radius-xl)] border border-[var(--glass-stroke-base)] p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
                   <input
@@ -178,11 +178,11 @@ export default function StepMapping({
                   rows={16}
                   value={episodes[selectedEpisode].content}
                   onChange={(e) => onUpdateEpisodeContent(selectedEpisode, e.target.value)}
-                  className="w-full border border-[var(--glass-stroke-strong)] rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-[var(--glass-focus-ring-strong)] focus:border-[var(--glass-stroke-focus)] resize-none font-mono text-sm leading-relaxed"
+                  className="w-full border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-lg)] p-4 focus:outline-none focus:ring-2 focus:ring-[var(--glass-focus-ring-strong)] focus:border-[var(--glass-stroke-focus)] resize-none font-mono text-sm leading-relaxed"
                 />
               </div>
 
-              <div className="mt-4 p-4 bg-[var(--glass-tone-info-bg)] border border-[var(--glass-stroke-focus)] rounded-xl">
+              <div className="mt-4 p-4 bg-[var(--glass-tone-info-bg)] border border-[var(--glass-stroke-focus)] rounded-[var(--glass-radius-lg)]">
                 <div className="flex items-start gap-3">
                   <AppIcon name="info" className="w-5 h-5 text-[var(--glass-tone-info-fg)] flex-shrink-0 mt-0.5" />
                   <div className="flex-1">

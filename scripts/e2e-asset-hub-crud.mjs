@@ -69,6 +69,10 @@ function toErrorMessage(error) {
   return error instanceof Error ? error.message : String(error)
 }
 
+function isObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
 function asObject(value, label) {
   assert(value !== null && typeof value === 'object' && !Array.isArray(value), `${label} must be a JSON object`)
   return value
@@ -82,6 +86,36 @@ function asArray(value, label) {
 function asNonEmptyString(value, label) {
   assert(typeof value === 'string' && value.trim().length > 0, `${label} must be a non-empty string`)
   return value
+}
+
+function collectSnakeCaseKeyPaths(value, pathLabel, paths) {
+  if (Array.isArray(value)) {
+    for (let index = 0; index < value.length; index += 1) {
+      collectSnakeCaseKeyPaths(value[index], `${pathLabel}[${index}]`, paths)
+    }
+    return
+  }
+
+  if (!isObject(value)) {
+    return
+  }
+
+  for (const [key, nestedValue] of Object.entries(value)) {
+    const keyPath = `${pathLabel}.${key}`
+    if (key.includes('_')) {
+      paths.push(keyPath)
+    }
+    collectSnakeCaseKeyPaths(nestedValue, keyPath, paths)
+  }
+}
+
+function assertNoSnakeCaseKeys(value, label) {
+  const snakeCasePaths = []
+  collectSnakeCaseKeyPaths(value, label, snakeCasePaths)
+  assert(
+    snakeCasePaths.length === 0,
+    `${label} must not include snake_case keys: ${snakeCasePaths.join(', ')}`,
+  )
 }
 
 function findObjectById(items, id, label) {
@@ -101,7 +135,9 @@ function assertStatus(stepId, actualStatus, expectedStatus) {
 function expectJsonObject(stepId, response, expectedStatus) {
   assertStatus(stepId, response.status, expectedStatus)
   assert(response.parseError === null, `${stepId}: ${response.parseError}`)
-  return asObject(response.json, `${stepId}: response body`)
+  const body = asObject(response.json, `${stepId}: response body`)
+  assertNoSnakeCaseKeys(body, `${stepId}: response body`)
+  return body
 }
 
 function assertSuccess(stepId, payload) {

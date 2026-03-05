@@ -132,6 +132,16 @@ mod tests {
     }
 
     #[test]
+    fn parse_token_prefers_authorization_when_cookie_is_also_present() {
+        let parts = request_parts(vec![
+            (header::AUTHORIZATION.as_str(), "Bearer header-token"),
+            (header::COOKIE.as_str(), "token=cookie-token"),
+        ]);
+        let token = parse_token(&parts).expect("parsing should succeed");
+        assert_eq!(token.as_deref(), Some("header-token"));
+    }
+
+    #[test]
     fn parse_token_rejects_invalid_authorization_scheme() {
         let parts = request_parts(vec![(header::AUTHORIZATION.as_str(), "Token token-123")]);
         let error = parse_token(&parts).expect_err("invalid scheme should be rejected");

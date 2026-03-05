@@ -1,4 +1,4 @@
-import { API_BASE_URL, apiRequest, getAuthToken } from './client';
+import { apiRequest, apiRequestBlob } from './client';
 
 export interface NovelEpisode {
   id: string;
@@ -80,6 +80,7 @@ export interface NovelTaskSubmitResponse {
 export interface NovelProjectRootResponse {
   project: {
     id: string;
+    name: string | null;
     novelPromotionData: {
       id: string;
       projectId: string;
@@ -467,25 +468,7 @@ export function selectProjectLocationImage(
 }
 
 async function downloadNovelZip(path: string, init?: RequestInit): Promise<Blob> {
-  const headers = new Headers(init?.headers ?? undefined);
-  const token = getAuthToken();
-  if (token && !headers.has('Authorization')) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
-
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    credentials: 'include',
-    headers,
-    method: init?.method ?? 'GET',
-    body: init?.body,
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || `download failed: ${response.status}`);
-  }
-
-  return response.blob();
+  return apiRequestBlob(path, init);
 }
 
 export async function downloadProjectImagesZip(projectId: string, episodeId?: string) {

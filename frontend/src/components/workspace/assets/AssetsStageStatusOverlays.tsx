@@ -33,7 +33,7 @@ export default function AssetsStageStatusOverlays({
       {toast && (
         <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right">
           <div
-            className={`flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg ${
+            className={`flex items-center gap-2 px-4 py-3 rounded-[var(--glass-radius-lg)] shadow-lg ${
               toast.type === 'success'
                 ? 'bg-[var(--glass-tone-success-fg)] text-white'
                 : toast.type === 'warning'

@@ -78,7 +78,7 @@ export function SpotlightCharCard({
     <div
       onClick={onClick}
       className={`
-        group relative rounded-xl cursor-pointer transition-all duration-500 ease-out
+        group relative rounded-[var(--glass-radius-lg)] cursor-pointer transition-all duration-500 ease-out
         ${isActive
           ? 'opacity-100 scale-100 ring-2 ring-[var(--glass-focus-ring-strong)] shadow-[var(--glass-shadow-md)] bg-[var(--glass-bg-surface)]'
           : 'opacity-50 scale-95 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-95 bg-[var(--glass-bg-muted)]'
@@ -137,7 +137,7 @@ export function SpotlightCharCard({
         <button
           onClick={hasVoice ? handlePlayVoice : undefined}
           disabled={!hasVoice}
-          className={`mt-1.5 w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${!hasVoice
+          className={`mt-1.5 w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-[var(--glass-radius-md)] text-xs font-medium transition-all ${!hasVoice
             ? 'bg-[var(--glass-bg-muted)] text-[var(--glass-text-tertiary)] cursor-not-allowed border border-dashed border-[var(--glass-stroke-base)]'
             : isPlaying
               ? 'bg-[var(--glass-accent-from)] text-white'
@@ -207,7 +207,7 @@ export function SpotlightLocationCard({
     <div
       onClick={onClick}
       className={`
-        group relative rounded-xl cursor-pointer transition-all duration-500 ease-out
+        group relative rounded-[var(--glass-radius-lg)] cursor-pointer transition-all duration-500 ease-out
         ${isActive
           ? 'opacity-100 scale-100 ring-2 ring-[var(--glass-stroke-success)] shadow-[var(--glass-shadow-md)] bg-[var(--glass-bg-surface)]'
           : 'opacity-50 scale-95 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-95 bg-[var(--glass-bg-muted)]'

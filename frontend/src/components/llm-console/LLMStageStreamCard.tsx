@@ -261,10 +261,10 @@ export default function LLMStageStreamCard({
   if (!activeStage) return null;
 
   return (
-    <article className="glass-surface-modal flex h-full w-full flex-col overflow-hidden rounded-2xl text-[var(--glass-text-primary)]">
+    <article className="glass-surface-modal flex h-full w-full flex-col overflow-hidden rounded-[var(--glass-radius-xl)] text-[var(--glass-text-primary)]">
       <header className="border-b border-[var(--glass-stroke-base)] px-5 py-5 md:px-6">
         <div className="grid grid-cols-1 gap-3 md:grid-cols-[15rem_minmax(0,1fr)_auto] md:items-center">
-          <div className="glass-surface-soft rounded-xl border border-[var(--glass-stroke-base)] p-3">
+          <div className="glass-surface-soft rounded-[var(--glass-radius-lg)] border border-[var(--glass-stroke-base)] p-3">
             <p className="text-[11px] uppercase tracking-[0.12em] text-[var(--glass-text-tertiary)]">
               {t('stageCard.stage')}
             </p>
@@ -301,7 +301,7 @@ export default function LLMStageStreamCard({
         </div>
 
         {errorMessage && (
-          <div className="mt-3 flex items-center gap-2 rounded-lg bg-[var(--glass-tone-danger-bg)] px-4 py-2.5 text-[var(--glass-tone-danger-fg)]">
+          <div className="mt-3 flex items-center gap-2 rounded-[var(--glass-radius-md)] bg-[var(--glass-tone-danger-bg)] px-4 py-2.5 text-[var(--glass-tone-danger-fg)]">
             <span className="text-base">⚠️</span>
             <span className="text-sm font-medium">{errorMessage}</span>
           </div>
@@ -309,7 +309,7 @@ export default function LLMStageStreamCard({
       </header>
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 p-5 md:grid-cols-[17rem_1fr] md:gap-5 md:p-6">
-        <aside className="glass-surface-soft min-h-0 rounded-xl border border-[var(--glass-stroke-base)] p-3">
+        <aside className="glass-surface-soft min-h-0 rounded-[var(--glass-radius-lg)] border border-[var(--glass-stroke-base)] p-3">
           <ul className="max-h-[40vh] space-y-2 overflow-y-auto pr-1 md:h-full md:max-h-none">
             {stages.map((stage) => {
               const isActive = stage.id === outputStageId;
@@ -319,7 +319,7 @@ export default function LLMStageStreamCard({
                   <button
                     type="button"
                     onClick={() => onSelectStage?.(stage.id)}
-                    className={`w-full rounded-lg border p-2.5 text-left ${
+                    className={`w-full rounded-[var(--glass-radius-md)] border p-2.5 text-left ${
                       isActive
                         ? 'border-[var(--glass-stroke-focus)] bg-[var(--glass-tone-info-bg)]'
                         : 'border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface)]'
@@ -344,7 +344,7 @@ export default function LLMStageStreamCard({
           </ul>
         </aside>
 
-        <section className="glass-surface-soft min-h-[320px] rounded-xl border border-[var(--glass-stroke-base)]">
+        <section className="glass-surface-soft min-h-[320px] rounded-[var(--glass-radius-lg)] border border-[var(--glass-stroke-base)]">
           <div className="border-b border-[var(--glass-stroke-base)] px-4 py-3 text-sm font-medium text-[var(--glass-text-primary)]">
             {t('stageCard.outputTitle', {
               stage: resolveProgressText(outputStage?.title, 'stageCard.currentStage'),
@@ -354,7 +354,7 @@ export default function LLMStageStreamCard({
             {structuredOutput.hasStructured ? (
               <div className="space-y-4">
                 {structuredOutput.showReasoning ? (
-                  <div className="rounded-lg border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface)]">
+                  <div className="rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface)]">
                     <div className="border-b border-[var(--glass-stroke-base)] px-3 py-2 text-xs font-semibold text-[var(--glass-text-primary)]">
                       {REASONING_HEADER}
                     </div>
@@ -370,7 +370,7 @@ export default function LLMStageStreamCard({
                   </div>
                 ) : null}
                 {structuredOutput.showFinal ? (
-                  <div className="rounded-lg border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface)]">
+                  <div className="rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface)]">
                     <div className="border-b border-[var(--glass-stroke-base)] px-3 py-2 text-xs font-semibold text-[var(--glass-text-primary)]">
                       {FINAL_HEADER}
                     </div>

@@ -57,7 +57,7 @@ export default function EmotionSettingsPanel({
                     value={prompt}
                     onChange={(e) => handlePromptChange(e.target.value)}
                     placeholder={t("emotionPlaceholder")}
-                    className="w-full px-3 py-2 text-sm border border-[var(--glass-stroke-focus)]/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]/50 focus:border-[var(--glass-stroke-focus)] bg-[var(--glass-bg-surface)]"
+                    className="w-full px-3 py-2 text-sm border border-[var(--glass-stroke-focus)]/60 rounded-[var(--glass-radius-lg)] focus:outline-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]/50 focus:border-[var(--glass-stroke-focus)] bg-[var(--glass-bg-surface)]"
                 />
             </div>
 
@@ -73,7 +73,7 @@ export default function EmotionSettingsPanel({
                     step="0.1"
                     value={strength}
                     onChange={(e) => handleStrengthChange(parseFloat(e.target.value))}
-                    className="w-full h-2 bg-[var(--glass-tone-info-bg)] rounded-lg appearance-none cursor-pointer accent-[var(--glass-accent-from)]"
+                    className="w-full h-2 bg-[var(--glass-tone-info-bg)] rounded-[var(--glass-radius-md)] appearance-none cursor-pointer accent-[var(--glass-accent-from)]"
                 />
                 <div className="flex justify-between text-[10px] text-[var(--glass-text-tertiary)] mt-1">
                     <span>{t("flat")}</span>
@@ -85,7 +85,7 @@ export default function EmotionSettingsPanel({
             <button
                 onClick={handleGenerate}
                 disabled={isVoiceGenerationRunning}
-                className="w-full py-2 text-sm bg-[var(--glass-tone-success-fg)] text-white rounded-xl hover:bg-[var(--glass-tone-success-fg)] font-medium transition-all shadow-[var(--glass-shadow-sm)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-2 text-sm bg-[var(--glass-tone-success-fg)] text-white rounded-[var(--glass-radius-lg)] hover:bg-[var(--glass-tone-success-fg)] font-medium transition-all shadow-[var(--glass-shadow-sm)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {isVoiceGenerationRunning ? (
                     <TaskStatusInline state={voiceGenerationState} className="justify-center text-white [&>span]:text-white [&_svg]:text-white" />

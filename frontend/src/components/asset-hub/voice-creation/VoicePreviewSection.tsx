@@ -58,7 +58,7 @@ export default function VoicePreviewSection({ runtime }: VoicePreviewSectionProp
                   <button
                     key={idx}
                     onClick={() => setVoicePrompt(prompt)}
-                    className={`glass-btn-base px-2.5 py-1 text-xs rounded-md border transition-all ${voicePrompt === prompt
+                    className={`glass-btn-base px-2.5 py-1 text-xs rounded-[var(--glass-radius-sm)] border transition-all ${voicePrompt === prompt
                       ? 'glass-btn-tone-info border-[var(--glass-stroke-focus)]'
                       : 'glass-btn-soft text-[var(--glass-text-secondary)] border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]'
                       }`}
@@ -98,7 +98,7 @@ export default function VoicePreviewSection({ runtime }: VoicePreviewSectionProp
             <button
               onClick={handleGenerate}
               disabled={!voicePrompt.trim()}
-              className="glass-btn-base glass-btn-primary w-full py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              className="glass-btn-base glass-btn-primary w-full py-2.5 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
             >
               {tv('generate3Schemes')}
             </button>
@@ -121,7 +121,7 @@ export default function VoicePreviewSection({ runtime }: VoicePreviewSectionProp
                   <div
                     key={idx}
                     onClick={() => setSelectedIndex(idx)}
-                    className={`relative p-3 rounded-lg border-2 cursor-pointer transition-all text-center ${selectedIndex === idx
+                    className={`relative p-3 rounded-[var(--glass-radius-md)] border-2 cursor-pointer transition-all text-center ${selectedIndex === idx
                       ? 'border-[var(--glass-stroke-focus)] bg-[var(--glass-tone-info-bg)]'
                       : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]'
                       }`}
@@ -151,14 +151,14 @@ export default function VoicePreviewSection({ runtime }: VoicePreviewSectionProp
                 <button
                   onClick={handleGenerate}
                   disabled={isVoiceCreationSubmitting}
-                  className="glass-btn-base glass-btn-secondary flex-1 py-2 rounded-lg text-sm"
+                  className="glass-btn-base glass-btn-secondary flex-1 py-2 rounded-[var(--glass-radius-md)] text-sm"
                 >
                   {tv('regenerate')}
                 </button>
                 <button
                   onClick={handleSaveDesigned}
                   disabled={selectedIndex === null || isSaving || !voiceName.trim()}
-                  className="glass-btn-base glass-btn-tone-success flex-1 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  className="glass-btn-base glass-btn-tone-success flex-1 py-2 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                 >
                   {isSaving ? tHub('modal.adding') : tHub('save')}
                 </button>
@@ -176,7 +176,7 @@ export default function VoicePreviewSection({ runtime }: VoicePreviewSectionProp
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${isDragging
+              className={`border-2 border-dashed rounded-[var(--glass-radius-lg)] p-8 text-center cursor-pointer transition-all ${isDragging
                 ? 'border-[var(--glass-stroke-focus)] bg-[var(--glass-tone-info-bg)]'
                 : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)] hover:bg-[var(--glass-bg-muted)]'
                 }`}
@@ -195,7 +195,7 @@ export default function VoicePreviewSection({ runtime }: VoicePreviewSectionProp
               />
             </div>
           ) : (
-            <div className="glass-surface-soft border border-[var(--glass-stroke-base)] rounded-xl p-4">
+            <div className="glass-surface-soft border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-lg)] p-4">
               <div className="text-sm font-medium text-[var(--glass-text-primary)] truncate">{uploadFile.name}</div>
               <button
                 onClick={() => {
@@ -210,7 +210,7 @@ export default function VoicePreviewSection({ runtime }: VoicePreviewSectionProp
               {uploadPreviewUrl && (
                 <button
                   onClick={handlePlayUpload}
-                  className="glass-btn-base glass-btn-tone-info w-full py-2 rounded-lg text-sm font-medium mt-2"
+                  className="glass-btn-base glass-btn-tone-info w-full py-2 rounded-[var(--glass-radius-md)] text-sm font-medium mt-2"
                 >
                   {tvCreate('previewAudio')}
                 </button>
@@ -222,7 +222,7 @@ export default function VoicePreviewSection({ runtime }: VoicePreviewSectionProp
             <button
               onClick={handleSaveUploaded}
               disabled={isUploading || !voiceName.trim()}
-              className="glass-btn-base glass-btn-tone-success w-full py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium flex items-center justify-center gap-2"
+              className="glass-btn-base glass-btn-tone-success w-full py-2.5 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium flex items-center justify-center gap-2"
             >
               {isUploading ? (
                 <TaskStatusInline
@@ -238,7 +238,7 @@ export default function VoicePreviewSection({ runtime }: VoicePreviewSectionProp
       )}
 
       {error && (
-        <div className="text-sm text-[var(--glass-tone-danger-fg)] bg-[var(--glass-tone-danger-bg)] px-3 py-2 rounded-lg">
+        <div className="text-sm text-[var(--glass-tone-danger-fg)] bg-[var(--glass-tone-danger-bg)] px-3 py-2 rounded-[var(--glass-radius-md)]">
           {error}
         </div>
       )}

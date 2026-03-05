@@ -430,7 +430,7 @@ export default function ScriptViewAssetsPanel({
               <div className="shrink-0 text-xs text-[var(--glass-text-tertiary)]">{tCommon('edit')} · {tScript('asset.activeCharacters')}</div>
               <div className="mt-3 flex-1 min-h-0 space-y-4 overflow-y-auto pr-1 custom-scrollbar">
                 {isAllClipsMode && (
-                  <div className="rounded-lg border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-muted)]/40 p-2 text-[11px] text-[var(--glass-text-tertiary)]">
+                  <div className="rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-muted)]/40 p-2 text-[11px] text-[var(--glass-text-tertiary)]">
                     当前为“全部片段”视图，文案要求仅在单片段视图可编辑
                   </div>
                 )}
@@ -469,7 +469,7 @@ export default function ScriptViewAssetsPanel({
                                     return next
                                   })
                                 }}
-                                className={`relative w-full rounded-lg overflow-hidden border-2 ${isThisAppearanceSelected ? 'border-[var(--glass-stroke-success)]' : 'border-transparent hover:border-[var(--glass-stroke-focus)]'}`}
+                                className={`relative w-full rounded-[var(--glass-radius-md)] overflow-hidden border-2 ${isThisAppearanceSelected ? 'border-[var(--glass-stroke-success)]' : 'border-transparent hover:border-[var(--glass-stroke-focus)]'}`}
                               >
                                 <div className="aspect-square bg-[var(--glass-bg-muted)]">
                                   {previewUrl ? (
@@ -510,14 +510,14 @@ export default function ScriptViewAssetsPanel({
                 <button
                   onClick={() => setShowAddChar(false)}
                   disabled={isSavingCharacterSelection}
-                  className="glass-btn-base glass-btn-secondary rounded-lg px-3 py-1.5 text-xs text-[var(--glass-text-secondary)]"
+                  className="glass-btn-base glass-btn-secondary rounded-[var(--glass-radius-md)] px-3 py-1.5 text-xs text-[var(--glass-text-secondary)]"
                 >
                   {tCommon('cancel')}
                 </button>
                 <button
                   onClick={() => void handleConfirmCharacterSelection()}
                   disabled={isSavingCharacterSelection || !hasCharacterSelectionChanges}
-                  className="glass-btn-base glass-btn-primary rounded-lg px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+                  className="glass-btn-base glass-btn-primary rounded-[var(--glass-radius-md)] px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {tCommon('confirm')}
                 </button>
@@ -583,7 +583,7 @@ export default function ScriptViewAssetsPanel({
               <div className="shrink-0 text-xs text-[var(--glass-text-tertiary)]">{tCommon('edit')} · {tScript('asset.activeLocations')}</div>
               <div className="mt-3 flex-1 min-h-0 overflow-y-auto pr-1 custom-scrollbar">
                 {isAllClipsMode && (
-                  <div className="mb-3 rounded-lg border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-muted)]/40 p-2 text-[11px] text-[var(--glass-text-tertiary)]">
+                  <div className="mb-3 rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-muted)]/40 p-2 text-[11px] text-[var(--glass-text-tertiary)]">
                     当前为“全部片段”视图，场景文案要求仅在单片段视图可编辑
                   </div>
                 )}
@@ -614,7 +614,7 @@ export default function ScriptViewAssetsPanel({
                               return next
                             })
                           }}
-                          className={`relative w-full overflow-hidden rounded-lg border-2 text-left transition-colors ${isSelected ? 'border-[var(--glass-stroke-success)]' : 'border-transparent hover:border-[var(--glass-stroke-focus)]'}`}
+                          className={`relative w-full overflow-hidden rounded-[var(--glass-radius-md)] border-2 text-left transition-colors ${isSelected ? 'border-[var(--glass-stroke-success)]' : 'border-transparent hover:border-[var(--glass-stroke-focus)]'}`}
                         >
                           <div className="aspect-video bg-[var(--glass-bg-muted)]">
                             {previewImage ? (
@@ -655,14 +655,14 @@ export default function ScriptViewAssetsPanel({
                 <button
                   onClick={() => setShowAddLoc(false)}
                   disabled={isSavingLocationSelection}
-                  className="glass-btn-base glass-btn-secondary rounded-lg px-3 py-1.5 text-xs text-[var(--glass-text-secondary)]"
+                  className="glass-btn-base glass-btn-secondary rounded-[var(--glass-radius-md)] px-3 py-1.5 text-xs text-[var(--glass-text-secondary)]"
                 >
                   {tCommon('cancel')}
                 </button>
                 <button
                   onClick={() => void handleConfirmLocationSelection()}
                   disabled={isSavingLocationSelection || !hasLocationSelectionChanges}
-                  className="glass-btn-base glass-btn-primary rounded-lg px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+                  className="glass-btn-base glass-btn-primary rounded-[var(--glass-radius-md)] px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {tCommon('confirm')}
                 </button>
@@ -692,7 +692,7 @@ export default function ScriptViewAssetsPanel({
 
       <div className="mt-4 mb-4">
         {!allAssetsHaveImages && globalCharIds.length + globalLocationIds.length > 0 && (
-          <div className="mb-3 p-4 bg-[var(--glass-bg-surface)] border border-[var(--glass-stroke-base)] rounded-2xl shadow-sm">
+          <div className="mb-3 p-4 bg-[var(--glass-bg-surface)] border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-xl)] shadow-sm">
             <p className="text-sm font-medium text-[var(--glass-text-primary)]">{tScript('generate.missingAssets', { count: missingAssetsCount })}</p>
             <p className="text-xs text-[var(--glass-text-tertiary)] mt-0.5">
               {tScript('generate.missingAssetsTip')}
@@ -706,7 +706,7 @@ export default function ScriptViewAssetsPanel({
         <button
           onClick={onGenerateStoryboard}
           disabled={isSubmittingStoryboardBuild || clips.length === 0 || !allAssetsHaveImages}
-          className="w-full py-4 text-lg font-bold bg-[var(--glass-accent-from)] text-white rounded-2xl"
+          className="w-full py-4 text-lg font-bold bg-[var(--glass-accent-from)] text-white rounded-[var(--glass-radius-xl)]"
         >
           {isSubmittingStoryboardBuild ? tScript('generate.generating') : tScript('generate.startGenerate')}
         </button>

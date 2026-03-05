@@ -10,7 +10,7 @@ import {
 } from 'react-router-dom';
 
 import { Navbar } from './components/Navbar';
-import { useHasAuthToken } from './hooks/useHasAuthToken';
+import { useAuthSession } from './hooks/useAuthSession';
 import i18n from './i18n';
 
 const Landing = lazy(() => import('./routes/Landing').then((module) => ({ default: module.Landing })));
@@ -56,10 +56,14 @@ function AppLayout() {
 }
 
 function RequireAuth() {
-  const hasToken = useHasAuthToken();
+  const { isAuthenticated, isBootstrapping } = useAuthSession();
   const location = useLocation();
 
-  if (!hasToken) {
+  if (isBootstrapping) {
+    return <RouteFallback />;
+  }
+
+  if (!isAuthenticated) {
     return (
       <Navigate
         to="/auth/signin"
@@ -72,10 +76,39 @@ function RequireAuth() {
   return <Outlet />;
 }
 
-function RedirectIfAuthenticated() {
-  const hasToken = useHasAuthToken();
+function RequireAdmin() {
+  const { user, isAuthenticated, isBootstrapping } = useAuthSession();
+  const location = useLocation();
 
-  if (hasToken) {
+  if (isBootstrapping) {
+    return <RouteFallback />;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to="/auth/signin"
+        replace
+        state={{ from: `${location.pathname}${location.search}${location.hash}` }}
+      />
+    );
+  }
+
+  if (!user || user.role !== 'admin') {
+    return <Navigate to="/workspace" replace />;
+  }
+
+  return <Outlet />;
+}
+
+function RedirectIfAuthenticated() {
+  const { isAuthenticated, isBootstrapping } = useAuthSession();
+
+  if (isBootstrapping) {
+    return <RouteFallback />;
+  }
+
+  if (isAuthenticated) {
     return <Navigate to="/workspace" replace />;
   }
 
@@ -181,24 +214,29 @@ const router = createBrowserRouter([
             ],
           },
           {
-            path: '/admin',
-            element: <AdminLayout />,
+            element: <RequireAdmin />,
             children: [
               {
-                index: true,
-                element: <Navigate to="ai-config" replace />,
-              },
-              {
-                path: 'ai-config',
-                element: <AiConfig />,
-              },
-              {
-                path: 'users',
-                element: <AdminUsers />,
-              },
-              {
-                path: 'system',
-                element: <AdminSystem />,
+                path: '/admin',
+                element: <AdminLayout />,
+                children: [
+                  {
+                    index: true,
+                    element: <Navigate to="ai-config" replace />,
+                  },
+                  {
+                    path: 'ai-config',
+                    element: <AiConfig />,
+                  },
+                  {
+                    path: 'users',
+                    element: <AdminUsers />,
+                  },
+                  {
+                    path: 'system',
+                    element: <AdminSystem />,
+                  },
+                ],
               },
             ],
           },

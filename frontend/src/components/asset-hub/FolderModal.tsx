@@ -65,14 +65,14 @@ export function FolderModal({ folder, onClose, onSave }: FolderModalProps) {
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="glass-btn-base glass-btn-secondary px-4 py-2 rounded-lg text-sm"
+                                className="glass-btn-base glass-btn-secondary px-4 py-2 rounded-[var(--glass-radius-md)] text-sm"
                             >
                                 {t('cancel')}
                             </button>
                             <button
                                 type="submit"
                                 disabled={!name.trim()}
-                                className="glass-btn-base glass-btn-primary px-4 py-2 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="glass-btn-base glass-btn-primary px-4 py-2 rounded-[var(--glass-radius-md)] text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {folder ? t('save') : t('create')}
                             </button>

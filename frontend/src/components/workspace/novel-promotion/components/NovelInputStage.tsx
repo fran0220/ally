@@ -72,7 +72,7 @@ function RatioSelector({
                   onChange(option.value)
                   setIsOpen(false)
                 }}
-                className={`flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-[var(--glass-bg-muted)]/70 transition-colors ${value === option.value
+                className={`flex flex-col items-center gap-1.5 p-2 rounded-[var(--glass-radius-md)] hover:bg-[var(--glass-bg-muted)]/70 transition-colors ${value === option.value
                   ? 'bg-[var(--glass-tone-info-bg)] shadow-[0_0_0_1px_rgba(79,128,255,0.35)]'
                   : ''
                   }`}
@@ -144,7 +144,7 @@ function StyleSelector({
                   onChange(option.value)
                   setIsOpen(false)
                 }}
-                className={`flex items-center gap-2 p-3 rounded-lg text-left transition-all ${value === option.value
+                className={`flex items-center gap-2 p-3 rounded-[var(--glass-radius-md)] text-left transition-all ${value === option.value
                   ? 'bg-[var(--glass-tone-info-bg)] text-[var(--glass-tone-info-fg)] shadow-[0_0_0_1px_rgba(79,128,255,0.35)]'
                   : 'hover:bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)]'
                   }`}
@@ -249,7 +249,7 @@ AI 将根据您的文本智能分析：
           {/* 资产库引导提示 */}
           <div className="mt-5 p-4 glass-surface-soft">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 glass-surface-soft rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 glass-surface-soft rounded-[var(--glass-radius-lg)] flex items-center justify-center flex-shrink-0">
                 <AppIcon name="image" className="w-5 h-5 text-[var(--glass-text-secondary)]" />
               </div>
               <div className="flex-1 min-w-0">
@@ -295,7 +295,7 @@ AI 将根据您的文本智能分析：
       <div className="glass-surface p-6">
         {/* 旁白开关 */}
         {onEnableNarrationChange && (
-          <div className="glass-surface-soft flex items-center justify-between p-4 rounded-xl mb-6">
+          <div className="glass-surface-soft flex items-center justify-between p-4 rounded-[var(--glass-radius-lg)] mb-6">
             <div className="flex items-center gap-3">
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--glass-tone-info-bg)] text-[var(--glass-tone-info-fg)] font-semibold text-sm">VO</span>
               <div>

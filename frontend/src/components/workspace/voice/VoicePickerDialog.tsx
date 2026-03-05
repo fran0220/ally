@@ -133,7 +133,7 @@ export default function VoicePickerDialog({ isOpen, onClose, onSelect }: VoicePi
                   <div
                     key={voice.id}
                     onClick={() => setSelectedVoice(voice)}
-                    className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${isSelected
+                    className={`relative p-4 rounded-[var(--glass-radius-lg)] border-2 cursor-pointer transition-all ${isSelected
                       ? 'border-[var(--glass-stroke-focus)] bg-[var(--glass-tone-info-bg)]'
                       : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)] bg-[var(--glass-bg-surface)]'
                       }`}
@@ -165,7 +165,7 @@ export default function VoicePickerDialog({ isOpen, onClose, onSelect }: VoicePi
                           e.stopPropagation()
                           handlePlay(voice)
                         }}
-                        className={`mt-2 w-full py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1 glass-btn-base ${isPlaying
+                        className={`mt-2 w-full py-1.5 rounded-[var(--glass-radius-md)] text-xs font-medium transition-all flex items-center justify-center gap-1 glass-btn-base ${isPlaying
                           ? 'glass-btn-tone-info'
                           : 'glass-btn-secondary text-[var(--glass-text-secondary)]'
                           }`}
@@ -193,14 +193,14 @@ export default function VoicePickerDialog({ isOpen, onClose, onSelect }: VoicePi
         <div className="flex gap-2 p-4 border-t border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface-strong)]">
           <button
             onClick={handleClose}
-            className="glass-btn-base glass-btn-secondary flex-1 py-2 rounded-lg text-sm"
+            className="glass-btn-base glass-btn-secondary flex-1 py-2 rounded-[var(--glass-radius-md)] text-sm"
           >
             {t('cancel')}
           </button>
           <button
             onClick={handleConfirm}
             disabled={!selectedVoice}
-            className="glass-btn-base glass-btn-primary flex-1 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+            className="glass-btn-base glass-btn-primary flex-1 py-2 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
           >
             {t('voicePickerConfirm')}
           </button>

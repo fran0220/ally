@@ -256,7 +256,7 @@ export default function CharacterCard({
     )
 
     return (
-      <div className="col-span-3 bg-[var(--glass-bg-surface)] rounded-lg border-2 border-[var(--glass-stroke-base)] p-4 shadow-sm transition-all">
+      <div className="col-span-3 bg-[var(--glass-bg-surface)] rounded-[var(--glass-radius-md)] border-2 border-[var(--glass-stroke-base)] p-4 shadow-sm transition-all">
         <input
           ref={fileInputRef}
           type="file"
@@ -384,7 +384,7 @@ export default function CharacterCard({
                 className="fixed inset-0 z-10"
                 onClick={() => setShowDeleteMenu(false)}
               />
-              <div className="absolute right-0 top-full mt-1 z-20 bg-[var(--glass-bg-surface)] border border-[var(--glass-stroke-base)] rounded-lg shadow-lg py-1 min-w-[100px]">
+              <div className="absolute right-0 top-full mt-1 z-20 bg-[var(--glass-bg-surface)] border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-md)] shadow-lg py-1 min-w-[100px]">
                 <button
                   onClick={() => {
                     setShowDeleteMenu(false)

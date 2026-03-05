@@ -76,7 +76,7 @@ export function RatioSelector({ value, onChange, options }: RatioSelectorProps) 
                   onChange(option.value);
                   setIsOpen(false);
                 }}
-                className={`flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-[var(--glass-bg-muted)] transition-colors ${
+                className={`flex flex-col items-center gap-1.5 p-2 rounded-[var(--glass-radius-md)] hover:bg-[var(--glass-bg-muted)] transition-colors ${
                   value === option.value
                     ? 'bg-[var(--glass-tone-info-bg)] shadow-[0_0_0_1px_rgba(79,128,255,0.35)]'
                     : ''
@@ -142,7 +142,7 @@ export function StyleSelector({ value, onChange, options }: StyleSelectorProps) 
                   onChange(option.value);
                   setIsOpen(false);
                 }}
-                className={`flex items-center gap-2 p-3 rounded-lg text-left transition-all ${
+                className={`flex items-center gap-2 p-3 rounded-[var(--glass-radius-md)] text-left transition-all ${
                   value === option.value
                     ? 'bg-[var(--glass-tone-info-bg)] text-[var(--glass-tone-info-fg)] shadow-[0_0_0_1px_rgba(79,128,255,0.35)]'
                     : 'hover:bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)]'

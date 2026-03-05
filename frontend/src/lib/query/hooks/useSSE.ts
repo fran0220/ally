@@ -1,11 +1,13 @@
+import { type TaskLifecycleEvent, type TaskStreamEvent } from '@/api/sse'
 import { logError as _ulogError } from '@/lib/logging/core'
+import { subscribeSharedTaskEvents } from '@/lib/sse/shared-subscriber'
+import { isTaskIntent, resolveTaskIntent } from '@/lib/task/intent'
+import { TASK_EVENT_TYPE, TASK_SSE_EVENT_TYPE, type SSEEvent } from '@/lib/task/types'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '../keys'
-import { TASK_EVENT_TYPE, TASK_SSE_EVENT_TYPE, type SSEEvent } from '@/lib/task/types'
 import { applyTaskLifecycleToOverlay } from '../task-target-overlay'
-import { isTaskIntent, resolveTaskIntent } from '@/lib/task/intent'
 
 type UseSSEOptions = {
   projectId?: string | null
@@ -14,24 +16,37 @@ type UseSSEOptions = {
   onEvent?: (event: SSEEvent) => void
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function toSseEvent(event: TaskLifecycleEvent | TaskStreamEvent): SSEEvent {
+  return {
+    id: event.id,
+    type: event.type,
+    taskId: event.taskId,
+    projectId: event.projectId,
+    userId: event.userId,
+    ts: event.ts,
+    taskType: event.taskType ?? null,
+    targetType: event.targetType ?? null,
+    targetId: event.targetId ?? null,
+    episodeId: event.episodeId ?? null,
+    payload: event.payload as SSEEvent['payload'],
+  }
+}
+
 export function useSSE({ projectId, episodeId, enabled = true, onEvent }: UseSSEOptions) {
   const queryClient = useQueryClient()
-  const sourceRef = useRef<EventSource | null>(null)
+  const [connected, setConnected] = useState(false)
   const targetStatesInvalidateTimerRef = useRef<number | null>(null)
   const isGlobalAssetProject = projectId === 'global-asset-hub'
 
-  const url = useMemo(() => {
-    if (!projectId) return null
-    const params = new URLSearchParams({ projectId })
-    if (episodeId) params.set('episodeId', episodeId)
-    return `/api/sse?${params}`
-  }, [projectId, episodeId])
-
   useEffect(() => {
-    if (!enabled || !url || !projectId) return
-
-    const source = new EventSource(url)
-    sourceRef.current = source
+    if (!enabled || !projectId) {
+      setConnected(false)
+      return
+    }
 
     const invalidateEpisodeScoped = (resolvedEpisodeId: string | null) => {
       if (!resolvedEpisodeId) return
@@ -90,37 +105,25 @@ export function useSSE({ projectId, episodeId, enabled = true, onEvent }: UseSSE
       queryClient.invalidateQueries({ queryKey: queryKeys.projectData(projectId) })
     }
 
-    const handleEvent = (event: MessageEvent) => {
+    const handleEvent = (event: TaskLifecycleEvent | TaskStreamEvent) => {
       try {
-        const payload = JSON.parse(event.data || '{}')
-        if (!payload || !payload.type) return
-        onEvent?.(payload as SSEEvent)
-        const eventType = payload.type as string
-        const targetType = typeof payload.targetType === 'string'
-          ? payload.targetType
-          : typeof payload?.payload?.targetType === 'string'
-            ? payload.payload.targetType
-            : null
-        const targetId = typeof payload.targetId === 'string'
-          ? payload.targetId
-          : typeof payload?.payload?.targetId === 'string'
-            ? payload.payload.targetId
-            : null
-        const eventEpisodeId = typeof payload.episodeId === 'string'
-          ? payload.episodeId
-          : typeof payload?.payload?.episodeId === 'string'
-            ? payload.payload.episodeId
-            : null
-        const resolvedEpisodeId = eventEpisodeId || episodeId || null
+        const payload = toSseEvent(event)
+        onEvent?.(payload)
 
-        const eventPayload = payload?.payload && typeof payload.payload === 'object'
-          ? (payload.payload as Record<string, unknown>)
-          : null
+        const eventType = payload.type
+        const eventPayload = isRecord(payload.payload) ? payload.payload : null
+        const targetType = payload.targetType ?? null
+        const targetId = payload.targetId ?? null
+        const eventEpisodeId = payload.episodeId ?? null
+        const resolvedEpisodeId = eventEpisodeId || episodeId || null
+        const lifecycleTypeFromPayload =
+          typeof eventPayload?.lifecycleType === 'string'
+            ? eventPayload.lifecycleType
+            : null
+
         const rawLifecycleType =
           eventType === TASK_SSE_EVENT_TYPE.LIFECYCLE
-            ? typeof eventPayload?.lifecycleType === 'string'
-              ? eventPayload.lifecycleType
-              : null
+            ? lifecycleTypeFromPayload ?? event.eventType
             : null
         const normalizedLifecycleType =
           rawLifecycleType === TASK_EVENT_TYPE.PROGRESS
@@ -166,14 +169,14 @@ export function useSSE({ projectId, episodeId, enabled = true, onEvent }: UseSSE
           lifecycleType: normalizedLifecycleType,
           targetType,
           targetId,
-          taskId: typeof payload.taskId === 'string' ? payload.taskId : null,
-          taskType: typeof payload.taskType === 'string' ? payload.taskType : null,
+          taskId: payload.taskId || null,
+          taskType: payload.taskType ?? null,
           intent: payloadIntent,
           hasOutputAtStart,
           progress: typeof eventPayload?.progress === 'number' ? Math.floor(eventPayload.progress) : null,
           stage: typeof eventPayload?.stage === 'string' ? eventPayload.stage : null,
           stageLabel: typeof eventPayload?.stageLabel === 'string' ? eventPayload.stageLabel : null,
-          eventTs: typeof payload.ts === 'string' ? payload.ts : null,
+          eventTs: payload.ts || null,
         })
 
         if (
@@ -190,39 +193,40 @@ export function useSSE({ projectId, episodeId, enabled = true, onEvent }: UseSSE
           invalidateByTarget(targetType, resolvedEpisodeId)
         }
       } catch (error) {
-        _ulogError('[useSSE] failed to parse event', error)
+        _ulogError('[useSSE] failed to handle event', error)
       }
     }
 
-    source.onmessage = handleEvent
-    const namedEvents = [
-      TASK_SSE_EVENT_TYPE.LIFECYCLE,
-      TASK_SSE_EVENT_TYPE.STREAM,
-    ] as const
-    const listeners: Array<{ type: string; handler: EventListener }> = []
-    for (const type of namedEvents) {
-      const handler: EventListener = (event) => handleEvent(event as MessageEvent)
-      source.addEventListener(type, handler)
-      listeners.push({ type, handler })
-    }
-    source.onerror = (error) => {
-      _ulogError('[useSSE] stream error', error)
-    }
+    setConnected(false)
+    const unsubscribe = subscribeSharedTaskEvents({
+      projectId,
+      episodeId,
+      onOpen: () => {
+        setConnected(true)
+      },
+      onError: (error) => {
+        setConnected(false)
+        _ulogError('[useSSE] stream error', error)
+      },
+      onLifecycle: (event) => {
+        handleEvent(event)
+      },
+      onStream: (event) => {
+        handleEvent(event)
+      },
+    })
 
     return () => {
       if (targetStatesInvalidateTimerRef.current !== null) {
         window.clearTimeout(targetStatesInvalidateTimerRef.current)
         targetStatesInvalidateTimerRef.current = null
       }
-      for (const listener of listeners) {
-        source.removeEventListener(listener.type, listener.handler)
-      }
-      source.close()
-      sourceRef.current = null
+      unsubscribe()
+      setConnected(false)
     }
-  }, [enabled, url, projectId, episodeId, queryClient, isGlobalAssetProject, onEvent])
+  }, [enabled, episodeId, projectId, queryClient, isGlobalAssetProject, onEvent])
 
   return {
-    connected: !!sourceRef.current && sourceRef.current.readyState === EventSource.OPEN,
+    connected,
   }
 }

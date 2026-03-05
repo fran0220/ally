@@ -64,7 +64,7 @@ export default function ImageSectionCandidateMode({
         sizes="(max-width: 768px) 100vw, 33vw"
       />
 
-      <div className="absolute bottom-2 left-2 right-2 glass-surface-soft border border-[var(--glass-stroke-base)] p-2 rounded-xl">
+      <div className="absolute bottom-2 left-2 right-2 glass-surface-soft border border-[var(--glass-stroke-base)] p-2 rounded-[var(--glass-radius-lg)]">
         <div className="flex items-center justify-between">
           <div className="flex gap-1">
             {validCandidates.map((url, idx) => (

@@ -52,7 +52,7 @@ export default function PanelVariantModalSuggestionList({
       </div>
 
       {error && (
-        <div className="p-3 bg-[var(--glass-tone-danger-bg)] text-[var(--glass-tone-danger-fg)] text-sm rounded-lg mb-3 border border-[var(--glass-stroke-danger)]">
+        <div className="p-3 bg-[var(--glass-tone-danger-bg)] text-[var(--glass-tone-danger-fg)] text-sm rounded-[var(--glass-radius-md)] mb-3 border border-[var(--glass-stroke-danger)]">
           {error}
         </div>
       )}
@@ -61,7 +61,7 @@ export default function PanelVariantModalSuggestionList({
         {suggestions.map((suggestion) => (
           <div
             key={suggestion.id}
-            className={`p-3 border rounded-lg transition-colors cursor-pointer ${selectedVariantId === suggestion.id ? 'border-[var(--glass-stroke-focus)] bg-[var(--glass-tone-info-bg)]' : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)] hover:bg-[var(--glass-bg-muted)]'}`}
+            className={`p-3 border rounded-[var(--glass-radius-md)] transition-colors cursor-pointer ${selectedVariantId === suggestion.id ? 'border-[var(--glass-stroke-focus)] bg-[var(--glass-tone-info-bg)]' : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)] hover:bg-[var(--glass-bg-muted)]'}`}
             onClick={() => !isSubmittingVariantTask && onSelectVariant(suggestion)}
           >
             <div className="flex items-start justify-between">
@@ -78,7 +78,7 @@ export default function PanelVariantModalSuggestionList({
               </div>
               <button
                 disabled={isSubmittingVariantTask}
-                className={`glass-btn-base px-3 py-1 text-xs rounded-lg ${isSubmittingVariantTask && selectedVariantId === suggestion.id ? 'glass-btn-soft text-[var(--glass-text-tertiary)]' : 'glass-btn-primary text-white'}`}
+                className={`glass-btn-base px-3 py-1 text-xs rounded-[var(--glass-radius-md)] ${isSubmittingVariantTask && selectedVariantId === suggestion.id ? 'glass-btn-soft text-[var(--glass-text-tertiary)]' : 'glass-btn-primary text-white'}`}
               >
                 {isSubmittingVariantTask && selectedVariantId === suggestion.id ? (
                   <TaskStatusInline

@@ -253,7 +253,7 @@ export function CharacterCard({ character, onImageClick, onImageEdit, onVoiceDes
                         )}
                     </div>
                     <div className="flex items-center gap-1">
-                        <button onClick={() => { _ulogInfo('[CharacterCard] 多图模式 - 重新生成按钮点击, characterId:', character.id, 'appearanceCount:', appearanceCount); handleGenerate() }} disabled={isAppearanceTaskRunning} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-md" title={t('regenerate')}>
+                        <button onClick={() => { _ulogInfo('[CharacterCard] 多图模式 - 重新生成按钮点击, characterId:', character.id, 'appearanceCount:', appearanceCount); handleGenerate() }} disabled={isAppearanceTaskRunning} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-[var(--glass-radius-sm)]" title={t('regenerate')}>
                             {isAppearanceTaskRunning ? (
                                 <TaskStatusInline state={displayTaskPresentation} className="[&_span]:sr-only [&_svg]:text-[var(--glass-tone-info-fg)]" />
                             ) : (
@@ -261,7 +261,7 @@ export function CharacterCard({ character, onImageClick, onImageEdit, onVoiceDes
                             )}
                         </button>
                         {hasPreviousVersion && (
-                            <button onClick={handleUndo} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-md" title={tAssets('image.undo')}>
+                            <button onClick={handleUndo} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-[var(--glass-radius-sm)]" title={tAssets('image.undo')}>
                                 <AppIcon name="sparkles" className="w-4 h-4 text-[var(--glass-tone-warning-fg)]" />
                             </button>
                         )}
@@ -273,7 +273,7 @@ export function CharacterCard({ character, onImageClick, onImageEdit, onVoiceDes
                                 return
                             }
                             setShowDeleteMenu(!showDeleteMenu)
-                        }} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-md">
+                        }} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-[var(--glass-radius-sm)]">
                             <AppIcon name="trash" className="w-4 h-4 text-[var(--glass-tone-danger-fg)]" />
                         </button>
                     </div>
@@ -281,7 +281,7 @@ export function CharacterCard({ character, onImageClick, onImageEdit, onVoiceDes
 
                 {/* 任务失败错误提示 */}
                 {taskErrorDisplay && !isAppearanceTaskRunning && (
-                    <div className="flex items-center gap-2 mb-3 p-2 rounded-lg bg-[var(--glass-danger-ring)] text-[var(--glass-tone-danger-fg)]">
+                    <div className="flex items-center gap-2 mb-3 p-2 rounded-[var(--glass-radius-md)] bg-[var(--glass-danger-ring)] text-[var(--glass-tone-danger-fg)]">
                         <AppIcon name="alert" className="w-4 h-4 shrink-0" />
                         <span className="text-xs line-clamp-2">{taskErrorDisplay.message}</span>
                     </div>
@@ -297,7 +297,7 @@ export function CharacterCard({ character, onImageClick, onImageEdit, onVoiceDes
                             <div key={index} className="relative group/thumb">
                                 <div
                                     onClick={() => onImageClick?.(validUrl)}
-                                    className={`rounded-lg overflow-hidden border-2 cursor-zoom-in transition-all ${isSelected ? 'border-[var(--glass-stroke-success)] ring-2 ring-[var(--glass-success-ring)]' : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]'}`}
+                                    className={`rounded-[var(--glass-radius-md)] overflow-hidden border-2 cursor-zoom-in transition-all ${isSelected ? 'border-[var(--glass-stroke-success)] ring-2 ring-[var(--glass-success-ring)]' : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]'}`}
                                 >
                                     <MediaImageWithLoading
                                         src={validUrl}
@@ -323,7 +323,7 @@ export function CharacterCard({ character, onImageClick, onImageEdit, onVoiceDes
                 {/* 确认按钮 */}
                 {effectiveSelectedIndex !== null && (
                     <div className="mt-4 flex justify-end">
-                        <button onClick={handleConfirmSelection} disabled={selectImage.isPending} className="glass-btn-base glass-btn-tone-success px-4 py-2 rounded-lg flex items-center gap-2 text-sm">
+                        <button onClick={handleConfirmSelection} disabled={selectImage.isPending} className="glass-btn-base glass-btn-tone-success px-4 py-2 rounded-[var(--glass-radius-md)] flex items-center gap-2 text-sm">
                             {selectImage.isPending ? (
                                 <TaskStatusInline state={selectImageRunningState} className="text-white [&>span]:sr-only [&_svg]:text-white" />
                             ) : (
@@ -361,8 +361,8 @@ export function CharacterCard({ character, onImageClick, onImageEdit, onVoiceDes
                         <div className="glass-surface-modal p-4 m-4 max-w-sm">
                             <p className="mb-4 text-sm text-[var(--glass-text-primary)]">{t('confirmDeleteCharacter')}</p>
                             <div className="flex gap-2 justify-end">
-                                <button onClick={() => setShowDeleteConfirm(false)} className="glass-btn-base glass-btn-secondary px-3 py-1.5 rounded-lg text-sm">{t('cancel')}</button>
-                                <button onClick={handleDelete} className="glass-btn-base glass-btn-danger px-3 py-1.5 rounded-lg text-sm">{t('delete')}</button>
+                                <button onClick={() => setShowDeleteConfirm(false)} className="glass-btn-base glass-btn-secondary px-3 py-1.5 rounded-[var(--glass-radius-md)] text-sm">{t('cancel')}</button>
+                                <button onClick={handleDelete} className="glass-btn-base glass-btn-danger px-3 py-1.5 rounded-[var(--glass-radius-md)] text-sm">{t('delete')}</button>
                             </div>
                         </div>
                     </div>
@@ -411,7 +411,7 @@ export function CharacterCard({ character, onImageClick, onImageEdit, onVoiceDes
                 ) : (
                     <div className="flex flex-col items-center justify-center py-12 text-[var(--glass-text-tertiary)]">
                         <AppIcon name="image" className="w-12 h-12 mb-3" />
-                        <button onClick={handleGenerate} className="glass-btn-base glass-btn-primary flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg">
+                        <button onClick={handleGenerate} className="glass-btn-base glass-btn-primary flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-[var(--glass-radius-md)]">
                             <AppIcon name="sparklesAlt" className="w-4 h-4" />
                             {t('generate')}
                         </button>
@@ -436,13 +436,13 @@ export function CharacterCard({ character, onImageClick, onImageEdit, onVoiceDes
                         {/* 编辑按钮 */}
                         <button
                             onClick={() => onEdit?.(character, appearance)}
-                            className="glass-btn-base glass-btn-soft h-6 w-6 rounded-md opacity-0 group-hover:opacity-100"
+                            className="glass-btn-base glass-btn-soft h-6 w-6 rounded-[var(--glass-radius-sm)] opacity-0 group-hover:opacity-100"
                             title={tAssets('video.panelCard.editPrompt')}
                         >
                             <AppIcon name="edit" className="w-4 h-4 text-[var(--glass-text-secondary)]" />
                         </button>
                         {/* 删除按钮 */}
-                        <button onClick={() => appearanceCount <= 1 ? setShowDeleteConfirm(true) : setShowDeleteMenu(!showDeleteMenu)} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-md text-[var(--glass-tone-danger-fg)] opacity-0 group-hover:opacity-100">
+                        <button onClick={() => appearanceCount <= 1 ? setShowDeleteConfirm(true) : setShowDeleteMenu(!showDeleteMenu)} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-[var(--glass-radius-sm)] text-[var(--glass-tone-danger-fg)] opacity-0 group-hover:opacity-100">
                             <AppIcon name="trash" className="w-4 h-4" />
                         </button>
                     </div>
@@ -478,8 +478,8 @@ export function CharacterCard({ character, onImageClick, onImageEdit, onVoiceDes
                     <div className="glass-surface-modal p-4 m-4">
                         <p className="mb-4 text-sm text-[var(--glass-text-primary)]">{t('confirmDeleteCharacter')}</p>
                         <div className="flex gap-2 justify-end">
-                            <button onClick={() => setShowDeleteConfirm(false)} className="glass-btn-base glass-btn-secondary px-3 py-1.5 rounded-lg text-sm">{t('cancel')}</button>
-                            <button onClick={handleDelete} className="glass-btn-base glass-btn-danger px-3 py-1.5 rounded-lg text-sm">{t('delete')}</button>
+                            <button onClick={() => setShowDeleteConfirm(false)} className="glass-btn-base glass-btn-secondary px-3 py-1.5 rounded-[var(--glass-radius-md)] text-sm">{t('cancel')}</button>
+                            <button onClick={handleDelete} className="glass-btn-base glass-btn-danger px-3 py-1.5 rounded-[var(--glass-radius-md)] text-sm">{t('delete')}</button>
                         </div>
                     </div>
                 </div>

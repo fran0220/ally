@@ -272,7 +272,7 @@ export default function GlobalAssetPicker({
                     <div
                       key={char.id}
                       onClick={() => setSelectedId(char.id)}
-                      className={`relative cursor-pointer rounded-xl border-2 p-2 transition-all hover:shadow-md ${selectedId === char.id
+                      className={`relative cursor-pointer rounded-[var(--glass-radius-lg)] border-2 p-2 transition-all hover:shadow-md ${selectedId === char.id
                         ? 'border-[var(--glass-stroke-focus)] bg-[var(--glass-tone-info-bg)]'
                         : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]'
                         }`}
@@ -281,7 +281,7 @@ export default function GlobalAssetPicker({
                         <AppIcon name="badgeCheck" className="absolute -top-2 -right-2 w-6 h-6 text-[var(--glass-tone-info-fg)] bg-[var(--glass-bg-surface)] rounded-full" />
                       )}
 
-                      <div className="aspect-square rounded-lg overflow-hidden bg-[var(--glass-bg-muted)] mb-2 relative">
+                      <div className="aspect-square rounded-[var(--glass-radius-md)] overflow-hidden bg-[var(--glass-bg-muted)] mb-2 relative">
                         {charPreview ? (
                           <MediaImageWithLoading
                             src={charPreview}
@@ -317,7 +317,7 @@ export default function GlobalAssetPicker({
                     <div
                       key={loc.id}
                       onClick={() => setSelectedId(loc.id)}
-                      className={`relative cursor-pointer rounded-xl border-2 p-2 transition-all hover:shadow-md ${selectedId === loc.id
+                      className={`relative cursor-pointer rounded-[var(--glass-radius-lg)] border-2 p-2 transition-all hover:shadow-md ${selectedId === loc.id
                         ? 'border-[var(--glass-stroke-focus)] bg-[var(--glass-tone-info-bg)]'
                         : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]'
                         }`}
@@ -326,7 +326,7 @@ export default function GlobalAssetPicker({
                         <AppIcon name="badgeCheck" className="absolute -top-2 -right-2 w-6 h-6 text-[var(--glass-tone-info-fg)] bg-[var(--glass-bg-surface)] rounded-full" />
                       )}
 
-                      <div className="aspect-video rounded-lg overflow-hidden bg-[var(--glass-bg-muted)] mb-2 relative">
+                      <div className="aspect-video rounded-[var(--glass-radius-md)] overflow-hidden bg-[var(--glass-bg-muted)] mb-2 relative">
                         {locPreview ? (
                           <MediaImageWithLoading
                             src={locPreview}
@@ -429,7 +429,7 @@ export default function GlobalAssetPicker({
           <button
             onClick={handleConfirm}
             disabled={!selectedId || externalLoading}
-            className="glass-btn-base glass-btn-primary px-4 py-2 text-sm rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="glass-btn-base glass-btn-primary px-4 py-2 text-sm rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {externalLoading && <TaskStatusInline state={copyingState} className="text-white [&>span]:sr-only [&_svg]:text-white" />}
             {t('assetPicker.confirmCopy')}

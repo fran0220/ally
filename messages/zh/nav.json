@@ -4,5 +4,8 @@
   "profile": "设置中心",
   "signin": "登录",
   "signup": "注册",
-  "logout": "退出登录"
+  "logout": "退出登录",
+  "admin": "管理后台",
+  "modelSettings": "模型设置",
+  "account": "账户"
 }

@@ -187,7 +187,7 @@ npm run dev
 
 高频路由分组（节选）：
 - 系统：`/healthz`、`/api/system/boot-id`
-- 认证：`/api/auth/register`、`/api/auth/login`、`/api/auth/refresh`
+- 认证：`/api/auth/register`、`/api/auth/login`、`/api/auth/refresh`、`/api/auth/session`、`/api/auth/logout`
 - 用户：`/api/user/models`、`/api/user/api-config`、`/api/user-preference`
 - 项目：`/api/projects`、`/api/projects/{id}`、`/api/projects/{id}/data`
 - Novel：`/api/novel-promotion/{projectId}/...`（含 wildcard dispatch）
@@ -196,6 +196,14 @@ npm run dev
 - Run：`/api/runs`、`/api/runs/{runId}/events`
 - SSE：`/api/sse?projectId=...`
 - 媒体：`/m/{publicId}`、`/api/files/{*path}`、`/api/cos/image`
+
+## API Contract 约束（Auth / SSE / Asset Hub）
+
+- 前端统一以 `frontend/src/api/contracts.ts` 作为上述接口的契约定义与运行时校验入口。
+- 返回 JSON 字段统一使用 camelCase；不再兼容 snake_case（例如 `user_id`、`created_at`、`project_id`）。
+- SSE 查询参数仅接受 `projectId`、`episodeId`；客户端重连游标通过 `Last-Event-ID` 传递。
+- Auth 成功响应统一要求 `token + user{name,id,role}`（注册额外包含 `message`），`/api/auth/logout` 要求返回 `success: true` 并清理 cookie。
+- Asset Hub 列表与 CRUD 响应统一要求 `success` 包络与 camelCase 资源字段。
 
 ## Worker 任务类型（核心）
 
@@ -244,6 +252,10 @@ node scripts/api-runtime-compare.mjs \
 # SSE / Worker 烟测
 node scripts/sse-reconnect-smoke.mjs --base http://127.0.0.1:43001 --project-id "<project-id>"
 node scripts/worker-runtime-smoke.mjs --base http://127.0.0.1:43001
+
+# Auth / Asset Hub 契约回归
+node scripts/e2e-auth-flow.mjs --base http://127.0.0.1:43001
+node scripts/e2e-asset-hub-crud.mjs --base http://127.0.0.1:43001
 ```
 
 ## 部署概览（jpdata）

@@ -24,7 +24,7 @@ export default function VideoPromptModal({
 
   return (
     <div className="fixed inset-0 bg-[var(--glass-overlay)] flex items-center justify-center z-50" onClick={onCancel}>
-      <div className="bg-[var(--glass-bg-surface)] rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-[var(--glass-bg-surface)] rounded-[var(--glass-radius-md)] max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         {/* 标题栏 */}
         <div className="sticky top-0 bg-[var(--glass-bg-surface)] border-b px-6 py-4 flex items-center justify-between">
           <h3 className="text-lg font-bold">{t('promptModal.title', { number: panelIndex + 1 })}</h3>
@@ -35,7 +35,7 @@ export default function VideoPromptModal({
 
         <div className="p-6 space-y-4">
           {/* 镜头信息 */}
-          <div className="p-3 bg-[var(--glass-bg-muted)] rounded-lg text-sm space-y-1">
+          <div className="p-3 bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-md)] text-sm space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-[var(--glass-text-tertiary)]">{t('promptModal.shotType')}</span>
               <span className="px-2 py-0.5 bg-[var(--glass-tone-info-bg)] text-[var(--glass-tone-info-fg)] rounded">{panel.textPanel?.shot_type}</span>
@@ -69,7 +69,7 @@ export default function VideoPromptModal({
             <textarea
               value={editValue}
               onChange={(e) => onEditValueChange(e.target.value)}
-              className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)]"
+              className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)]"
               rows={6}
               placeholder={t('promptModal.placeholder')}
             />

@@ -11,6 +11,17 @@ const DEFAULT_TIMEOUT_MS = 15000
 
 const PROTECTED_ENDPOINTS = [
   {
+    id: 'protected-auth-session',
+    method: 'GET',
+    path: '/api/auth/session',
+    expectedShape: 'session user object',
+    verify(payload, failures) {
+      assertObject(payload, failures, 'response body must be a JSON object')
+      assertAuthUserShape(payload?.user, failures, 'response.user')
+      assertNoSnakeCaseKeys(payload, failures, 'response')
+    },
+  },
+  {
     id: 'protected-user-preference',
     method: 'GET',
     path: '/api/user-preference',
@@ -88,6 +99,79 @@ function assertArray(value, failures, message) {
 
 function isObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+function collectSnakeCaseKeyPaths(value, pathLabel, paths) {
+  if (Array.isArray(value)) {
+    for (let index = 0; index < value.length; index += 1) {
+      collectSnakeCaseKeyPaths(value[index], `${pathLabel}[${index}]`, paths)
+    }
+    return
+  }
+
+  if (!isObject(value)) {
+    return
+  }
+
+  for (const [key, nestedValue] of Object.entries(value)) {
+    const keyPath = `${pathLabel}.${key}`
+    if (key.includes('_')) {
+      paths.push(keyPath)
+    }
+    collectSnakeCaseKeyPaths(nestedValue, keyPath, paths)
+  }
+}
+
+function assertNoSnakeCaseKeys(value, failures, label) {
+  if (!isObject(value) && !Array.isArray(value)) {
+    return
+  }
+
+  const snakeCasePaths = []
+  collectSnakeCaseKeyPaths(value, label, snakeCasePaths)
+  if (snakeCasePaths.length > 0) {
+    failures.push(`${label} must not include snake_case keys: ${snakeCasePaths.join(', ')}`)
+  }
+}
+
+function assertAuthUserShape(value, failures, label) {
+  if (!isObject(value)) {
+    failures.push(`${label} must be an object`)
+    return
+  }
+
+  if (typeof value.id !== 'string' || value.id.trim().length === 0) {
+    failures.push(`${label}.id must be a non-empty string`)
+  }
+  if (typeof value.name !== 'string' || value.name.trim().length === 0) {
+    failures.push(`${label}.name must be a non-empty string`)
+  }
+  if (value.role !== 'admin' && value.role !== 'user') {
+    failures.push(`${label}.role must be one of: admin, user`)
+  }
+  if ('username' in value) {
+    failures.push(`${label}.username is deprecated; expected ${label}.name`)
+  }
+
+  assertNoSnakeCaseKeys(value, failures, label)
+}
+
+function assertAuthPayloadShape(value, failures, label, options = {}) {
+  assertObject(value, failures, `${label} must be a JSON object`)
+  if (!isObject(value)) {
+    return
+  }
+
+  assertNoSnakeCaseKeys(value, failures, label)
+
+  if (options.requireMessage && (typeof value.message !== 'string' || value.message.trim().length === 0)) {
+    failures.push(`${label}.message must be a non-empty string`)
+  }
+  if (typeof value.token !== 'string' || value.token.trim().length === 0) {
+    failures.push(`${label}.token must be a non-empty string`)
+  }
+
+  assertAuthUserShape(value.user, failures, `${label}.user`)
 }
 
 function parseArgs(argv) {
@@ -230,22 +314,6 @@ function extractToken(payload) {
 
   if (typeof payload.token === 'string' && payload.token.trim().length > 0) {
     return payload.token.trim()
-  }
-
-  return null
-}
-
-function extractRefreshToken(payload) {
-  if (!isObject(payload)) {
-    return null
-  }
-
-  if (typeof payload.refreshToken === 'string' && payload.refreshToken.trim().length > 0) {
-    return payload.refreshToken.trim()
-  }
-
-  if (typeof payload.refresh_token === 'string' && payload.refresh_token.trim().length > 0) {
-    return payload.refresh_token.trim()
   }
 
   return null
@@ -594,7 +662,6 @@ async function runFlow({ baseUrl, timeoutMs, testUser, testPassword }) {
   const steps = []
 
   let accessToken = null
-  let refreshToken = null
 
   const registerResult = await runRequest({
     baseUrl,
@@ -603,7 +670,6 @@ async function runFlow({ baseUrl, timeoutMs, testUser, testPassword }) {
     path: '/api/auth/register',
     body: {
       name: testUser,
-      email: testUser,
       password: testPassword,
     },
   })
@@ -624,28 +690,21 @@ async function runFlow({ baseUrl, timeoutMs, testUser, testPassword }) {
       failures.push(registerResult.parseError)
     }
 
+    assertAuthPayloadShape(registerResult.json, failures, 'register response', {
+      requireMessage: true,
+    })
     const bodyToken = extractToken(registerResult.json)
-    const cookieToken = registerResult.cookieToken
 
     if (!bodyToken) {
       failures.push('response.token is required')
-      if (cookieToken) {
-        warnings.push('falling back to token from Set-Cookie for subsequent steps')
-      }
     }
 
-    const selectedToken = bodyToken || cookieToken
-    if (selectedToken) {
-      const tokenValidation = validateJwtToken(selectedToken)
+    if (bodyToken) {
+      const tokenValidation = validateJwtToken(bodyToken)
       if (!tokenValidation.ok) {
         failures.push(...tokenValidation.failures.map((item) => `token validation failed: ${item}`))
       }
-      accessToken = selectedToken
-    }
-
-    refreshToken = extractRefreshToken(registerResult.json)
-    if (!refreshToken) {
-      warnings.push('response.refreshToken missing; refresh step will reuse access token as request body value')
+      accessToken = bodyToken
     }
 
     const step = createStepResult({
@@ -699,17 +758,12 @@ async function runFlow({ baseUrl, timeoutMs, testUser, testPassword }) {
     printStepResult(dependencyFailure)
     steps.push(dependencyFailure)
   } else {
-    const refreshBody = {
-      refreshToken: refreshToken || accessToken,
-    }
-
     const refreshResult = await runRequest({
       baseUrl,
       timeoutMs,
       method: 'POST',
       path: '/api/auth/refresh',
       token: accessToken,
-      body: refreshBody,
     })
 
     const failures = []
@@ -727,24 +781,19 @@ async function runFlow({ baseUrl, timeoutMs, testUser, testPassword }) {
       failures.push(refreshResult.parseError)
     }
 
-    const refreshedToken = extractToken(refreshResult.json) || refreshResult.cookieToken
-    if (!extractToken(refreshResult.json) && refreshResult.cookieToken) {
-      warnings.push('response.token missing; using token from Set-Cookie fallback')
+    assertAuthPayloadShape(refreshResult.json, failures, 'refresh response')
+
+    const refreshedToken = extractToken(refreshResult.json)
+    if (!refreshedToken) {
+      failures.push('response.token is required')
     }
 
-    if (!refreshedToken) {
-      failures.push('response did not contain a usable token')
-    } else {
+    if (refreshedToken) {
       const tokenValidation = validateJwtToken(refreshedToken)
       if (!tokenValidation.ok) {
         failures.push(...tokenValidation.failures.map((item) => `token validation failed: ${item}`))
       }
       accessToken = refreshedToken
-    }
-
-    const refreshedRefreshToken = extractRefreshToken(refreshResult.json)
-    if (refreshedRefreshToken) {
-      refreshToken = refreshedRefreshToken
     }
 
     const step = createStepResult({
@@ -790,6 +839,8 @@ async function runFlow({ baseUrl, timeoutMs, testUser, testPassword }) {
       failures.push(loginResult.parseError)
     }
 
+    assertAuthPayloadShape(loginResult.json, failures, 'login response')
+
     const loginToken = extractToken(loginResult.json)
     if (!loginToken) {
       failures.push('response.token is required')
@@ -801,32 +852,6 @@ async function runFlow({ baseUrl, timeoutMs, testUser, testPassword }) {
       accessToken = loginToken
     }
 
-    const loginRefreshToken = extractRefreshToken(loginResult.json)
-    if (loginRefreshToken) {
-      refreshToken = loginRefreshToken
-    }
-
-    const user = isObject(loginResult.json) ? loginResult.json.user : null
-    if (!isObject(user)) {
-      failures.push('response.user must be an object')
-    } else {
-      if (typeof user.id !== 'string' || user.id.trim().length === 0) {
-        failures.push('response.user.id must be a non-empty string')
-      }
-      const hasUsername = typeof user.username === 'string' && user.username.trim().length > 0
-      const hasName = typeof user.name === 'string' && user.name.trim().length > 0
-      if (!hasUsername && !hasName) {
-        failures.push('response.user must include username or name')
-      }
-      if (typeof user.role !== 'string' || user.role.trim().length === 0) {
-        failures.push('response.user.role must be a non-empty string')
-      }
-    }
-
-    if (refreshToken) {
-      warnings.push('refreshToken captured from auth flow')
-    }
-
     const step = createStepResult({
       id: 'auth-login',
       title: 'Login with registered credentials',
@@ -836,6 +861,69 @@ async function runFlow({ baseUrl, timeoutMs, testUser, testPassword }) {
       actualStatus: loginResult.status,
       responseSummary: loginResult.summary,
       requestError: loginResult.requestError,
+      failures,
+      warnings,
+    })
+    printStepResult(step)
+    steps.push(step)
+  }
+
+  if (!accessToken) {
+    const dependencyFailure = createDependencyFailureStep({
+      id: 'auth-logout',
+      title: 'Logout current session',
+      method: 'POST',
+      path: '/api/auth/logout',
+      message: 'cannot logout because login step did not produce a usable token',
+    })
+    printStepResult(dependencyFailure)
+    steps.push(dependencyFailure)
+  } else {
+    const logoutResult = await runRequest({
+      baseUrl,
+      timeoutMs,
+      method: 'POST',
+      path: '/api/auth/logout',
+      token: accessToken,
+    })
+
+    const failures = []
+    const warnings = []
+
+    if (logoutResult.requestError) {
+      failures.push(`request failed: ${logoutResult.requestError}`)
+    }
+    if (logoutResult.status !== 200) {
+      failures.push(`status ${logoutResult.status} != expected 200`)
+    }
+    if (logoutResult.parseError) {
+      failures.push(logoutResult.parseError)
+    }
+
+    assertObject(logoutResult.json, failures, 'logout response must be a JSON object')
+    if (isObject(logoutResult.json)) {
+      assertNoSnakeCaseKeys(logoutResult.json, failures, 'logout response')
+      if (logoutResult.json.success !== true) {
+        failures.push('logout response.success must be true')
+      }
+    }
+
+    const hasClearCookie = logoutResult.setCookies.some(
+      (cookie) => /(?:^|\s|,)token=;/i.test(cookie) && /max-age=0/i.test(cookie),
+    )
+    if (!hasClearCookie) {
+      failures.push('logout response must clear the token cookie (token=; Max-Age=0)')
+    }
+
+    const step = createStepResult({
+      id: 'auth-logout',
+      title: 'Logout current session',
+      method: 'POST',
+      path: '/api/auth/logout',
+      expectedStatus: '200',
+      actualStatus: logoutResult.status,
+      responseSummary: logoutResult.summary,
+      requestError: logoutResult.requestError,
       failures,
       warnings,
     })
@@ -874,6 +962,7 @@ async function main() {
     }
     console.log('- auth-refresh: POST /api/auth/refresh')
     console.log('- auth-login: POST /api/auth/login')
+    console.log('- auth-logout: POST /api/auth/logout')
     return
   }
 

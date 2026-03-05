@@ -84,7 +84,7 @@ function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id
             pointer-events-auto
             flex items-center gap-3
             px-4 py-3
-            rounded-xl
+            rounded-[var(--glass-radius-lg)]
             animate-in slide-in-from-right-full duration-300
             max-w-md
             border
@@ -96,7 +96,7 @@ function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id
           <button
             type="button"
             onClick={() => onDismiss(toast.id)}
-            className="glass-btn-base glass-btn-ghost w-6 h-6 rounded-md p-0 opacity-70 hover:opacity-100 transition-opacity"
+            className="glass-btn-base glass-btn-ghost w-6 h-6 rounded-[var(--glass-radius-sm)] p-0 opacity-70 hover:opacity-100 transition-opacity"
           >
             <AppIcon name="close" className="w-4 h-4" />
           </button>

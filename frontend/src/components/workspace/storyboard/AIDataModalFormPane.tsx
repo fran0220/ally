@@ -52,7 +52,7 @@ export default function AIDataModalFormPane({
             type="text"
             value={shotType}
             onChange={(event) => onShotTypeChange(event.target.value)}
-            className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)]"
+            className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)]"
             placeholder={t('aiData.shotTypePlaceholder')}
           />
         </div>
@@ -62,7 +62,7 @@ export default function AIDataModalFormPane({
             type="text"
             value={cameraMove}
             onChange={(event) => onCameraMoveChange(event.target.value)}
-            className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)]"
+            className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)]"
             placeholder={t('aiData.cameraMovePlaceholder')}
           />
         </div>
@@ -71,13 +71,13 @@ export default function AIDataModalFormPane({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-medium text-[var(--glass-text-secondary)] mb-1">{t('aiData.scene')}</label>
-          <div className="px-3 py-2 bg-[var(--glass-bg-muted)] border border-[var(--glass-stroke-base)] rounded-lg text-sm text-[var(--glass-text-secondary)]">
+          <div className="px-3 py-2 bg-[var(--glass-bg-muted)] border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-md)] text-sm text-[var(--glass-text-secondary)]">
             {location || t('aiData.notSelected')}
           </div>
         </div>
         <div>
           <label className="block text-xs font-medium text-[var(--glass-text-secondary)] mb-1">{t('aiData.characters')}</label>
-          <div className="px-3 py-2 bg-[var(--glass-bg-muted)] border border-[var(--glass-stroke-base)] rounded-lg text-sm text-[var(--glass-text-secondary)]">
+          <div className="px-3 py-2 bg-[var(--glass-bg-muted)] border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-md)] text-sm text-[var(--glass-text-secondary)]">
             {characters.length > 0 ? characters.join('、') : t('common.none')}
           </div>
         </div>
@@ -89,7 +89,7 @@ export default function AIDataModalFormPane({
           value={description}
           onChange={(event) => onDescriptionChange(event.target.value)}
           rows={3}
-          className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg text-sm resize-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)]"
+          className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] text-sm resize-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)]"
           placeholder={t('insert.placeholder.description')}
         />
       </div>
@@ -100,7 +100,7 @@ export default function AIDataModalFormPane({
           value={videoPrompt}
           onChange={(event) => onVideoPromptChange(event.target.value)}
           rows={2}
-          className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg text-sm resize-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)] bg-[var(--glass-tone-warning-bg)]"
+          className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] text-sm resize-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)] bg-[var(--glass-tone-warning-bg)]"
           placeholder={t('panel.videoPromptPlaceholder')}
         />
       </div>
@@ -117,7 +117,7 @@ export default function AIDataModalFormPane({
               type="text"
               value={photographyRules.scene_summary || ''}
               onChange={(event) => onPhotographyFieldChange('scene_summary', event.target.value)}
-              className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
+              className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
             />
           </div>
 
@@ -128,7 +128,7 @@ export default function AIDataModalFormPane({
                 type="text"
                 value={photographyRules.lighting?.direction || ''}
                 onChange={(event) => onPhotographyFieldChange('lighting.direction', event.target.value)}
-                className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
+                className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
               />
             </div>
             <div>
@@ -137,7 +137,7 @@ export default function AIDataModalFormPane({
                 type="text"
                 value={photographyRules.lighting?.quality || ''}
                 onChange={(event) => onPhotographyFieldChange('lighting.quality', event.target.value)}
-                className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
+                className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
               />
             </div>
           </div>
@@ -148,7 +148,7 @@ export default function AIDataModalFormPane({
               type="text"
               value={photographyRules.depth_of_field || ''}
               onChange={(event) => onPhotographyFieldChange('depth_of_field', event.target.value)}
-              className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
+              className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
             />
           </div>
 
@@ -158,7 +158,7 @@ export default function AIDataModalFormPane({
               type="text"
               value={photographyRules.color_tone || ''}
               onChange={(event) => onPhotographyFieldChange('color_tone', event.target.value)}
-              className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
+              className="w-full px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] text-sm focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
             />
           </div>
 
@@ -167,7 +167,7 @@ export default function AIDataModalFormPane({
               <label className="block text-xs font-medium text-[var(--glass-text-secondary)] mb-2">{t('aiData.characterPosition')}</label>
               <div className="space-y-3">
                 {photographyRules.characters.map((character, index) => (
-                  <div key={index} className="p-3 bg-[var(--glass-bg-muted)] rounded-lg border border-[var(--glass-stroke-base)]">
+                  <div key={index} className="p-3 bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)]">
                     <div className="text-xs font-medium text-[var(--glass-tone-info-fg)] mb-2">{character.name}</div>
                     <div className="grid grid-cols-3 gap-2">
                       <div>
@@ -214,7 +214,7 @@ export default function AIDataModalFormPane({
 
           <div className="space-y-3">
             {actingNotes.map((character, index) => (
-              <div key={index} className="p-3 bg-[var(--glass-tone-info-bg)] rounded-lg border border-[var(--glass-stroke-focus)]">
+              <div key={index} className="p-3 bg-[var(--glass-tone-info-bg)] rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-focus)]">
                 <div className="text-xs font-medium text-[var(--glass-tone-info-fg)] mb-2">{character.name}</div>
                 <div>
                   <label className="block text-[10px] text-[var(--glass-text-tertiary)] mb-0.5">{t('aiData.actingDescription')}</label>

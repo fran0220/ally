@@ -111,6 +111,7 @@ export function subscribeAuthToken(listener: () => void): () => void {
 }
 
 export function setAuthToken(token: string | null): void {
+  const previousToken = readAuthToken();
   authTokenCache = normalizeToken(token);
   authTokenLoaded = true;
 
@@ -126,7 +127,9 @@ export function setAuthToken(token: string | null): void {
     }
   }
 
-  emitAuthTokenChanged();
+  if (previousToken !== authTokenCache) {
+    emitAuthTokenChanged();
+  }
 }
 
 function toRecord(value: unknown): Record<string, unknown> | null {
@@ -161,6 +164,14 @@ export class ApiClientError extends Error {
   }
 }
 
+export function isApiClientError(error: unknown): error is ApiClientError {
+  return error instanceof ApiClientError;
+}
+
+export function isUnauthorizedApiError(error: unknown): error is ApiClientError {
+  return isApiClientError(error) && error.status === 401;
+}
+
 function parseResponsePayload(response: Response, rawText: string): unknown {
   if (!rawText) {
     return null;
@@ -189,6 +200,14 @@ function resolveErrorMessage(status: number, payload: unknown): string {
     }
   }
   return `API request failed: ${status}`;
+}
+
+function throwApiClientError(response: Response, payload: unknown): never {
+  if (response.status === 401) {
+    setAuthToken(null);
+  }
+
+  throw new ApiClientError(resolveErrorMessage(response.status, payload), response.status, payload);
 }
 
 function hasScheme(value: string): boolean {
@@ -242,11 +261,31 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
   const payload = parseResponsePayload(response, rawText);
 
   if (!response.ok) {
-    if (response.status === 401) {
-      setAuthToken(null);
-    }
-    throw new ApiClientError(resolveErrorMessage(response.status, payload), response.status, payload);
+    throwApiClientError(response, payload);
   }
 
   return payload as T;
+}
+
+export type ApiContractParser<T> = (payload: unknown) => T;
+
+export async function apiRequestWithContract<T>(
+  path: string,
+  parser: ApiContractParser<T>,
+  init: RequestInit = {},
+): Promise<T> {
+  const payload = await apiRequest<unknown>(path, init);
+  return parser(payload);
+}
+
+export async function apiRequestBlob(path: string, init: RequestInit = {}): Promise<Blob> {
+  const response = await fetchWithAuth(path, init);
+
+  if (!response.ok) {
+    const rawText = await response.text();
+    const payload = parseResponsePayload(response, rawText);
+    throwApiClientError(response, payload);
+  }
+
+  return response.blob();
 }

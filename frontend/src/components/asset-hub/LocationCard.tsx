@@ -194,7 +194,7 @@ export function LocationCard({ location, onImageClick, onImageEdit, onEdit }: Lo
             </div>
           </div>
           <div className="flex items-center gap-1 ml-2">
-            <button onClick={handleGenerate} disabled={isTaskRunning} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-md" title={t('regenerate')}>
+            <button onClick={handleGenerate} disabled={isTaskRunning} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-[var(--glass-radius-sm)]" title={t('regenerate')}>
               {isTaskRunning ? (
                 <TaskStatusInline state={displayTaskPresentation} className="[&_span]:sr-only [&_svg]:text-[var(--glass-tone-info-fg)]" />
               ) : (
@@ -202,11 +202,11 @@ export function LocationCard({ location, onImageClick, onImageEdit, onEdit }: Lo
               )}
             </button>
             {hasPreviousVersion && (
-              <button onClick={handleUndo} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-md" title={tAssets('image.undo')}>
+              <button onClick={handleUndo} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-[var(--glass-radius-sm)]" title={tAssets('image.undo')}>
                 <AppIcon name="sparkles" className="w-4 h-4 text-[var(--glass-tone-warning-fg)]" />
               </button>
             )}
-            <button onClick={() => setShowDeleteConfirm(true)} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-md">
+            <button onClick={() => setShowDeleteConfirm(true)} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-[var(--glass-radius-sm)]">
               <AppIcon name="trash" className="w-4 h-4 text-[var(--glass-tone-danger-fg)]" />
             </button>
           </div>
@@ -214,7 +214,7 @@ export function LocationCard({ location, onImageClick, onImageEdit, onEdit }: Lo
 
         {/* 任务失败错误提示 */}
         {taskErrorDisplay && !isTaskRunning && (
-          <div className="flex items-center gap-2 mb-3 p-2 rounded-lg bg-[var(--glass-danger-ring)] text-[var(--glass-tone-danger-fg)]">
+          <div className="flex items-center gap-2 mb-3 p-2 rounded-[var(--glass-radius-md)] bg-[var(--glass-danger-ring)] text-[var(--glass-tone-danger-fg)]">
             <AppIcon name="alert" className="w-4 h-4 shrink-0" />
             <span className="text-xs line-clamp-2">{taskErrorDisplay.message}</span>
           </div>
@@ -228,7 +228,7 @@ export function LocationCard({ location, onImageClick, onImageEdit, onEdit }: Lo
               <div key={img.id} className="relative group/thumb">
                 <div
                   onClick={() => onImageClick?.(img.imageUrl!)}
-                  className={`rounded-lg overflow-hidden border-2 cursor-zoom-in transition-all ${isThisSelected ? 'border-[var(--glass-stroke-success)] ring-2 ring-[var(--glass-success-ring)]' : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]'}`}
+                  className={`rounded-[var(--glass-radius-md)] overflow-hidden border-2 cursor-zoom-in transition-all ${isThisSelected ? 'border-[var(--glass-stroke-success)] ring-2 ring-[var(--glass-success-ring)]' : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]'}`}
                 >
                   <MediaImageWithLoading
                     src={img.imageUrl!}
@@ -254,7 +254,7 @@ export function LocationCard({ location, onImageClick, onImageEdit, onEdit }: Lo
         {/* 确认按钮 */}
         {effectiveSelectedIndex !== null && (
           <div className="mt-4 flex justify-end">
-            <button onClick={handleConfirmSelection} disabled={selectImage.isPending} className="glass-btn-base glass-btn-tone-success px-4 py-2 rounded-lg flex items-center gap-2 text-sm">
+            <button onClick={handleConfirmSelection} disabled={selectImage.isPending} className="glass-btn-base glass-btn-tone-success px-4 py-2 rounded-[var(--glass-radius-md)] flex items-center gap-2 text-sm">
               {selectImage.isPending ? (
                 <TaskStatusInline state={selectImageRunningState} className="text-white [&>span]:sr-only [&_svg]:text-white" />
               ) : (
@@ -267,12 +267,12 @@ export function LocationCard({ location, onImageClick, onImageEdit, onEdit }: Lo
 
         {/* 删除确认 */}
         {showDeleteConfirm && (
-          <div className="absolute inset-0 glass-overlay flex items-center justify-center z-20 rounded-xl">
+          <div className="absolute inset-0 glass-overlay flex items-center justify-center z-20 rounded-[var(--glass-radius-lg)]">
             <div className="glass-surface-modal p-4 m-4">
               <p className="mb-4 text-sm text-[var(--glass-text-primary)]">{t('confirmDeleteLocation')}</p>
               <div className="flex gap-2 justify-end">
-                <button onClick={() => setShowDeleteConfirm(false)} className="glass-btn-base glass-btn-secondary px-3 py-1.5 rounded-lg text-sm">{t('cancel')}</button>
-                <button onClick={handleDelete} className="glass-btn-base glass-btn-danger px-3 py-1.5 rounded-lg text-sm">{t('delete')}</button>
+                <button onClick={() => setShowDeleteConfirm(false)} className="glass-btn-base glass-btn-secondary px-3 py-1.5 rounded-[var(--glass-radius-md)] text-sm">{t('cancel')}</button>
+                <button onClick={handleDelete} className="glass-btn-base glass-btn-danger px-3 py-1.5 rounded-[var(--glass-radius-md)] text-sm">{t('delete')}</button>
               </div>
             </div>
           </div>
@@ -320,7 +320,7 @@ export function LocationCard({ location, onImageClick, onImageEdit, onEdit }: Lo
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-[var(--glass-text-tertiary)]">
             <AppIcon name="globe2" className="w-12 h-12 mb-3" />
-            <button onClick={handleGenerate} className="glass-btn-base glass-btn-primary flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg">
+            <button onClick={handleGenerate} className="glass-btn-base glass-btn-primary flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-[var(--glass-radius-md)]">
               <AppIcon name="sparklesAlt" className="w-4 h-4" />
               {t('generate')}
             </button>
@@ -345,13 +345,13 @@ export function LocationCard({ location, onImageClick, onImageEdit, onEdit }: Lo
             {/* 编辑按钮 */}
             <button
               onClick={() => onEdit?.(location, currentImageIndex)}
-              className="glass-btn-base glass-btn-soft h-6 w-6 rounded-md opacity-0 group-hover:opacity-100"
+              className="glass-btn-base glass-btn-soft h-6 w-6 rounded-[var(--glass-radius-sm)] opacity-0 group-hover:opacity-100"
               title={tAssets('video.panelCard.editPrompt')}
             >
               <AppIcon name="edit" className="w-4 h-4 text-[var(--glass-text-secondary)]" />
             </button>
             {/* 删除按钮 */}
-            <button onClick={() => setShowDeleteConfirm(true)} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-md text-[var(--glass-tone-danger-fg)] opacity-0 group-hover:opacity-100">
+            <button onClick={() => setShowDeleteConfirm(true)} className="glass-btn-base glass-btn-soft h-6 w-6 rounded-[var(--glass-radius-sm)] text-[var(--glass-tone-danger-fg)] opacity-0 group-hover:opacity-100">
               <AppIcon name="trash" className="w-4 h-4" />
             </button>
           </div>
@@ -365,8 +365,8 @@ export function LocationCard({ location, onImageClick, onImageEdit, onEdit }: Lo
           <div className="glass-surface-modal p-4 m-4">
             <p className="mb-4 text-sm text-[var(--glass-text-primary)]">{t('confirmDeleteLocation')}</p>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowDeleteConfirm(false)} className="glass-btn-base glass-btn-secondary px-3 py-1.5 rounded-lg text-sm">{t('cancel')}</button>
-              <button onClick={handleDelete} className="glass-btn-base glass-btn-danger px-3 py-1.5 rounded-lg text-sm">{t('delete')}</button>
+              <button onClick={() => setShowDeleteConfirm(false)} className="glass-btn-base glass-btn-secondary px-3 py-1.5 rounded-[var(--glass-radius-md)] text-sm">{t('cancel')}</button>
+              <button onClick={handleDelete} className="glass-btn-base glass-btn-danger px-3 py-1.5 rounded-[var(--glass-radius-md)] text-sm">{t('delete')}</button>
             </div>
           </div>
         </div>

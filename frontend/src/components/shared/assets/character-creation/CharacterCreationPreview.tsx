@@ -23,7 +23,7 @@ export default function CharacterCreationPreview({
 
   return (
     <div
-      className="border-2 border-dashed border-[var(--glass-stroke-base)] rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:border-[var(--glass-stroke-focus)] hover:bg-[var(--glass-tone-info-bg)] transition-all relative min-h-[120px]"
+      className="border-2 border-dashed border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-md)] p-4 flex flex-col items-center justify-center cursor-pointer hover:border-[var(--glass-stroke-focus)] hover:bg-[var(--glass-tone-info-bg)] transition-all relative min-h-[120px]"
       onDrop={onDrop}
       onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
       onClick={() => fileInputRef.current?.click()}

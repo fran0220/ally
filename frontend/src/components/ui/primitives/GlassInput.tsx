@@ -15,7 +15,7 @@ export const GlassInput = forwardRef<HTMLInputElement, GlassInputProps>(function
       ref={ref}
       className={cx(
         'glass-input-base',
-        density === 'compact' ? 'h-9 px-3 text-sm leading-5' : 'h-10 px-3 text-sm leading-5',
+        density === 'compact' ? 'h-8 px-2.5 text-sm leading-5' : 'h-9 px-3 text-sm leading-5',
         className,
       )}
       {...props}

@@ -1,42 +1,17 @@
 import { buildAuthHeaders, resolveApiUrl } from './client';
+import {
+  parseHeartbeatPayload,
+  parseTaskLifecycleEvent,
+  parseTaskStreamEvent,
+  type HeartbeatPayload,
+  type TaskLifecycleEvent,
+  type TaskStreamEvent,
+} from './contracts';
 
 export const TASK_LIFECYCLE_EVENT = 'task.lifecycle';
 export const TASK_STREAM_EVENT = 'task.stream';
 export const HEARTBEAT_EVENT = 'heartbeat';
-
-export interface TaskLifecycleEvent {
-  id: string;
-  type: 'task.lifecycle';
-  taskId: string;
-  projectId: string;
-  userId: string;
-  eventType: string;
-  taskType?: string;
-  targetType?: string;
-  targetId?: string;
-  episodeId?: string;
-  payload: Record<string, unknown>;
-  ts: string;
-}
-
-export interface TaskStreamEvent {
-  id: string;
-  type: 'task.stream';
-  taskId: string;
-  projectId: string;
-  userId: string;
-  eventType: string;
-  taskType?: string;
-  targetType?: string;
-  targetId?: string;
-  episodeId?: string;
-  payload: Record<string, unknown>;
-  ts: string;
-}
-
-export interface HeartbeatPayload {
-  ts: string;
-}
+export type { HeartbeatPayload, TaskLifecycleEvent, TaskStreamEvent } from './contracts';
 
 export interface TaskEventSubscriptionOptions {
   projectId: string;
@@ -308,56 +283,43 @@ function parseJson(raw: string): unknown {
   }
 }
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function parseTaskEvent(
-  raw: string,
-  expectedType: typeof TASK_LIFECYCLE_EVENT | typeof TASK_STREAM_EVENT,
-): TaskLifecycleEvent | TaskStreamEvent | null {
-  const parsed = parseJson(raw);
-  if (!isObject(parsed)) {
-    return null;
-  }
-
-  if (parsed.type !== expectedType || typeof parsed.taskId !== 'string') {
-    return null;
-  }
-
-  const payload = isObject(parsed.payload) ? parsed.payload : {};
-  return {
-    id: typeof parsed.id === 'string' ? parsed.id : '',
-    type: expectedType,
-    taskId: parsed.taskId,
-    projectId: typeof parsed.projectId === 'string' ? parsed.projectId : '',
-    userId: typeof parsed.userId === 'string' ? parsed.userId : '',
-    eventType: typeof parsed.eventType === 'string' ? parsed.eventType : '',
-    taskType: typeof parsed.taskType === 'string' ? parsed.taskType : undefined,
-    targetType: typeof parsed.targetType === 'string' ? parsed.targetType : undefined,
-    targetId: typeof parsed.targetId === 'string' ? parsed.targetId : undefined,
-    episodeId: typeof parsed.episodeId === 'string' ? parsed.episodeId : undefined,
-    payload,
-    ts: typeof parsed.ts === 'string' ? parsed.ts : new Date().toISOString(),
-  };
-}
-
 function parseLifecycleEvent(raw: string): TaskLifecycleEvent | null {
-  const parsed = parseTaskEvent(raw, TASK_LIFECYCLE_EVENT);
-  return parsed as TaskLifecycleEvent | null;
+  const parsed = parseJson(raw);
+  if (parsed === null) {
+    return null;
+  }
+
+  try {
+    return parseTaskLifecycleEvent(parsed);
+  } catch {
+    return null;
+  }
 }
 
 function parseStreamEvent(raw: string): TaskStreamEvent | null {
-  const parsed = parseTaskEvent(raw, TASK_STREAM_EVENT);
-  return parsed as TaskStreamEvent | null;
+  const parsed = parseJson(raw);
+  if (parsed === null) {
+    return null;
+  }
+
+  try {
+    return parseTaskStreamEvent(parsed);
+  } catch {
+    return null;
+  }
 }
 
 function parseHeartbeat(raw: string): HeartbeatPayload | null {
   const parsed = parseJson(raw);
-  if (!isObject(parsed) || typeof parsed.ts !== 'string') {
+  if (parsed === null) {
     return null;
   }
-  return { ts: parsed.ts };
+
+  try {
+    return parseHeartbeatPayload(parsed);
+  } catch {
+    return null;
+  }
 }
 
 function buildSsePath(projectId: string, episodeId?: string | null): string {

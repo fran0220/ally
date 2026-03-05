@@ -92,7 +92,7 @@ export default function FirstLastFramePanel({
 
   return (
     <div className="mb-2 space-y-2">
-      <div className="p-2 bg-[var(--glass-tone-info-bg)] border border-[var(--glass-stroke-focus)] rounded-lg">
+      <div className="p-2 bg-[var(--glass-tone-info-bg)] border border-[var(--glass-stroke-focus)] rounded-[var(--glass-radius-md)]">
         <div className="flex items-center gap-2 text-xs text-[var(--glass-tone-info-fg)] mb-2">
           <span>{t("firstLastFrame.title")}</span>
           <span className="text-[var(--glass-tone-info-fg)]">{t("firstLastFrame.range", { from: panelIndex + 1, to: panelIndex + 2 })}</span>

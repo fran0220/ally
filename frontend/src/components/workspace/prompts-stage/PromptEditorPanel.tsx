@@ -23,7 +23,7 @@ export default function PromptEditorPanel({ runtime }: PromptEditorPanelProps) {
   return (
     <>
       {onAppendContent && (
-        <div className="mt-8 p-6 bg-[var(--glass-bg-muted)] rounded-lg border-2 border-dashed border-[var(--glass-stroke-strong)]">
+        <div className="mt-8 p-6 bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-md)] border-2 border-dashed border-[var(--glass-stroke-strong)]">
           <h3 className="text-lg font-semibold text-[var(--glass-text-primary)] mb-3">{tStoryboard('prompts.appendTitle')}</h3>
           <p className="text-sm text-[var(--glass-text-secondary)] mb-4">
             {tStoryboard('prompts.appendDescription')}
@@ -33,7 +33,7 @@ export default function PromptEditorPanel({ runtime }: PromptEditorPanelProps) {
             onChange={(e) => setAppendContent(e.target.value)}
             placeholder={tStoryboard('panelActions.pasteSrtPlaceholder')}
             disabled={isAppending}
-            className="w-full h-48 p-4 border border-[var(--glass-stroke-strong)] rounded-lg resize-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)] disabled:bg-[var(--glass-bg-muted)] disabled:cursor-not-allowed font-mono text-sm"
+            className="w-full h-48 p-4 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] resize-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)] disabled:bg-[var(--glass-bg-muted)] disabled:cursor-not-allowed font-mono text-sm"
           />
           <div className="flex justify-end mt-4">
             <button

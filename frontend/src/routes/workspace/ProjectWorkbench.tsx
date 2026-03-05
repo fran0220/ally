@@ -615,7 +615,7 @@ export function ProjectWorkbench() {
                       <MediaImageWithLoading
                         src={item.imageUrl}
                         alt={item.description ?? item.id}
-                        containerClassName="h-32 rounded-lg"
+                        containerClassName="h-32 rounded-[var(--glass-radius-md)]"
                         className="h-32 w-full object-cover"
                       />
                       <span className="truncate text-xs text-[var(--glass-text-secondary)]">

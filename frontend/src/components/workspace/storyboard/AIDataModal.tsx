@@ -82,7 +82,7 @@ export default function AIDataModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-[var(--glass-overlay)] backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-[var(--glass-bg-surface)] rounded-2xl shadow-2xl w-[90vw] max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="relative bg-[var(--glass-bg-surface)] rounded-[var(--glass-radius-xl)] shadow-2xl w-[90vw] max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--glass-stroke-base)] bg-[var(--glass-bg-muted)]">
           <div className="flex items-center gap-3">
             <span className="text-2xl" />
@@ -91,7 +91,7 @@ export default function AIDataModal({
               <p className="text-xs text-[var(--glass-text-tertiary)]">{t('aiData.subtitle', { number: panelNumber })}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-[var(--glass-bg-muted)] rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-md)] transition-colors">
             <AppIcon name="close" className="w-5 h-5 text-[var(--glass-text-tertiary)]" />
           </button>
         </div>
@@ -125,13 +125,13 @@ export default function AIDataModal({
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--glass-stroke-base)] bg-[var(--glass-bg-muted)]">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm text-[var(--glass-text-secondary)] hover:text-[var(--glass-text-primary)] hover:bg-[var(--glass-bg-muted)] rounded-lg transition-colors"
+            className="px-4 py-2 text-sm text-[var(--glass-text-secondary)] hover:text-[var(--glass-text-primary)] hover:bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-md)] transition-colors"
           >
             {t('candidate.cancel')}
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 text-sm text-white bg-[var(--glass-accent-from)] hover:bg-[var(--glass-accent-to)] rounded-lg transition-colors flex items-center gap-2"
+            className="px-4 py-2 text-sm text-white bg-[var(--glass-accent-from)] hover:bg-[var(--glass-accent-to)] rounded-[var(--glass-radius-md)] transition-colors flex items-center gap-2"
           >
             <AppIcon name="check" className="w-4 h-4" />
             {t('aiData.save')}

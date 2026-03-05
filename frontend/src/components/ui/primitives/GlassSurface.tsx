@@ -31,9 +31,9 @@ export function GlassSurface({
       className={cx(
         variantClass,
         density === 'compact' ? 'glass-density-compact' : 'glass-density-default',
-        padded ? 'p-4 md:p-6' : '',
+        padded ? 'p-3 md:p-4' : '',
         interactive
-          ? 'transition-all duration-[250ms] [transition-timing-function:cubic-bezier(0.68,-0.55,0.265,1.55)] hover:-translate-y-0.5 hover:shadow-[var(--glass-shadow-md)]'
+          ? 'hover-lift press-feedback cursor-pointer'
           : '',
         className,
       )}

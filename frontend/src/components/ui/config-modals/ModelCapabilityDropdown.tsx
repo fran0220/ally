@@ -265,7 +265,7 @@ export function ModelCapabilityDropdown({
                     onModelChange(m.value);
                   }}
                   disabled={m.disabled}
-                  className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-left transition-all ${value === m.value
+                  className={`flex items-center gap-2 w-full px-3 py-2 rounded-[var(--glass-radius-md)] text-left transition-all ${value === m.value
                     ? 'bg-[var(--glass-tone-info-bg)] text-[var(--glass-tone-info-fg)] shadow-[0_0_0_1px_rgba(79,128,255,0.35)]'
                     : m.disabled
                       ? 'text-[var(--glass-text-tertiary)] opacity-60 cursor-not-allowed'
@@ -305,7 +305,7 @@ export function ModelCapabilityDropdown({
                             {resolveCapabilityLabel(def)}
                           </span>
                           {def.options.length === 1 ? (
-                            <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-[var(--glass-bg-surface-strong)] border border-[var(--glass-stroke-base)] text-[var(--glass-text-secondary)] flex items-center gap-1">
+                            <span className="text-[11px] font-medium px-2 py-0.5 rounded-[var(--glass-radius-sm)] bg-[var(--glass-bg-surface-strong)] border border-[var(--glass-stroke-base)] text-[var(--glass-text-secondary)] flex items-center gap-1">
                               {(() => {
                                 const ratioValue = String(def.options[0]);
                                 return isR && isValidRatioText(ratioValue) ? <RatioIcon ratio={ratioValue} size={10} /> : null;
@@ -317,7 +317,7 @@ export function ModelCapabilityDropdown({
                             <select
                               value={selectValue}
                               onChange={(event) => onCapabilityChange(def.field, event.target.value, def.options[0]!)}
-                              className="min-w-[110px] px-2 py-1 text-[11px] rounded-lg border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface)] text-[var(--glass-text-secondary)] focus:outline-none focus:ring-1 focus:ring-[var(--glass-tone-info-fg)]"
+                              className="min-w-[110px] px-2 py-1 text-[11px] rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface)] text-[var(--glass-text-secondary)] focus:outline-none focus:ring-1 focus:ring-[var(--glass-tone-info-fg)]"
                             >
                               {def.options.map((opt) => {
                                 const s = String(opt);
@@ -329,7 +329,7 @@ export function ModelCapabilityDropdown({
                               })}
                             </select>
                           ) : (
-                            <div className="flex rounded-lg border border-[var(--glass-stroke-base)] overflow-hidden">
+                            <div className="flex rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)] overflow-hidden">
                               {def.options.map((opt) => {
                                 const s = String(opt);
                                 const disabled = isOptionDisabled(def, opt);
@@ -361,7 +361,7 @@ export function ModelCapabilityDropdown({
                         <span className="text-xs text-[var(--glass-text-secondary)] font-medium shrink-0">
                           {toggle.label}
                         </span>
-                        <div className="flex rounded-lg border border-[var(--glass-stroke-base)] overflow-hidden">
+                        <div className="flex rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)] overflow-hidden">
                           <button
                             type="button"
                             onClick={() => toggle.onChange(true)}

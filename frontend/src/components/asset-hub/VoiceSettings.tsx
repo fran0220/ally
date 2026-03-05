@@ -99,8 +99,8 @@ export default function VoiceSettings({
 
     // 紧凑模式样式
     const containerClass = compact
-        ? 'glass-surface-soft border border-[var(--glass-stroke-base)] rounded-xl p-3'
-        : 'mt-4 glass-surface-soft border border-[var(--glass-stroke-base)] rounded-xl p-4'
+        ? 'glass-surface-soft border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-lg)] p-3'
+        : 'mt-4 glass-surface-soft border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-lg)] p-4'
 
     const headerClass = compact
         ? 'flex items-center gap-2 mb-2 pb-2 border-b'
@@ -133,7 +133,7 @@ export default function VoiceSettings({
                 <button
                     onClick={() => voiceFileInputRef.current?.click()}
                     disabled={uploadVoice.isPending}
-                    className="glass-btn-base glass-btn-secondary flex-1 min-w-[70px] px-2 py-1.5 rounded-lg text-xs font-medium transition-all relative group whitespace-nowrap"
+                    className="glass-btn-base glass-btn-secondary flex-1 min-w-[70px] px-2 py-1.5 rounded-[var(--glass-radius-md)] text-xs font-medium transition-all relative group whitespace-nowrap"
                 >
                     <div className="flex items-center justify-center gap-1">
                         {hasCustomVoice && <div className="w-1.5 h-1.5 bg-[var(--glass-tone-success-fg)] rounded-full flex-shrink-0"></div>}
@@ -144,7 +144,7 @@ export default function VoiceSettings({
                 {onVoiceDesign && (
                     <button
                         onClick={() => onVoiceDesign(characterId, characterName)}
-                        className="glass-btn-base glass-btn-tone-info flex-1 min-w-[70px] px-2 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap"
+                        className="glass-btn-base glass-btn-tone-info flex-1 min-w-[70px] px-2 py-1.5 rounded-[var(--glass-radius-md)] text-xs font-medium transition-all whitespace-nowrap"
                     >
                         <div className="flex items-center justify-center gap-1">
                             <AppIcon name="bolt" className="w-3.5 h-3.5 flex-shrink-0" />
@@ -156,7 +156,7 @@ export default function VoiceSettings({
                 {onVoiceSelect && (
                     <button
                         onClick={() => onVoiceSelect(characterId)}
-                        className="glass-btn-base glass-btn-secondary flex-1 min-w-[70px] px-2 py-1.5 rounded-lg text-xs text-[var(--glass-tone-info-fg)] font-medium transition-all whitespace-nowrap"
+                        className="glass-btn-base glass-btn-secondary flex-1 min-w-[70px] px-2 py-1.5 rounded-[var(--glass-radius-md)] text-xs text-[var(--glass-tone-info-fg)] font-medium transition-all whitespace-nowrap"
                     >
                         <div className="flex items-center justify-center gap-1">
                             <AppIcon name="folderCards" className="w-3.5 h-3.5 flex-shrink-0" />
@@ -170,7 +170,7 @@ export default function VoiceSettings({
             {hasCustomVoice && (
                 <button
                     onClick={handlePreviewVoice}
-                    className={`glass-btn-base w-full mt-2 px-3 py-2 border rounded-lg text-sm font-medium transition-all ${isPreviewingVoice
+                    className={`glass-btn-base w-full mt-2 px-3 py-2 border rounded-[var(--glass-radius-md)] text-sm font-medium transition-all ${isPreviewingVoice
                         ? 'glass-btn-tone-info border-[var(--glass-stroke-focus)]'
                         : 'glass-btn-secondary text-[var(--glass-tone-info-fg)] border-[var(--glass-stroke-base)]'
                         }`}

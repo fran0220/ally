@@ -27,7 +27,7 @@ type DefaultModelField =
   | 'lipSyncModel'
 
 const MONO_ICON_BADGE =
-  'inline-flex items-center justify-center rounded-lg bg-[var(--glass-bg-surface)] p-1 text-[var(--glass-text-secondary)]'
+  'inline-flex items-center justify-center rounded-[var(--glass-radius-md)] bg-[var(--glass-bg-surface)] p-1 text-[var(--glass-text-secondary)]'
 
 const Icons = {
   settings: () => (
@@ -220,9 +220,9 @@ export function ApiConfigTabContainer() {
 
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-4xl space-y-6 p-6">
-          <div className="glass-surface rounded-2xl p-3.5">
+          <div className="glass-surface rounded-[var(--glass-radius-xl)] p-3.5">
             <div className="mb-1 flex items-center gap-2 px-1">
-              <span className="glass-surface-soft inline-flex h-6 w-6 items-center justify-center rounded-lg text-[var(--glass-text-secondary)]">
+              <span className="glass-surface-soft inline-flex h-6 w-6 items-center justify-center rounded-[var(--glass-radius-md)] text-[var(--glass-text-secondary)]">
                 <Icons.settings />
               </span>
               <h2 className="text-[15px] font-semibold text-[var(--glass-text-primary)]">{t('defaultModels')}</h2>
@@ -267,7 +267,7 @@ export function ApiConfigTabContainer() {
                 return (
                   <div
                     key={card.field}
-                    className="glass-surface-soft rounded-xl p-2.5"
+                    className="glass-surface-soft rounded-[var(--glass-radius-lg)] p-2.5"
                   >
                     <div className="mb-2 flex items-center gap-2">
                       <span className={MONO_ICON_BADGE}>

@@ -58,7 +58,7 @@ export function StageNavigation({
           ? `/workspace/${projectId}?stage=${stage.id}&episode=${episodeId}`
           : `/workspace/${projectId}?stage=${stage.id}`
 
-        const className = `px-5 py-2.5 rounded-xl transition-all font-medium inline-block ${isCurrent
+        const className = `px-5 py-2.5 rounded-[var(--glass-radius-lg)] transition-all font-medium inline-block ${isCurrent
           ? 'bg-[var(--glass-accent-from)] text-white shadow-md'
           : isEnabled
             ? 'bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-muted)] cursor-pointer'

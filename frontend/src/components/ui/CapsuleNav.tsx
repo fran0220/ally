@@ -124,7 +124,7 @@ export function CapsuleNav({ items, activeId, onItemClick, projectId, episodeId 
   return (
     <nav className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-fadeInDown">
       <div
-        className="flex rounded-full px-2 py-1"
+        className="flex rounded-[var(--glass-radius-lg)] px-2 py-1"
         style={{
           background: 'rgba(255,255,255,0.55)',
           backdropFilter: 'blur(24px) saturate(1.6)',
@@ -205,10 +205,9 @@ export function EpisodeSelector({
     <div className="fixed top-20 left-6 z-[60]" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="glass-btn-base glass-btn-secondary flex items-center gap-3 px-4 py-3 transition-all group"
-        style={{ borderRadius: '1.5rem' }}
+        className="glass-btn-base glass-btn-secondary flex items-center gap-3 px-4 py-3 rounded-[var(--glass-radius-lg)] transition-all group"
       >
-        <div className="glass-surface-soft flex h-10 w-10 items-center justify-center rounded-xl text-xs font-bold text-[var(--glass-tone-info-fg)]">
+        <div className="glass-surface-soft flex h-10 w-10 items-center justify-center rounded-[var(--glass-radius-lg)] text-xs font-bold text-[var(--glass-tone-info-fg)]">
           {t('episode')}
         </div>
         <div className="flex flex-col items-start text-left mr-2">
@@ -240,7 +239,7 @@ export function EpisodeSelector({
                 return (
                   <div
                     key={ep.id}
-                    className="flex items-center gap-2 p-3 rounded-xl bg-[var(--glass-tone-info-bg)] border border-[var(--glass-stroke-focus)]"
+                    className="flex items-center gap-2 p-3 rounded-[var(--glass-radius-lg)] bg-[var(--glass-tone-info-bg)] border border-[var(--glass-stroke-focus)]"
                   >
                     <div className={`w-2 h-10 rounded-full ${statusColor}`} />
                     <input
@@ -255,7 +254,7 @@ export function EpisodeSelector({
                           setEditingId(null);
                         }
                       }}
-                      className="flex-1 px-2 py-1 text-sm border border-[var(--glass-stroke-focus)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--glass-focus-ring-strong)]"
+                      className="flex-1 px-2 py-1 text-sm border border-[var(--glass-stroke-focus)] rounded-[var(--glass-radius-md)] focus:outline-none focus:ring-2 focus:ring-[var(--glass-focus-ring-strong)]"
                       autoFocus
                     />
                     <button
@@ -265,13 +264,13 @@ export function EpisodeSelector({
                         }
                         setEditingId(null);
                       }}
-                      className="w-7 h-7 rounded-lg bg-[var(--glass-accent-from)] text-white hover:bg-[var(--glass-accent-to)] flex items-center justify-center"
+                      className="w-7 h-7 rounded-[var(--glass-radius-md)] bg-[var(--glass-accent-from)] text-white hover:bg-[var(--glass-accent-to)] flex items-center justify-center"
                     >
                       <AppIcon name="check" className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setEditingId(null)}
-                      className="w-7 h-7 rounded-lg bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-surface-strong)] flex items-center justify-center"
+                      className="w-7 h-7 rounded-[var(--glass-radius-md)] bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-surface-strong)] flex items-center justify-center"
                     >
                       <AppIcon name="close" className="w-4 h-4" />
                     </button>
@@ -283,7 +282,7 @@ export function EpisodeSelector({
                 return (
                   <div
                     key={ep.id}
-                    className="flex items-center gap-2 p-3 rounded-xl bg-[var(--glass-tone-danger-bg)] border border-[var(--glass-tone-danger-fg)]/30"
+                    className="flex items-center gap-2 p-3 rounded-[var(--glass-radius-lg)] bg-[var(--glass-tone-danger-bg)] border border-[var(--glass-tone-danger-fg)]/30"
                   >
                     <div className="flex-1 text-sm font-medium text-[var(--glass-tone-danger-fg)] truncate">
                       {t('deleteEpisode')}：{ep.title}
@@ -294,13 +293,13 @@ export function EpisodeSelector({
                         setDeletingId(null);
                         setIsOpen(false);
                       }}
-                      className="px-2 py-1 rounded-lg bg-[var(--glass-tone-danger-fg)] text-white text-xs font-medium hover:opacity-90 transition-opacity"
+                      className="px-2 py-1 rounded-[var(--glass-radius-md)] bg-[var(--glass-tone-danger-fg)] text-white text-xs font-medium hover:opacity-90 transition-opacity"
                     >
                       {t('deleteEpisodeConfirm')}
                     </button>
                     <button
                       onClick={() => setDeletingId(null)}
-                      className="w-7 h-7 rounded-lg bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-surface-strong)] flex items-center justify-center"
+                      className="w-7 h-7 rounded-[var(--glass-radius-md)] bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-surface-strong)] flex items-center justify-center"
                     >
                       <AppIcon name="close" className="w-4 h-4" />
                     </button>
@@ -311,7 +310,7 @@ export function EpisodeSelector({
               return (
                 <div
                   key={ep.id}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
+                  className={`w-full flex items-center gap-3 p-3 rounded-[var(--glass-radius-lg)] transition-all ${
                     ep.id === currentId
                       ? 'bg-[var(--glass-tone-info-bg)] border border-[var(--glass-stroke-focus)]'
                       : 'hover:bg-[var(--glass-bg-muted)] border border-transparent'
@@ -348,7 +347,7 @@ export function EpisodeSelector({
                         setEditingId(ep.id);
                         setEditingName(ep.title);
                       }}
-                      className="w-7 h-7 rounded-lg hover:bg-[var(--glass-bg-surface-strong)] flex items-center justify-center text-[var(--glass-text-tertiary)] hover:text-[var(--glass-text-secondary)] transition-colors"
+                      className="w-7 h-7 rounded-[var(--glass-radius-md)] hover:bg-[var(--glass-bg-surface-strong)] flex items-center justify-center text-[var(--glass-text-tertiary)] hover:text-[var(--glass-text-secondary)] transition-colors"
                       title={t('editEpisodeName')}
                     >
                       <AppIcon name="edit" className="w-4 h-4" />
@@ -360,7 +359,7 @@ export function EpisodeSelector({
                         e.stopPropagation();
                         setDeletingId(ep.id);
                       }}
-                      className="w-7 h-7 rounded-lg hover:bg-[var(--glass-tone-danger-bg)] flex items-center justify-center text-[var(--glass-text-tertiary)] hover:text-[var(--glass-tone-danger-fg)] transition-colors"
+                      className="w-7 h-7 rounded-[var(--glass-radius-md)] hover:bg-[var(--glass-tone-danger-bg)] flex items-center justify-center text-[var(--glass-text-tertiary)] hover:text-[var(--glass-tone-danger-fg)] transition-colors"
                       title={t('deleteEpisode')}
                     >
                       <AppIcon name="trash" className="w-4 h-4" />
@@ -378,7 +377,7 @@ export function EpisodeSelector({
                   onAdd();
                   setIsOpen(false);
                 }}
-                className="w-full flex items-center justify-center gap-2 p-2 rounded-xl text-[var(--glass-text-tertiary)] hover:text-[var(--glass-tone-info-fg)] hover:bg-[var(--glass-tone-info-bg)] font-medium text-sm transition-colors"
+                className="w-full flex items-center justify-center gap-2 p-2 rounded-[var(--glass-radius-lg)] text-[var(--glass-text-tertiary)] hover:text-[var(--glass-tone-info-fg)] hover:bg-[var(--glass-tone-info-bg)] font-medium text-sm transition-colors"
               >
                 <span className="text-lg">+</span> {t('newEpisode')}
               </button>

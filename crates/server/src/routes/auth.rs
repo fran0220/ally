@@ -47,12 +47,36 @@ struct UserRow {
     password: Option<String>,
 }
 
-fn set_token_cookie(headers: &mut HeaderMap, token: &str) -> Result<(), AppError> {
-    let cookie = format!("token={token}; HttpOnly; Path=/; SameSite=Lax");
-    let value = header::HeaderValue::from_str(&cookie)
+const AUTH_COOKIE_NAME: &str = "token";
+const AUTH_COOKIE_PATH: &str = "/";
+const AUTH_COOKIE_SAME_SITE: &str = "Lax";
+const AUTH_COOKIE_EXPIRES_AT_EPOCH: &str = "Thu, 01 Jan 1970 00:00:00 GMT";
+
+fn insert_set_cookie(headers: &mut HeaderMap, cookie: &str) -> Result<(), AppError> {
+    let value = header::HeaderValue::from_str(cookie)
         .map_err(|err| AppError::internal(format!("failed to build auth cookie: {err}")))?;
     headers.insert(header::SET_COOKIE, value);
     Ok(())
+}
+
+fn token_cookie(token: &str) -> String {
+    format!(
+        "{AUTH_COOKIE_NAME}={token}; HttpOnly; Path={AUTH_COOKIE_PATH}; SameSite={AUTH_COOKIE_SAME_SITE}"
+    )
+}
+
+fn cleared_token_cookie() -> String {
+    format!(
+        "{AUTH_COOKIE_NAME}=; HttpOnly; Path={AUTH_COOKIE_PATH}; SameSite={AUTH_COOKIE_SAME_SITE}; Max-Age=0; Expires={AUTH_COOKIE_EXPIRES_AT_EPOCH}"
+    )
+}
+
+fn set_token_cookie(headers: &mut HeaderMap, token: &str) -> Result<(), AppError> {
+    insert_set_cookie(headers, &token_cookie(token))
+}
+
+fn clear_token_cookie(headers: &mut HeaderMap) -> Result<(), AppError> {
+    insert_set_cookie(headers, &cleared_token_cookie())
 }
 
 pub async fn register(
@@ -174,4 +198,151 @@ pub async fn refresh(
             }
         })),
     ))
+}
+
+pub async fn session(user: AuthUser) -> Result<impl IntoResponse, AppError> {
+    Ok((
+        StatusCode::OK,
+        Json(json!({
+            "user": {
+                "id": user.id,
+                "name": user.username,
+                "role": user.role,
+            }
+        })),
+    ))
+}
+
+pub async fn logout() -> Result<impl IntoResponse, AppError> {
+    let mut headers = HeaderMap::new();
+    clear_token_cookie(&mut headers)?;
+    Ok((
+        StatusCode::OK,
+        headers,
+        Json(json!({
+            "success": true,
+        })),
+    ))
+}
+
+#[cfg(test)]
+mod tests {
+    use axum::{
+        body::to_bytes,
+        http::{HeaderMap, StatusCode, header},
+        response::IntoResponse,
+    };
+
+    use super::{
+        AUTH_COOKIE_EXPIRES_AT_EPOCH, clear_token_cookie, logout, session, set_token_cookie,
+    };
+    use crate::extractors::auth::AuthUser;
+
+    #[test]
+    fn set_token_cookie_sets_expected_scope() {
+        let mut headers = HeaderMap::new();
+        set_token_cookie(&mut headers, "jwt-token").expect("setting auth cookie should succeed");
+
+        let set_cookie = headers
+            .get(header::SET_COOKIE)
+            .and_then(|value| value.to_str().ok())
+            .expect("set-cookie should be present and valid utf-8");
+
+        assert!(set_cookie.starts_with("token=jwt-token;"));
+        assert!(set_cookie.contains("HttpOnly"));
+        assert!(set_cookie.contains("Path=/"));
+        assert!(set_cookie.contains("SameSite=Lax"));
+        assert!(!set_cookie.contains("Max-Age=0"));
+    }
+
+    #[test]
+    fn clear_token_cookie_sets_expired_cookie_header() {
+        let mut headers = HeaderMap::new();
+        clear_token_cookie(&mut headers).expect("clearing auth cookie should succeed");
+
+        let set_cookie = headers
+            .get(header::SET_COOKIE)
+            .and_then(|value| value.to_str().ok())
+            .expect("set-cookie should be present and valid utf-8");
+
+        assert!(set_cookie.starts_with("token=;"));
+        assert!(set_cookie.contains("HttpOnly"));
+        assert!(set_cookie.contains("Path=/"));
+        assert!(set_cookie.contains("SameSite=Lax"));
+        assert!(set_cookie.contains("Max-Age=0"));
+        assert!(set_cookie.contains(&format!("Expires={AUTH_COOKIE_EXPIRES_AT_EPOCH}")));
+    }
+
+    #[tokio::test]
+    async fn logout_returns_ok_and_cookie_clear_header() {
+        let response = logout()
+            .await
+            .expect("logout handler should succeed")
+            .into_response();
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let set_cookie = response
+            .headers()
+            .get(header::SET_COOKIE)
+            .and_then(|value| value.to_str().ok())
+            .expect("logout response should include set-cookie");
+        assert!(set_cookie.contains("Max-Age=0"));
+        assert!(set_cookie.contains(&format!("Expires={AUTH_COOKIE_EXPIRES_AT_EPOCH}")));
+
+        let (_, body) = response.into_parts();
+        let body_bytes = to_bytes(body, usize::MAX)
+            .await
+            .expect("logout response body should be readable");
+        let body_json: serde_json::Value =
+            serde_json::from_slice(&body_bytes).expect("logout body should be valid json");
+        assert_eq!(
+            body_json
+                .get("success")
+                .and_then(serde_json::Value::as_bool),
+            Some(true)
+        );
+    }
+
+    #[tokio::test]
+    async fn session_returns_authenticated_user_payload() {
+        let response = session(AuthUser {
+            id: "user-1".to_string(),
+            username: "alice".to_string(),
+            role: "admin".to_string(),
+        })
+        .await
+        .expect("session handler should succeed")
+        .into_response();
+
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let (_, body) = response.into_parts();
+        let body_bytes = to_bytes(body, usize::MAX)
+            .await
+            .expect("session response body should be readable");
+        let body_json: serde_json::Value =
+            serde_json::from_slice(&body_bytes).expect("session body should be valid json");
+
+        assert_eq!(
+            body_json
+                .get("user")
+                .and_then(|value| value.get("id"))
+                .and_then(serde_json::Value::as_str),
+            Some("user-1")
+        );
+        assert_eq!(
+            body_json
+                .get("user")
+                .and_then(|value| value.get("name"))
+                .and_then(serde_json::Value::as_str),
+            Some("alice")
+        );
+        assert_eq!(
+            body_json
+                .get("user")
+                .and_then(|value| value.get("role"))
+                .and_then(serde_json::Value::as_str),
+            Some("admin")
+        );
+    }
 }

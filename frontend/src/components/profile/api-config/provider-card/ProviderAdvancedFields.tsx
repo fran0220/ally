@@ -220,7 +220,7 @@ export function ProviderAdvancedFields({
     }
 
     return (
-      <div className="mt-2.5 rounded-lg bg-[var(--glass-bg-muted)] px-2 py-2">
+      <div className="mt-2.5 rounded-[var(--glass-radius-md)] bg-[var(--glass-bg-muted)] px-2 py-2">
         <label className="flex items-center gap-2">
           <button
             onClick={() =>
@@ -248,14 +248,14 @@ export function ProviderAdvancedFields({
 
   return useTabbedLayout ? (
     <div className="space-y-2.5 p-3">
-      <div className="rounded-lg p-0.5" style={{ background: 'rgba(0,0,0,0.04)' }}>
+      <div className="rounded-[var(--glass-radius-md)] p-0.5" style={{ background: 'rgba(0,0,0,0.04)' }}>
         <div
           className="relative grid gap-1"
           style={{ gridTemplateColumns: `repeat(${Math.max(1, visibleTypes.length)}, minmax(0, 1fr))` }}
         >
           {visibleTypes.length > 0 && currentType && (
             <div
-              className="absolute bottom-0.5 top-0.5 rounded-md bg-white transition-transform duration-200"
+              className="absolute bottom-0.5 top-0.5 rounded-[var(--glass-radius-sm)] bg-white transition-transform duration-200"
               style={{
                 boxShadow: '0 1px 4px rgba(0,0,0,0.15), 0 0 0 0.5px rgba(0,0,0,0.06)',
                 width: `calc(100% / ${visibleTypes.length})`,
@@ -267,7 +267,7 @@ export function ProviderAdvancedFields({
             <button
               key={type}
               onClick={() => setActiveType(type)}
-              className={`relative z-[1] flex items-center justify-center gap-1 rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors ${currentType === type
+              className={`relative z-[1] flex items-center justify-center gap-1 rounded-[var(--glass-radius-sm)] px-3 py-1.5 text-[12px] font-medium transition-colors ${currentType === type
                 ? 'text-[var(--glass-text-primary)]'
                 : 'text-[var(--glass-text-tertiary)] hover:text-[var(--glass-text-secondary)]'
                 }`}
@@ -301,7 +301,7 @@ export function ProviderAdvancedFields({
       )}
 
       {currentType && state.showAddForm === currentType && addableModelTypes.has(currentType) && (
-        <div className="glass-surface-soft rounded-xl p-3">
+        <div className="glass-surface-soft rounded-[var(--glass-radius-lg)] p-3">
           <div className="mb-2.5 flex items-center gap-2">
             <input
               type="text"
@@ -341,7 +341,7 @@ export function ProviderAdvancedFields({
           </div>
           {renderCustomPricingEditor(currentType)}
           {currentType === 'video' && provider.id === 'ark' && (
-            <div className="mt-2.5 flex items-center gap-2 rounded-lg bg-[var(--glass-bg-muted)] px-2 py-2">
+            <div className="mt-2.5 flex items-center gap-2 rounded-[var(--glass-radius-md)] bg-[var(--glass-bg-muted)] px-2 py-2">
               <button
                 onClick={() => state.setBatchMode(!state.batchMode)}
                 className="glass-check-mini"
@@ -359,7 +359,7 @@ export function ProviderAdvancedFields({
         </div>
       )}
 
-      <div className="glass-surface-soft rounded-xl p-2">
+      <div className="glass-surface-soft rounded-[var(--glass-radius-lg)] p-2">
         <div
           className="glass-provider-model-scroll h-[280px] overflow-y-auto pr-1"
           style={{ scrollbarGutter: 'stable' }}
@@ -394,7 +394,7 @@ export function ProviderAdvancedFields({
           </button>
         </div>
       ) : (
-        <div className="glass-surface-soft rounded-xl p-3">
+        <div className="glass-surface-soft rounded-[var(--glass-radius-lg)] p-3">
           <div className="mb-2.5 flex items-center gap-2">
             <input
               type="text"
@@ -457,7 +457,7 @@ function ModelRow({
   const rowDisabledClass = model.enabled ? '' : 'opacity-50'
 
   return (
-    <div className={`group flex items-center justify-between gap-2 rounded-xl bg-[var(--glass-bg-surface)] px-3 py-2 transition-colors hover:bg-[var(--glass-bg-surface-strong)] ${rowDisabledClass}`}>
+    <div className={`group flex items-center justify-between gap-2 rounded-[var(--glass-radius-lg)] bg-[var(--glass-bg-surface)] px-3 py-2 transition-colors hover:bg-[var(--glass-bg-surface-strong)] ${rowDisabledClass}`}>
       {state.editingModelId === model.modelKey ? (
         <>
           <div className="flex min-w-0 flex-1 flex-col gap-2">
@@ -506,7 +506,7 @@ function ModelRow({
                 {model.name}
               </span>
               {state.isDefaultModel(model) && model.enabled && (
-                <span className="shrink-0 rounded-md bg-[var(--glass-text-primary)] px-1.5 py-0.5 text-[10px] leading-none text-white">
+                <span className="shrink-0 rounded-[var(--glass-radius-sm)] bg-[var(--glass-text-primary)] px-1.5 py-0.5 text-[10px] leading-none text-white">
                   {t('default')}
                 </span>
               )}

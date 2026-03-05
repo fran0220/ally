@@ -28,7 +28,7 @@
   background: var(--glass-bg-nav);
   border: 1px solid var(--glass-stroke-base);
   box-shadow: var(--glass-shadow-nav);
-  border-radius: 999px;
+  border-radius: var(--glass-radius-lg);
 }
 
 .glass-surface-soft {
@@ -58,12 +58,12 @@
 .glass-textarea-base,
 .glass-select-base {
   width: 100%;
-  border-radius: var(--glass-radius-md);
+  border-radius: var(--glass-radius-sm);
   border: 1px solid var(--glass-stroke-base);
   background: var(--glass-bg-surface);
   color: var(--glass-text-primary);
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  transition: border-color 180ms ease-out, box-shadow 200ms cubic-bezier(0.2, 0, 0, 1), background-color 180ms ease-out;
 }
 
 .glass-input-base::placeholder,
@@ -107,14 +107,14 @@
   gap: 8px;
   cursor: pointer;
   font-weight: 600;
-  border-radius: var(--glass-radius-md);
+  border-radius: var(--glass-radius-sm);
   border: 1px solid transparent;
   transition:
-    transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55),
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    color 0.2s ease;
+    transform 200ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 180ms ease-out,
+    border-color 180ms ease-out,
+    box-shadow 200ms cubic-bezier(0.2, 0, 0, 1),
+    color 150ms ease;
   white-space: nowrap;
 }
 
@@ -126,6 +126,11 @@
 .glass-btn-base:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.glass-btn-base:active:not(:disabled) {
+  transform: scale(0.98) translateY(0);
+  transition-duration: 100ms;
 }
 
 .glass-btn-primary {
@@ -241,11 +246,12 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  border-radius: 999px;
+  padding: 3px 8px;
+  border-radius: var(--glass-radius-sm);
   border: 1px solid transparent;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .glass-chip-neutral {
@@ -303,15 +309,15 @@
   border-radius: var(--glass-radius-xs);
   color: var(--glass-text-tertiary);
   transition:
-    transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55),
-    background-color 0.2s ease,
-    color 0.2s ease;
+    transform 180ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 150ms ease,
+    color 150ms ease;
 }
 
 .glass-icon-btn-sm:hover {
   color: var(--glass-text-secondary);
   background: var(--glass-bg-muted);
-  transform: translateY(-1px);
+  transform: scale(1.08);
 }
 
 .glass-list-row {
@@ -324,15 +330,14 @@
   border: 1px solid var(--glass-stroke-base);
   background: var(--glass-bg-surface);
   transition:
-    transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55),
-    border-color 0.2s ease,
-    background-color 0.2s ease;
+    transform 200ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 180ms ease-out,
+    background-color 180ms ease-out;
 }
 
 .glass-list-row:hover {
   border-color: var(--glass-stroke-strong);
   background: var(--glass-bg-muted);
-  transform: translateY(-1px);
 }
 
 .glass-list-row[data-disabled='true'] {

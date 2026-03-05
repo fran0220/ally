@@ -44,7 +44,7 @@ export default function VideoTimelinePanel({
         className="w-full px-6 py-4 flex items-center justify-between hover:bg-[var(--glass-bg-muted)]/50 transition-colors cursor-pointer"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[var(--glass-accent-from)] rounded-xl flex items-center justify-center shadow-[var(--glass-shadow-md)]">
+          <div className="w-10 h-10 bg-[var(--glass-accent-from)] rounded-[var(--glass-radius-lg)] flex items-center justify-center shadow-[var(--glass-shadow-md)]">
             <AppIcon name="micOutline" className="w-5 h-5 text-white" />
           </div>
           <div className="text-left">

@@ -1,96 +1,79 @@
-import { apiRequest } from './client';
+import {
+  parseAssetCharacterListResponse,
+  parseAssetCharacterMutationResponse,
+  parseAssetFolderListResponse,
+  parseAssetFolderMutationResponse,
+  parseAssetLocationListResponse,
+  parseAssetLocationMutationResponse,
+  parseAssetVoiceListResponse,
+  parseAssetVoiceMutationResponse,
+  parseSuccessResponse,
+} from './contracts';
+import { apiRequestWithContract } from './client';
 
-export interface AssetFolder {
-  id: string;
-  user_id?: string;
-  userId?: string;
-  name: string;
-  created_at?: string;
-  updated_at?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+export type {
+  AssetCharacter,
+  AssetCharacterAppearance,
+  AssetFolder,
+  AssetLocation,
+  AssetLocationImage,
+  AssetVoice,
+} from './contracts';
 
-export interface AssetCharacterAppearance {
-  id: string;
-  appearanceIndex: number;
-  changeReason: string;
-  description: string | null;
-  imageUrl: string | null;
-  imageUrls: string[];
-  selectedIndex: number | null;
-}
-
-export interface AssetCharacter {
-  id: string;
-  folderId: string | null;
-  name: string;
-  voiceId?: string | null;
-  voiceType?: string | null;
-  customVoiceUrl: string | null;
-  globalVoiceId?: string | null;
-  appearances: AssetCharacterAppearance[];
-}
-
-export interface AssetLocationImage {
-  id: string;
-  imageIndex: number;
-  imageUrl: string | null;
-  description: string | null;
-  isSelected: boolean;
-}
-
-export interface AssetLocation {
-  id: string;
-  folderId: string | null;
-  name: string;
-  summary: string | null;
-  images: AssetLocationImage[];
-}
-
-export interface AssetVoice {
-  id: string;
-  folderId: string | null;
-  name: string;
-  description: string | null;
-  voiceType: string;
-  customVoiceUrl: string | null;
-  language: string;
-  gender: string | null;
-}
-
-export function listAssetFolders() {
-  return apiRequest<{ folders: AssetFolder[] }>('/api/asset-hub/folders');
-}
-
-export function createAssetFolder(name: string) {
-  return apiRequest<{ success: boolean; folder: AssetFolder }>('/api/asset-hub/folders', {
-    method: 'POST',
-    body: JSON.stringify({ name }),
-  });
-}
-
-export function updateAssetFolder(folderId: string, name: string) {
-  return apiRequest<{ success: boolean; folder: AssetFolder }>(`/api/asset-hub/folders/${folderId}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ name }),
-  });
-}
-
-export function deleteAssetFolder(folderId: string) {
-  return apiRequest<{ success: boolean }>(`/api/asset-hub/folders/${folderId}`, {
-    method: 'DELETE',
-  });
-}
-
-export function listAssetCharacters(folderId?: string | null) {
+function buildListPath(basePath: string, folderId?: string | null): string {
   const params = new URLSearchParams();
   if (folderId) {
     params.set('folderId', folderId);
   }
+
   const query = params.toString();
-  const path = query ? `/api/asset-hub/characters?${query}` : '/api/asset-hub/characters';
-  return apiRequest<{ characters: AssetCharacter[] }>(path);
+  return query ? `${basePath}?${query}` : basePath;
+}
+
+export function listAssetFolders() {
+  return apiRequestWithContract(
+    '/api/asset-hub/folders',
+    parseAssetFolderListResponse,
+  );
+}
+
+export function createAssetFolder(name: string) {
+  return apiRequestWithContract(
+    '/api/asset-hub/folders',
+    parseAssetFolderMutationResponse,
+    {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    },
+  );
+}
+
+export function updateAssetFolder(folderId: string, name: string) {
+  return apiRequestWithContract(
+    `/api/asset-hub/folders/${folderId}`,
+    parseAssetFolderMutationResponse,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ name }),
+    },
+  );
+}
+
+export function deleteAssetFolder(folderId: string) {
+  return apiRequestWithContract(
+    `/api/asset-hub/folders/${folderId}`,
+    parseSuccessResponse,
+    {
+      method: 'DELETE',
+    },
+  );
+}
+
+export function listAssetCharacters(folderId?: string | null) {
+  return apiRequestWithContract(
+    buildListPath('/api/asset-hub/characters', folderId),
+    parseAssetCharacterListResponse,
+  );
 }
 
 export function createAssetCharacter(payload: {
@@ -98,10 +81,14 @@ export function createAssetCharacter(payload: {
   folderId?: string | null;
   profileData?: Record<string, unknown>;
 }) {
-  return apiRequest<{ success: boolean; character: AssetCharacter }>('/api/asset-hub/characters', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+  return apiRequestWithContract(
+    '/api/asset-hub/characters',
+    parseAssetCharacterMutationResponse,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  );
 }
 
 export function updateAssetCharacter(
@@ -115,16 +102,24 @@ export function updateAssetCharacter(
     globalVoiceId: string | null;
   }>,
 ) {
-  return apiRequest<{ success: boolean; character: AssetCharacter }>(`/api/asset-hub/characters/${characterId}`, {
-    method: 'PATCH',
-    body: JSON.stringify(payload),
-  });
+  return apiRequestWithContract(
+    `/api/asset-hub/characters/${characterId}`,
+    parseAssetCharacterMutationResponse,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    },
+  );
 }
 
 export function deleteAssetCharacter(characterId: string) {
-  return apiRequest<{ success: boolean }>(`/api/asset-hub/characters/${characterId}`, {
-    method: 'DELETE',
-  });
+  return apiRequestWithContract(
+    `/api/asset-hub/characters/${characterId}`,
+    parseSuccessResponse,
+    {
+      method: 'DELETE',
+    },
+  );
 }
 
 export function updateAssetCharacterAppearance(
@@ -136,8 +131,9 @@ export function updateAssetCharacterAppearance(
     changeReason: string;
   }>,
 ) {
-  return apiRequest<{ success: boolean }>(
+  return apiRequestWithContract(
     `/api/asset-hub/characters/${characterId}/appearances/${appearanceIndex}`,
+    parseSuccessResponse,
     {
       method: 'PATCH',
       body: JSON.stringify(payload),
@@ -146,13 +142,10 @@ export function updateAssetCharacterAppearance(
 }
 
 export function listAssetLocations(folderId?: string | null) {
-  const params = new URLSearchParams();
-  if (folderId) {
-    params.set('folderId', folderId);
-  }
-  const query = params.toString();
-  const path = query ? `/api/asset-hub/locations?${query}` : '/api/asset-hub/locations';
-  return apiRequest<{ locations: AssetLocation[] }>(path);
+  return apiRequestWithContract(
+    buildListPath('/api/asset-hub/locations', folderId),
+    parseAssetLocationListResponse,
+  );
 }
 
 export function createAssetLocation(payload: {
@@ -162,10 +155,14 @@ export function createAssetLocation(payload: {
   imageUrl?: string;
   description?: string;
 }) {
-  return apiRequest<{ success: boolean; location: AssetLocation }>('/api/asset-hub/locations', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+  return apiRequestWithContract(
+    '/api/asset-hub/locations',
+    parseAssetLocationMutationResponse,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  );
 }
 
 export function updateAssetLocation(
@@ -176,26 +173,31 @@ export function updateAssetLocation(
     folderId: string | null;
   }>,
 ) {
-  return apiRequest<{ success: boolean; location: AssetLocation }>(`/api/asset-hub/locations/${locationId}`, {
-    method: 'PATCH',
-    body: JSON.stringify(payload),
-  });
+  return apiRequestWithContract(
+    `/api/asset-hub/locations/${locationId}`,
+    parseAssetLocationMutationResponse,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    },
+  );
 }
 
 export function deleteAssetLocation(locationId: string) {
-  return apiRequest<{ success: boolean }>(`/api/asset-hub/locations/${locationId}`, {
-    method: 'DELETE',
-  });
+  return apiRequestWithContract(
+    `/api/asset-hub/locations/${locationId}`,
+    parseSuccessResponse,
+    {
+      method: 'DELETE',
+    },
+  );
 }
 
 export function listAssetVoices(folderId?: string | null) {
-  const params = new URLSearchParams();
-  if (folderId) {
-    params.set('folderId', folderId);
-  }
-  const query = params.toString();
-  const path = query ? `/api/asset-hub/voices?${query}` : '/api/asset-hub/voices';
-  return apiRequest<{ voices: AssetVoice[] }>(path);
+  return apiRequestWithContract(
+    buildListPath('/api/asset-hub/voices', folderId),
+    parseAssetVoiceListResponse,
+  );
 }
 
 export function createAssetVoice(payload: {
@@ -206,10 +208,14 @@ export function createAssetVoice(payload: {
   customVoiceUrl?: string;
   language?: string;
 }) {
-  return apiRequest<{ success: boolean; voice: AssetVoice }>('/api/asset-hub/voices', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+  return apiRequestWithContract(
+    '/api/asset-hub/voices',
+    parseAssetVoiceMutationResponse,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  );
 }
 
 export function updateAssetVoice(
@@ -222,16 +228,24 @@ export function updateAssetVoice(
     voiceType: string | null;
   }>,
 ) {
-  return apiRequest<{ success: boolean; voice: AssetVoice }>(`/api/asset-hub/voices/${voiceId}`, {
-    method: 'PATCH',
-    body: JSON.stringify(payload),
-  });
+  return apiRequestWithContract(
+    `/api/asset-hub/voices/${voiceId}`,
+    parseAssetVoiceMutationResponse,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    },
+  );
 }
 
 export function deleteAssetVoice(voiceId: string) {
-  return apiRequest<{ success: boolean }>(`/api/asset-hub/voices/${voiceId}`, {
-    method: 'DELETE',
-  });
+  return apiRequestWithContract(
+    `/api/asset-hub/voices/${voiceId}`,
+    parseSuccessResponse,
+    {
+      method: 'DELETE',
+    },
+  );
 }
 
 export function bindCharacterVoice(

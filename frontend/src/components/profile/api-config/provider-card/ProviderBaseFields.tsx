@@ -23,7 +23,7 @@ export function ProviderBaseFields({ provider, t, state }: ProviderBaseFieldsPro
   return (
     <>
       <div className="px-3.5 pt-2.5">
-        <div className="glass-surface-soft flex items-center gap-2.5 rounded-xl px-3 py-2">
+        <div className="glass-surface-soft flex items-center gap-2.5 rounded-[var(--glass-radius-lg)] px-3 py-2">
           <span className="w-[64px] shrink-0 whitespace-nowrap text-[12px] font-semibold text-[var(--glass-text-primary)]">
             {t('apiKeyLabel')}
           </span>
@@ -56,7 +56,7 @@ export function ProviderBaseFields({ provider, t, state }: ProviderBaseFieldsPro
             <div className="flex min-w-0 flex-1 items-center gap-2">
               {provider.hasApiKey ? (
                 <>
-                  <span className="min-w-0 max-w-[220px] flex-1 truncate rounded-lg bg-[var(--glass-bg-surface)] px-3 py-1.5 font-mono text-[12px] text-[var(--glass-text-secondary)]">
+                  <span className="min-w-0 max-w-[220px] flex-1 truncate rounded-[var(--glass-radius-md)] bg-[var(--glass-bg-surface)] px-3 py-1.5 font-mono text-[12px] text-[var(--glass-text-secondary)]">
                     {state.showKey ? provider.apiKey : state.maskedKey}
                   </span>
                   <div className="flex shrink-0 items-center gap-1">
@@ -96,7 +96,7 @@ export function ProviderBaseFields({ provider, t, state }: ProviderBaseFieldsPro
 
       {state.showBaseUrlEdit && (
         <div className="px-3.5 pb-2.5 pt-2">
-          <div className="glass-surface-soft flex items-center gap-2.5 rounded-xl px-3 py-2">
+          <div className="glass-surface-soft flex items-center gap-2.5 rounded-[var(--glass-radius-lg)] px-3 py-2">
             <div className="flex w-full items-center gap-2">
               <span className="w-[64px] shrink-0 whitespace-nowrap text-[12px] font-semibold text-[var(--glass-text-tertiary)]">
                 {t('baseUrl')}
@@ -129,7 +129,7 @@ export function ProviderBaseFields({ provider, t, state }: ProviderBaseFieldsPro
               ) : (
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                   {provider.baseUrl ? (
-                    <span className="min-w-0 flex-1 truncate rounded-lg bg-[var(--glass-bg-surface)] px-3 py-1.5 font-mono text-[12px] text-[var(--glass-text-secondary)]">
+                    <span className="min-w-0 flex-1 truncate rounded-[var(--glass-radius-md)] bg-[var(--glass-bg-surface)] px-3 py-1.5 font-mono text-[12px] text-[var(--glass-text-secondary)]">
                       {provider.baseUrl}
                     </span>
                   ) : (

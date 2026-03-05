@@ -105,8 +105,8 @@ export default function VoiceSettings({
 
     // 紧凑模式样式
     const containerClass = compact
-        ? 'border border-[var(--glass-stroke-base)] rounded-xl p-3 bg-[var(--glass-bg-surface-strong)]'
-        : 'mt-4 border border-[var(--glass-stroke-base)] rounded-xl p-4 bg-[var(--glass-bg-surface-strong)]'
+        ? 'border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-lg)] p-3 bg-[var(--glass-bg-surface-strong)]'
+        : 'mt-4 border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-lg)] p-4 bg-[var(--glass-bg-surface-strong)]'
 
     const headerClass = compact
         ? 'flex items-center gap-2 mb-2 pb-2 border-b'
@@ -140,7 +140,7 @@ export default function VoiceSettings({
                 <button
                     onClick={() => voiceFileInputRef.current?.click()}
                     disabled={uploadVoice.isPending}
-                    className="flex-1 min-w-[80px] px-2 py-1.5 bg-[var(--glass-bg-surface)] border border-[var(--glass-stroke-base)] rounded-lg text-xs text-[var(--glass-text-secondary)] font-medium hover:border-[var(--glass-stroke-success)] hover:bg-[var(--glass-tone-success-bg)] hover:text-[var(--glass-tone-success-fg)] transition-all relative group whitespace-nowrap"
+                    className="flex-1 min-w-[80px] px-2 py-1.5 bg-[var(--glass-bg-surface)] border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-md)] text-xs text-[var(--glass-text-secondary)] font-medium hover:border-[var(--glass-stroke-success)] hover:bg-[var(--glass-tone-success-bg)] hover:text-[var(--glass-tone-success-fg)] transition-all relative group whitespace-nowrap"
                 >
                     <div className="flex items-center justify-center gap-1">
                         {hasCustomVoice && <div className="w-1.5 h-1.5 bg-[var(--glass-tone-success-fg)] rounded-full flex-shrink-0"></div>}
@@ -152,7 +152,7 @@ export default function VoiceSettings({
                 {onSelectFromHub && (
                     <button
                         onClick={() => onSelectFromHub(characterId)}
-                        className="flex-1 min-w-[80px] px-2 py-1.5 bg-[var(--glass-bg-surface)] border border-[var(--glass-stroke-focus)] rounded-lg text-xs text-[var(--glass-tone-info-fg)] font-medium hover:border-[var(--glass-stroke-focus)] hover:bg-[var(--glass-tone-info-bg)] transition-all whitespace-nowrap"
+                        className="flex-1 min-w-[80px] px-2 py-1.5 bg-[var(--glass-bg-surface)] border border-[var(--glass-stroke-focus)] rounded-[var(--glass-radius-md)] text-xs text-[var(--glass-tone-info-fg)] font-medium hover:border-[var(--glass-stroke-focus)] hover:bg-[var(--glass-tone-info-bg)] transition-all whitespace-nowrap"
                     >
                         <div className="flex items-center justify-center gap-1">
                             <AppIcon name="copy" className="w-3.5 h-3.5 flex-shrink-0" />
@@ -179,7 +179,7 @@ export default function VoiceSettings({
             {hasCustomVoice && (
                 <button
                     onClick={handlePreviewVoice}
-                    className={`w-full mt-2 px-3 py-2 border rounded-lg text-sm font-medium transition-all ${isPreviewingVoice
+                    className={`w-full mt-2 px-3 py-2 border rounded-[var(--glass-radius-md)] text-sm font-medium transition-all ${isPreviewingVoice
                         ? 'bg-[var(--glass-accent-from)] border-[var(--glass-stroke-focus)] text-white hover:bg-[var(--glass-accent-to)]'
                         : 'bg-[var(--glass-tone-info-bg)] border-[var(--glass-stroke-focus)] text-[var(--glass-tone-info-fg)] hover:bg-[var(--glass-tone-info-bg)]'
                         }`}

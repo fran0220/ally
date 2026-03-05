@@ -189,7 +189,7 @@ export function LocationCreationModal({
                     key={style.value}
                     type="button"
                     onClick={() => setArtStyle(style.value)}
-                    className={`glass-btn-base px-3 py-2 rounded-lg text-sm border transition-all justify-start ${artStyle === style.value
+                    className={`glass-btn-base px-3 py-2 rounded-[var(--glass-radius-md)] text-sm border transition-all justify-start ${artStyle === style.value
                       ? 'glass-btn-tone-info border-[var(--glass-stroke-focus)]'
                       : 'glass-btn-soft border-[var(--glass-stroke-base)] text-[var(--glass-text-secondary)]'
                       }`}
@@ -201,7 +201,7 @@ export function LocationCreationModal({
               </div>
             </div>
 
-            <div className="glass-surface-soft rounded-xl p-4 space-y-3 border border-[var(--glass-stroke-base)]">
+            <div className="glass-surface-soft rounded-[var(--glass-radius-lg)] p-4 space-y-3 border border-[var(--glass-stroke-base)]">
               <div className="flex items-center gap-2 text-sm font-medium text-[var(--glass-tone-info-fg)]">
                 <AppIcon name="sparklesAlt" className="w-4 h-4" />
                 <span>{t('assetModal.aiDesign.title')} {t('assetModal.common.optional')}</span>
@@ -224,7 +224,7 @@ export function LocationCreationModal({
                 <button
                   onClick={() => { void handleAiDesign(); }}
                   disabled={isAiDesigning || !aiInstruction.trim()}
-                  className="glass-btn-base glass-btn-tone-info px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm whitespace-nowrap"
+                  className="glass-btn-base glass-btn-tone-info px-4 py-2 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm whitespace-nowrap"
                 >
                   {isAiDesigning ? (
                     <TaskStatusInline state={aiDesigningState} className="text-white [&>span]:text-white [&_svg]:text-white" />
@@ -259,7 +259,7 @@ export function LocationCreationModal({
         <div className="flex gap-3 justify-end p-4 border-t border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface-strong)] rounded-b-xl flex-shrink-0">
           <button
             onClick={onClose}
-            className="glass-btn-base glass-btn-secondary px-4 py-2 rounded-lg text-sm"
+            className="glass-btn-base glass-btn-secondary px-4 py-2 rounded-[var(--glass-radius-md)] text-sm"
             disabled={isSubmitting}
           >
             {t('assetModal.common.cancel')}
@@ -267,7 +267,7 @@ export function LocationCreationModal({
           <button
             onClick={() => { void handleSubmit(); }}
             disabled={isSubmitting || !name.trim() || !description.trim()}
-            className="glass-btn-base glass-btn-primary px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center gap-2"
+            className="glass-btn-base glass-btn-primary px-4 py-2 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center gap-2"
           >
             {isSubmitting ? (
               <TaskStatusInline state={submittingState} className="text-white [&>span]:text-white [&_svg]:text-white" />

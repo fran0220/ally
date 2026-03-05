@@ -15,7 +15,7 @@ export const GlassTextarea = forwardRef<HTMLTextAreaElement, GlassTextareaProps>
       ref={ref}
       className={cx(
         'glass-textarea-base resize-none',
-        density === 'compact' ? 'px-3 py-2 text-sm leading-6' : 'px-3 py-2.5 text-sm leading-6',
+        density === 'compact' ? 'px-2.5 py-1.5 text-sm leading-6' : 'px-3 py-2 text-sm leading-6',
         className,
       )}
       {...props}

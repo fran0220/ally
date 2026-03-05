@@ -228,7 +228,7 @@ export function CharacterCreationModal({
         <div className="flex justify-end p-4 border-t border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface-strong)] rounded-b-xl flex-shrink-0">
           <button
             onClick={onClose}
-            className="glass-btn-base glass-btn-secondary px-4 py-2 rounded-lg text-sm"
+            className="glass-btn-base glass-btn-secondary px-4 py-2 rounded-[var(--glass-radius-md)] text-sm"
             disabled={isSubmitting}
           >
             {t('assetModal.common.cancel')}

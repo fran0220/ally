@@ -34,7 +34,7 @@ export default function ImageSectionActionButtons({
   return (
     <>
       <div className={`absolute bottom-1.5 left-1/2 -translate-x-1/2 z-20 transition-opacity ${isSubmittingPanelImageTask ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-        <div className="relative glass-surface-modal border border-[var(--glass-stroke-base)] rounded-lg p-0.5">
+        <div className="relative glass-surface-modal border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-md)] p-0.5">
           <div className="flex items-center gap-0.5">
             <button
               onClick={() => {
@@ -44,7 +44,7 @@ export default function ImageSectionActionButtons({
                 triggerPulse()
                 onRegeneratePanelImage(panelId, 1, isSubmittingPanelImageTask)
               }}
-              className={`glass-btn-base glass-btn-secondary flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] transition-all active:scale-95 ${isSubmittingPanelImageTask ? 'opacity-75' : ''}`}
+              className={`glass-btn-base glass-btn-secondary flex items-center gap-0.5 px-1.5 py-0.5 rounded-[var(--glass-radius-sm)] text-[10px] transition-all active:scale-95 ${isSubmittingPanelImageTask ? 'opacity-75' : ''}`}
               title={isSubmittingPanelImageTask ? t('video.panelCard.forceRegenerate') : t('panel.regenerateImage')}
             >
               <AppIcon name="refresh" className="w-2.5 h-2.5" />
@@ -52,7 +52,7 @@ export default function ImageSectionActionButtons({
             </button>
             <button
               onClick={() => setShowCountDropdown(!showCountDropdown)}
-              className={`glass-btn-base glass-btn-secondary px-1 py-0.5 rounded-md text-[10px] transition-all active:scale-95 ${isSubmittingPanelImageTask ? 'opacity-75' : ''}`}
+              className={`glass-btn-base glass-btn-secondary px-1 py-0.5 rounded-[var(--glass-radius-sm)] text-[10px] transition-all active:scale-95 ${isSubmittingPanelImageTask ? 'opacity-75' : ''}`}
               title={t('image.selectCount')}
             >
               <AppIcon name="chevronDown" className="w-2.5 h-2.5" />
@@ -62,7 +62,7 @@ export default function ImageSectionActionButtons({
 
             <button
               onClick={onOpenAIDataModal}
-              className={`glass-btn-base glass-btn-secondary flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] transition-all active:scale-95 ${isSubmittingPanelImageTask || isModifying ? 'opacity-75' : ''}`}
+              className={`glass-btn-base glass-btn-secondary flex items-center gap-0.5 px-1.5 py-0.5 rounded-[var(--glass-radius-sm)] text-[10px] transition-all active:scale-95 ${isSubmittingPanelImageTask || isModifying ? 'opacity-75' : ''}`}
               title={t('aiData.viewData')}
             >
               <AppIcon name="chart" className="w-2.5 h-2.5" />
@@ -71,7 +71,7 @@ export default function ImageSectionActionButtons({
             {imageUrl && (
               <button
                 onClick={onOpenEditModal}
-                className={`glass-btn-base glass-btn-secondary flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] transition-all active:scale-95 ${isSubmittingPanelImageTask || isModifying ? 'opacity-75' : ''}`}
+                className={`glass-btn-base glass-btn-secondary flex items-center gap-0.5 px-1.5 py-0.5 rounded-[var(--glass-radius-sm)] text-[10px] transition-all active:scale-95 ${isSubmittingPanelImageTask || isModifying ? 'opacity-75' : ''}`}
               >
                 <span>{t('image.editImage')}</span>
               </button>
@@ -83,7 +83,7 @@ export default function ImageSectionActionButtons({
                 <button
                   onClick={() => onUndo(panelId)}
                   disabled={isSubmittingPanelImageTask}
-                  className="glass-btn-base glass-btn-secondary flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] transition-all active:scale-95 disabled:opacity-50"
+                  className="glass-btn-base glass-btn-secondary flex items-center gap-0.5 px-1.5 py-0.5 rounded-[var(--glass-radius-sm)] text-[10px] transition-all active:scale-95 disabled:opacity-50"
                   title={t('assets.image.undo')}
                 >
                   <span>{t('assets.image.undo')}</span>
@@ -93,7 +93,7 @@ export default function ImageSectionActionButtons({
           </div>
 
           {showCountDropdown && (
-            <div className="absolute left-0 bottom-full mb-1 z-30 glass-surface-modal border border-[var(--glass-stroke-base)] rounded-lg py-1 min-w-[120px] shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
+            <div className="absolute left-0 bottom-full mb-1 z-30 glass-surface-modal border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-md)] py-1 min-w-[120px] shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
               {[2, 3, 4].map((count) => (
                 <button
                   key={count}

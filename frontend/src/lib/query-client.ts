@@ -1,6 +1,7 @@
-import { QueryClient } from '@tanstack/react-query';
+import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
 
-import { ApiClientError } from '../api/client';
+import { ApiClientError, isUnauthorizedApiError } from '../api/client';
+import { queryKeys } from './query-keys';
 
 const MAX_QUERY_RETRIES = 2;
 
@@ -27,7 +28,21 @@ function shouldRetry(failureCount: number, error: unknown): boolean {
 }
 
 export function createQueryClient(): QueryClient {
-  return new QueryClient({
+  let queryClient: QueryClient | null = null;
+
+  const onRequestError = (error: unknown) => {
+    if (queryClient && isUnauthorizedApiError(error)) {
+      queryClient.setQueryData(queryKeys.auth.session(), null);
+    }
+  };
+
+  queryClient = new QueryClient({
+    queryCache: new QueryCache({
+      onError: onRequestError,
+    }),
+    mutationCache: new MutationCache({
+      onError: onRequestError,
+    }),
     defaultOptions: {
       queries: {
         staleTime: 8_000,
@@ -42,4 +57,6 @@ export function createQueryClient(): QueryClient {
       },
     },
   });
+
+  return queryClient;
 }

@@ -14,7 +14,7 @@ export default function StoryboardGroupFailedAlert({
   onClose,
 }: StoryboardGroupFailedAlertProps) {
   return (
-    <div className="mb-4 rounded-lg border border-[var(--glass-stroke-danger)] bg-[var(--glass-danger-ring)] p-3">
+    <div className="mb-4 rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-danger)] bg-[var(--glass-danger-ring)] p-3">
       <div className="flex items-start gap-3">
         <AppIcon name="alert" className="mt-0.5 h-5 w-5 shrink-0 text-[var(--glass-tone-danger-fg)]" />
         <div className="flex-1">

@@ -171,14 +171,14 @@ export default function PanelVariantModal({
                 <MediaImageWithLoading
                   src={panel.imageUrl}
                   alt={t('variant.shotNum', { number: panel.panelNumber ?? '' })}
-                  containerClassName="w-full aspect-[9/16] rounded-lg shadow-[var(--glass-shadow-sm)]"
-                  className="w-full aspect-[9/16] object-cover rounded-lg shadow-[var(--glass-shadow-sm)]"
+                  containerClassName="w-full aspect-[9/16] rounded-[var(--glass-radius-md)] shadow-[var(--glass-shadow-sm)]"
+                  className="w-full aspect-[9/16] object-cover rounded-[var(--glass-radius-md)] shadow-[var(--glass-shadow-sm)]"
                   width={256}
                   height={456}
                   sizes="128px"
                 />
               ) : (
-                <div className="w-full aspect-[9/16] bg-[var(--glass-bg-muted)] rounded-lg flex items-center justify-center text-[var(--glass-text-tertiary)] text-xs">
+                <div className="w-full aspect-[9/16] bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-md)] flex items-center justify-center text-[var(--glass-text-tertiary)] text-xs">
                   {t('variant.noImage')}
                 </div>
               )}
@@ -232,7 +232,7 @@ export default function PanelVariantModal({
               void handleCustomVariant()
             }}
             disabled={isSubmittingVariantTask || !customInput.trim()}
-            className={`glass-btn-base px-4 py-2 text-sm rounded-lg ${isSubmittingVariantTask || !customInput.trim() ? 'glass-btn-soft text-[var(--glass-text-tertiary)] cursor-not-allowed' : 'glass-btn-primary text-white'}`}
+            className={`glass-btn-base px-4 py-2 text-sm rounded-[var(--glass-radius-md)] ${isSubmittingVariantTask || !customInput.trim() ? 'glass-btn-soft text-[var(--glass-text-tertiary)] cursor-not-allowed' : 'glass-btn-primary text-white'}`}
           >
             {isSubmittingVariantTask ? (
               <TaskStatusInline

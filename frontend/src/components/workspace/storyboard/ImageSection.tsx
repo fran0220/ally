@@ -106,7 +106,7 @@ export default function ImageSection({
       <span className="text-[10px] text-center mt-1 line-clamp-2 px-1">{failedError}</span>
       <button
         onClick={onClearError}
-        className="glass-btn-base glass-btn-tone-danger mt-1 px-2 py-1 text-[10px] rounded-md"
+        className="glass-btn-base glass-btn-tone-danger mt-1 px-2 py-1 text-[10px] rounded-[var(--glass-radius-sm)]"
       >
         {t('variant.close')}
       </button>
@@ -122,7 +122,7 @@ export default function ImageSection({
           triggerPulse()
           onRegeneratePanelImage(panelId, 1, false)
         }}
-        className="glass-btn-base glass-btn-tone-success mt-1 px-4 py-2 text-xs rounded-lg transition-all active:scale-95"
+        className="glass-btn-base glass-btn-tone-success mt-1 px-4 py-2 text-xs rounded-[var(--glass-radius-md)] transition-all active:scale-95"
       >
         {t('panel.generateImage')}
       </button>

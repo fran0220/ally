@@ -215,7 +215,7 @@ export default function VoiceDesignDialogBase({
                   <button
                     key={index}
                     onClick={() => setVoicePrompt(prompt)}
-                    className={`glass-btn-base px-2.5 py-1 text-xs rounded-md border transition-all ${
+                    className={`glass-btn-base px-2.5 py-1 text-xs rounded-[var(--glass-radius-sm)] border transition-all ${
                       voicePrompt === prompt
                         ? 'glass-btn-tone-info border-[var(--glass-stroke-focus)]'
                         : 'glass-btn-soft text-[var(--glass-text-secondary)] border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]'
@@ -254,7 +254,7 @@ export default function VoiceDesignDialogBase({
           </details>
 
           {error && (
-            <div className="text-sm text-[var(--glass-tone-danger-fg)] bg-[var(--glass-tone-danger-bg)] px-3 py-2 rounded-lg">
+            <div className="text-sm text-[var(--glass-tone-danger-fg)] bg-[var(--glass-tone-danger-bg)] px-3 py-2 rounded-[var(--glass-radius-md)]">
               {error}
             </div>
           )}
@@ -263,7 +263,7 @@ export default function VoiceDesignDialogBase({
             <button
               onClick={handleGenerate}
               disabled={!voicePrompt.trim()}
-              className="glass-btn-base glass-btn-primary w-full py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              className="glass-btn-base glass-btn-primary w-full py-2.5 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
             >
               {tv('voiceDesign.generate3Schemes')}
             </button>
@@ -288,7 +288,7 @@ export default function VoiceDesignDialogBase({
                   <div
                     key={voice.voiceId}
                     onClick={() => setSelectedIndex(index)}
-                    className={`relative p-3 rounded-lg border-2 cursor-pointer transition-all text-center ${
+                    className={`relative p-3 rounded-[var(--glass-radius-md)] border-2 cursor-pointer transition-all text-center ${
                       selectedIndex === index
                         ? 'border-[var(--glass-stroke-focus)] bg-[var(--glass-tone-info-bg)]'
                         : 'border-[var(--glass-stroke-base)] hover:border-[var(--glass-stroke-focus)]'
@@ -327,14 +327,14 @@ export default function VoiceDesignDialogBase({
                 <button
                   onClick={handleGenerate}
                   disabled={isDesignSubmitting}
-                  className="glass-btn-base glass-btn-secondary flex-1 py-2 rounded-lg text-sm"
+                  className="glass-btn-base glass-btn-secondary flex-1 py-2 rounded-[var(--glass-radius-md)] text-sm"
                 >
                   {tv('voiceDesign.regenerate')}
                 </button>
                 <button
                   onClick={handleConfirmSelection}
                   disabled={selectedIndex === null}
-                  className="glass-btn-base glass-btn-tone-success flex-1 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  className="glass-btn-base glass-btn-tone-success flex-1 py-2 rounded-[var(--glass-radius-md)] disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                 >
                   {tv('voiceDesign.confirmUse')}
                 </button>
@@ -360,13 +360,13 @@ export default function VoiceDesignDialogBase({
             <div className="flex gap-2">
               <button
                 onClick={() => setShowConfirmDialog(false)}
-                className="glass-btn-base glass-btn-secondary flex-1 py-2 rounded-lg text-sm"
+                className="glass-btn-base glass-btn-secondary flex-1 py-2 rounded-[var(--glass-radius-md)] text-sm"
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={doSave}
-                className="glass-btn-base glass-btn-danger flex-1 py-2 rounded-lg text-sm"
+                className="glass-btn-base glass-btn-danger flex-1 py-2 rounded-[var(--glass-radius-md)] text-sm"
               >
                 {tv('voiceDesign.confirmReplaceBtn')}
               </button>

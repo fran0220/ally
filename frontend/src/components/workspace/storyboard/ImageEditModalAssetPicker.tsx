@@ -80,7 +80,7 @@ export default function ImageEditModalAssetPicker({
                             })
                           }
                         }}
-                        className={`relative aspect-square rounded-lg overflow-hidden border-2 ${isSelected ? 'border-[var(--glass-stroke-focus)]' : 'border-transparent'}`}
+                        className={`relative aspect-square rounded-[var(--glass-radius-md)] overflow-hidden border-2 ${isSelected ? 'border-[var(--glass-stroke-focus)]' : 'border-transparent'}`}
                       >
                         {displayImageUrl ? (
                           <MediaImageWithLoading
@@ -145,7 +145,7 @@ export default function ImageEditModalAssetPicker({
                           })
                         }
                       }}
-                      className={`relative aspect-[3/2] rounded-lg overflow-hidden border-2 ${isSelected ? 'border-[var(--glass-stroke-focus)]' : 'border-transparent'}`}
+                      className={`relative aspect-[3/2] rounded-[var(--glass-radius-md)] overflow-hidden border-2 ${isSelected ? 'border-[var(--glass-stroke-focus)]' : 'border-transparent'}`}
                     >
                       {displayImageUrl ? (
                         <MediaImageWithLoading
@@ -182,7 +182,7 @@ export default function ImageEditModalAssetPicker({
         <div className="p-4 border-t flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-[var(--glass-accent-from)] text-white rounded-lg hover:bg-[var(--glass-accent-to)]"
+            className="px-4 py-2 bg-[var(--glass-accent-from)] text-white rounded-[var(--glass-radius-md)] hover:bg-[var(--glass-accent-to)]"
           >
             {t('common.confirm')}
           </button>

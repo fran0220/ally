@@ -60,7 +60,7 @@ export function ProviderSection({
     }
 
     return (
-        <div className="glass-surface mb-5 rounded-2xl p-5">
+        <div className="glass-surface mb-5 rounded-[var(--glass-radius-xl)] p-5">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--glass-text-primary)]">
                     {icon}
@@ -78,7 +78,7 @@ export function ProviderSection({
 
             {/* 添加表单 */}
             {showAddForm && (
-                <div className="glass-surface-soft mb-4 flex items-center gap-2 rounded-xl p-3">
+                <div className="glass-surface-soft mb-4 flex items-center gap-2 rounded-[var(--glass-radius-lg)] p-3">
                     <input
                         type="text"
                         value={newProvider.name}
@@ -102,7 +102,7 @@ export function ProviderSection({
                         placeholder="API Key"
                         className="glass-input-base w-40 px-2 py-1.5 text-sm"
                     />
-                    <button onClick={handleAdd} className="glass-btn-base glass-btn-primary rounded-lg px-3 py-1.5 text-sm">
+                    <button onClick={handleAdd} className="glass-btn-base glass-btn-primary rounded-[var(--glass-radius-md)] px-3 py-1.5 text-sm">
                         {t('add')}
                     </button>
                     <button onClick={() => setShowAddForm(false)} className="glass-btn-base glass-btn-secondary px-2 py-1.5 text-sm">
@@ -119,7 +119,7 @@ export function ProviderSection({
 
                     if (isEditing && showBaseUrl) {
                         return (
-                            <div key={provider.id} className="glass-surface-soft flex items-center gap-3 rounded-xl px-3 py-2.5">
+                            <div key={provider.id} className="glass-surface-soft flex items-center gap-3 rounded-[var(--glass-radius-lg)] px-3 py-2.5">
                                 <input
                                     type="text"
                                     value={editData.name}
@@ -132,21 +132,21 @@ export function ProviderSection({
                                     onChange={e => setEditData({ ...editData, baseUrl: e.target.value })}
                                     className="glass-input-base flex-1 px-2 py-1.5 text-sm font-mono"
                                 />
-                                <button onClick={() => handleSaveEdit(provider)} className="glass-btn-base glass-btn-primary rounded-lg px-3 py-1 text-sm">{t('save')}</button>
-                                <button onClick={() => setEditingId(null)} className="glass-btn-base glass-btn-secondary rounded-lg px-2 py-1 text-sm">{tc('cancel')}</button>
+                                <button onClick={() => handleSaveEdit(provider)} className="glass-btn-base glass-btn-primary rounded-[var(--glass-radius-md)] px-3 py-1 text-sm">{t('save')}</button>
+                                <button onClick={() => setEditingId(null)} className="glass-btn-base glass-btn-secondary rounded-[var(--glass-radius-md)] px-2 py-1 text-sm">{tc('cancel')}</button>
                             </div>
                         )
                     }
 
                     return (
-                        <div key={provider.id} className="glass-surface-soft group flex items-center gap-3 rounded-xl px-3 py-2.5">
+                        <div key={provider.id} className="glass-surface-soft group flex items-center gap-3 rounded-[var(--glass-radius-lg)] px-3 py-2.5">
                             {showBaseUrl && (
                                 <button
                                     onClick={() => {
                                         setEditingId(provider.id)
                                         setEditData({ name: provider.name, baseUrl: provider.baseUrl || '' })
                                     }}
-                                    className="glass-btn-base glass-btn-tone-info cursor-pointer rounded-lg p-1.5"
+                                    className="glass-btn-base glass-btn-tone-info cursor-pointer rounded-[var(--glass-radius-md)] p-1.5"
                                 >
                                     <AppIcon name="edit" className="w-4 h-4" />
                                 </button>
@@ -182,7 +182,7 @@ export function ProviderSection({
                             {!isPreset(provider.id) && onDelete && (
                                 <button
                                     onClick={() => onDelete(provider.id)}
-                                    className="glass-btn-base glass-btn-tone-danger cursor-pointer rounded-lg p-1.5"
+                                    className="glass-btn-base glass-btn-tone-danger cursor-pointer rounded-[var(--glass-radius-md)] p-1.5"
                                 >
                                     <AppIcon name="trash" className="w-4 h-4" />
                                 </button>

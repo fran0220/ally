@@ -45,6 +45,64 @@ function parseOptionalInt(raw, name, fallback) {
   return parsed
 }
 
+function isObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+function collectSnakeCaseKeyPaths(value, pathLabel, paths) {
+  if (Array.isArray(value)) {
+    for (let index = 0; index < value.length; index += 1) {
+      collectSnakeCaseKeyPaths(value[index], `${pathLabel}[${index}]`, paths)
+    }
+    return
+  }
+
+  if (!isObject(value)) {
+    return
+  }
+
+  for (const [key, nestedValue] of Object.entries(value)) {
+    const keyPath = `${pathLabel}.${key}`
+    if (key.includes('_')) {
+      paths.push(keyPath)
+    }
+    collectSnakeCaseKeyPaths(nestedValue, keyPath, paths)
+  }
+}
+
+function assertNoSnakeCaseKeys(value, label) {
+  const snakeCasePaths = []
+  collectSnakeCaseKeyPaths(value, label, snakeCasePaths)
+  assert(
+    snakeCasePaths.length === 0,
+    `${label} must not include snake_case keys: ${snakeCasePaths.join(', ')}`,
+  )
+}
+
+function assertHeartbeatShape(event, label) {
+  assert(isObject(event.json), `${label} heartbeat payload must be a JSON object`)
+  assertNoSnakeCaseKeys(event.json, `${label}.heartbeat`)
+  assert(
+    typeof event.json.ts === 'string' && event.json.ts.trim().length > 0,
+    `${label} heartbeat payload.ts must be a non-empty string`,
+  )
+}
+
+function assertTaskLifecycleShape(event, label) {
+  assert(isObject(event.json), `${label} lifecycle payload must be a JSON object`)
+  assertNoSnakeCaseKeys(event.json, `${label}.taskLifecycle`)
+
+  const payload = event.json
+  assert(payload.type === 'task.lifecycle', `${label} payload.type must be task.lifecycle`)
+  assert(typeof payload.id === 'string' && payload.id.trim().length > 0, `${label} payload.id must be a non-empty string`)
+  assert(typeof payload.taskId === 'string' && payload.taskId.trim().length > 0, `${label} payload.taskId must be a non-empty string`)
+  assert(typeof payload.projectId === 'string' && payload.projectId.trim().length > 0, `${label} payload.projectId must be a non-empty string`)
+  assert(typeof payload.userId === 'string' && payload.userId.trim().length > 0, `${label} payload.userId must be a non-empty string`)
+  assert(typeof payload.eventType === 'string' && payload.eventType.trim().length > 0, `${label} payload.eventType must be a non-empty string`)
+  assert(typeof payload.ts === 'string' && payload.ts.trim().length > 0, `${label} payload.ts must be a non-empty string`)
+  assert(isObject(payload.payload), `${label} payload.payload must be a JSON object`)
+}
+
 function parseSseEventBlock(block) {
   const lines = block.split('\n')
   let eventName = 'message'
@@ -298,6 +356,9 @@ async function main() {
     firstConnection = await createSseConnection({ baseUrl, token, projectId, lastEventId: null })
 
     const firstEvent = await firstConnection.nextEvent(timeoutMs)
+    if (firstEvent.event === 'heartbeat') {
+      assertHeartbeatShape(firstEvent, 'first event')
+    }
     report.assertions.push(`first connection established via event ${firstEvent.event}`)
 
     const firstTask = await submitAssetHubTask({ baseUrl, token, suffix: 'first' })
@@ -308,6 +369,7 @@ async function main() {
       taskId: firstTask.taskId,
       timeoutMs,
     })
+    assertTaskLifecycleShape(firstLifecycle, 'first lifecycle event')
     assert(typeof firstLifecycle.id === 'string' && firstLifecycle.id.trim().length > 0, 'first lifecycle event missing SSE id')
 
     report.firstConnection = {
@@ -337,6 +399,7 @@ async function main() {
       taskId: secondTask.taskId,
       timeoutMs,
     })
+    assertTaskLifecycleShape(replayed, 'reconnect lifecycle event')
 
     const beforeId = Number(report.firstConnection.lastEventId)
     const replayedId = Number(replayed.id)

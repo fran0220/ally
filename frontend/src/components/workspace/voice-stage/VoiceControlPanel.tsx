@@ -141,7 +141,7 @@ export default function VoiceControlPanel({
 
       {isLineEditorOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--glass-overlay)] p-4" onClick={onCancelEdit}>
-          <div className="w-full max-w-xl bg-[var(--glass-bg-surface)] rounded-2xl shadow-2xl border border-[var(--glass-stroke-base)] p-5" onClick={(event) => event.stopPropagation()}>
+          <div className="w-full max-w-xl bg-[var(--glass-bg-surface)] rounded-[var(--glass-radius-xl)] shadow-2xl border border-[var(--glass-stroke-base)] p-5" onClick={(event) => event.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-[var(--glass-text-primary)]">
                 {editingLineId ? t('lineEditor.editTitle') : t('lineEditor.addTitle')}
@@ -163,7 +163,7 @@ export default function VoiceControlPanel({
                   onChange={(event) => onEditingContentChange(event.target.value)}
                   placeholder={t('lineEditor.contentPlaceholder')}
                   rows={4}
-                  className="w-full rounded-xl border border-[var(--glass-stroke-strong)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] resize-y"
+                  className="w-full rounded-[var(--glass-radius-lg)] border border-[var(--glass-stroke-strong)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] resize-y"
                 />
               </div>
 
@@ -172,7 +172,7 @@ export default function VoiceControlPanel({
                 <select
                   value={editingSpeaker}
                   onChange={(event) => onEditingSpeakerChange(event.target.value)}
-                  className="w-full rounded-xl border border-[var(--glass-stroke-strong)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
+                  className="w-full rounded-[var(--glass-radius-lg)] border border-[var(--glass-stroke-strong)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
                 >
                   <option value="" disabled>{t('lineEditor.selectSpeaker')}</option>
                   {speakerOptions.map((speaker) => (
@@ -191,7 +191,7 @@ export default function VoiceControlPanel({
                 <select
                   value={editingMatchedPanelId}
                   onChange={(event) => onEditingMatchedPanelIdChange(event.target.value)}
-                  className="w-full rounded-xl border border-[var(--glass-stroke-strong)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
+                  className="w-full rounded-[var(--glass-radius-lg)] border border-[var(--glass-stroke-strong)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)]"
                 >
                   <option value="">{t('lineEditor.unboundPanel')}</option>
                   {bindablePanelOptions.map((panel) => (
@@ -207,14 +207,14 @@ export default function VoiceControlPanel({
               <button
                 onClick={onCancelEdit}
                 disabled={isSavingLineEditor}
-                className="px-4 py-2 text-sm rounded-lg border border-[var(--glass-stroke-base)] text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-muted)] disabled:opacity-60"
+                className="px-4 py-2 text-sm rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)] text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-muted)] disabled:opacity-60"
               >
                 {t('common.cancel')}
               </button>
               <button
                 onClick={onSaveEdit}
                 disabled={isSavingLineEditor}
-                className="px-4 py-2 text-sm rounded-lg bg-[var(--glass-accent-from)] text-white hover:bg-[var(--glass-accent-to)] disabled:opacity-60 flex items-center gap-2"
+                className="px-4 py-2 text-sm rounded-[var(--glass-radius-md)] bg-[var(--glass-accent-from)] text-white hover:bg-[var(--glass-accent-to)] disabled:opacity-60 flex items-center gap-2"
               >
                 {isSavingLineEditor && (
                   <TaskStatusInline state={savingLineEditorState} className="text-white [&>span]:text-white [&_svg]:text-white" />

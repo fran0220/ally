@@ -97,7 +97,7 @@ export default function ImageEditModal({
   return (
     <div className="fixed inset-0 bg-[var(--glass-overlay)] z-50 flex items-center justify-center p-4">
       <div
-        className="bg-[var(--glass-bg-surface)] rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-[var(--glass-bg-surface)] rounded-[var(--glass-radius-lg)] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
         onPaste={handlePaste}
       >
         <div className="p-6 border-b">
@@ -112,7 +112,7 @@ export default function ImageEditModal({
               value={editPrompt}
               onChange={(event) => setEditPrompt(event.target.value)}
               placeholder={t('imageEdit.promptPlaceholder')}
-              className="w-full h-24 px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-lg focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)] resize-none"
+              className="w-full h-24 px-3 py-2 border border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] focus:border-[var(--glass-stroke-focus)] resize-none"
               autoFocus
             />
           </div>
@@ -142,8 +142,8 @@ export default function ImageEditModal({
                   <MediaImageWithLoading
                     src={image}
                     alt=""
-                    containerClassName="w-full h-full rounded-lg"
-                    className="w-full h-full object-cover rounded-lg"
+                    containerClassName="w-full h-full rounded-[var(--glass-radius-md)]"
+                    className="w-full h-full object-cover rounded-[var(--glass-radius-md)]"
                   />
                   <button
                     onClick={() => removeImage(index)}
@@ -155,7 +155,7 @@ export default function ImageEditModal({
               ))}
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-16 h-16 border-2 border-dashed border-[var(--glass-stroke-strong)] rounded-lg flex items-center justify-center text-[var(--glass-text-tertiary)] hover:border-[var(--glass-stroke-focus)] hover:text-[var(--glass-tone-info-fg)] transition-colors"
+                className="w-16 h-16 border-2 border-dashed border-[var(--glass-stroke-strong)] rounded-[var(--glass-radius-md)] flex items-center justify-center text-[var(--glass-text-tertiary)] hover:border-[var(--glass-stroke-focus)] hover:text-[var(--glass-tone-info-fg)] transition-colors"
               >
                 <AppIcon name="plus" className="w-6 h-6" />
               </button>
@@ -166,14 +166,14 @@ export default function ImageEditModal({
         <div className="p-6 border-t flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-muted)] rounded-lg transition-colors"
+            className="px-4 py-2 text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-md)] transition-colors"
           >
             {t('candidate.cancel')}
           </button>
           <button
             onClick={handleSubmit}
             disabled={!editPrompt.trim()}
-            className="px-4 py-2 bg-[var(--glass-accent-from)] text-white rounded-lg hover:bg-[var(--glass-accent-to)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 bg-[var(--glass-accent-from)] text-white rounded-[var(--glass-radius-md)] hover:bg-[var(--glass-accent-to)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {t('imageEdit.start')}
           </button>

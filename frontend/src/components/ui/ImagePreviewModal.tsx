@@ -69,7 +69,7 @@ export function ImagePreviewModal({ imageUrl, onClose }: ImagePreviewModalProps)
           src={displayImageUrl}
           alt={t('preview')}
           containerClassName="max-h-[90vh] max-w-full"
-          className="max-h-[90vh] max-w-full rounded-lg object-contain shadow-2xl"
+          className="max-h-[90vh] max-w-full rounded-[var(--glass-radius-md)] object-contain shadow-2xl"
           onClick={(event) => event.stopPropagation()}
         />
       </div>

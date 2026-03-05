@@ -94,7 +94,7 @@ export default function InsertPanelModal({
                 <div className="px-5 py-3 border-b border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface-strong)] rounded-t-2xl">
                     <div className="flex items-center justify-between">
                         <h2 className="text-base font-bold text-[var(--glass-text-primary)] flex items-center gap-2">
-                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-[var(--glass-tone-info-bg)] text-[var(--glass-tone-info-fg)] text-sm font-bold">+</span>
+                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-[var(--glass-radius-md)] bg-[var(--glass-tone-info-bg)] text-[var(--glass-tone-info-fg)] text-sm font-bold">+</span>
                             {t('insertModal.insertBetween', { before: prevPanel.panelNumber ?? 0, after: nextPanel?.panelNumber ?? '' })}
                         </h2>
                         <button
@@ -112,16 +112,16 @@ export default function InsertPanelModal({
                     {/* 前后镜头预览 - 更紧凑 */}
                     <div className="flex gap-3 items-center">
                         {/* 前一个镜头 */}
-                        <div className="flex-1 bg-[var(--glass-bg-muted)] rounded-lg p-2 text-center">
+                        <div className="flex-1 bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-md)] p-2 text-center">
                             {prevPanel.imageUrl ? (
                                 <MediaImageWithLoading
                                     src={prevPanel.imageUrl}
                                     alt={`${t('insertModal.panel')} ${prevPanel.panelNumber}`}
-                                    containerClassName="w-full aspect-[9/16] rounded-md"
-                                    className="w-full aspect-[9/16] object-cover rounded-md"
+                                    containerClassName="w-full aspect-[9/16] rounded-[var(--glass-radius-sm)]"
+                                    className="w-full aspect-[9/16] object-cover rounded-[var(--glass-radius-sm)]"
                                 />
                             ) : (
-                                <div className="w-full aspect-[9/16] bg-[var(--glass-bg-muted)] rounded-md flex items-center justify-center text-[var(--glass-text-tertiary)] text-xs">
+                                <div className="w-full aspect-[9/16] bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-sm)] flex items-center justify-center text-[var(--glass-text-tertiary)] text-xs">
                                     {t('insertModal.noImage')}
                                 </div>
                             )}
@@ -136,18 +136,18 @@ export default function InsertPanelModal({
                         </div>
 
                         {/* 后一个镜头 */}
-                        <div className="flex-1 bg-[var(--glass-bg-muted)] rounded-lg p-2 text-center">
+                        <div className="flex-1 bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-md)] p-2 text-center">
                             {nextPanel ? (
                                 <>
                                     {nextPanel.imageUrl ? (
                                         <MediaImageWithLoading
                                             src={nextPanel.imageUrl}
                                             alt={`${t('insertModal.panel')} ${nextPanel.panelNumber}`}
-                                            containerClassName="w-full aspect-[9/16] rounded-md"
-                                            className="w-full aspect-[9/16] object-cover rounded-md"
+                                            containerClassName="w-full aspect-[9/16] rounded-[var(--glass-radius-sm)]"
+                                            className="w-full aspect-[9/16] object-cover rounded-[var(--glass-radius-sm)]"
                                         />
                                     ) : (
-                                        <div className="w-full aspect-[9/16] bg-[var(--glass-bg-muted)] rounded-md flex items-center justify-center text-[var(--glass-text-tertiary)] text-xs">
+                                        <div className="w-full aspect-[9/16] bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-sm)] flex items-center justify-center text-[var(--glass-text-tertiary)] text-xs">
                                             {t('insertModal.noImage')}
                                         </div>
                                     )}
@@ -155,7 +155,7 @@ export default function InsertPanelModal({
                                 </>
                             ) : (
                                 <>
-                                    <div className="w-full aspect-[9/16] bg-[var(--glass-bg-muted)] rounded-md flex items-center justify-center text-[var(--glass-text-tertiary)] text-xs">
+                                    <div className="w-full aspect-[9/16] bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-sm)] flex items-center justify-center text-[var(--glass-text-tertiary)] text-xs">
                                         {t('insertModal.insertAtEnd')}
                                     </div>
                                     <div className="text-xs text-[var(--glass-text-tertiary)] mt-1">{t('insertModal.insert')}</div>
@@ -170,7 +170,7 @@ export default function InsertPanelModal({
                             value={userInput}
                             onChange={(e) => setUserInput(e.target.value)}
                             placeholder={t('insertModal.placeholder')}
-                            className="w-full h-16 px-3 py-2 border border-[var(--glass-stroke-base)] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] text-sm"
+                            className="w-full h-16 px-3 py-2 border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-md)] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--glass-tone-info-fg)] text-sm"
                             disabled={isInserting}
                         />
                     </div>
@@ -180,7 +180,7 @@ export default function InsertPanelModal({
                         <button
                             onClick={handleAutoAnalyze}
                             disabled={isInserting}
-                            className={`flex-1 py-2.5 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all
+                            className={`flex-1 py-2.5 rounded-[var(--glass-radius-md)] font-medium text-sm flex items-center justify-center gap-2 transition-all
                                 ${isInserting ? 'bg-[var(--glass-bg-muted)] text-[var(--glass-text-tertiary)]' : 'bg-[var(--glass-bg-muted)] text-[var(--glass-text-secondary)] hover:bg-[var(--glass-bg-muted)]'}`}
                         >
                             {isInserting && !userInput ? (
@@ -193,7 +193,7 @@ export default function InsertPanelModal({
                         <button
                             onClick={handleInsert}
                             disabled={isInserting || !userInput.trim()}
-                            className={`flex-1 py-2.5 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all
+                            className={`flex-1 py-2.5 rounded-[var(--glass-radius-md)] font-medium text-sm flex items-center justify-center gap-2 transition-all
                                 ${isInserting || !userInput.trim() ? 'bg-[var(--glass-bg-muted)] text-[var(--glass-text-tertiary)]' : 'bg-[var(--glass-accent-from)] text-white hover:bg-[var(--glass-accent-to)] shadow-[var(--glass-shadow-md)]'}`}
                         >
                             {isInserting && userInput ? (

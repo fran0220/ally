@@ -12,7 +12,7 @@ export default function VideoPanelCardFooter({ runtime }: VideoPanelCardFooterPr
 
   return (
     <div className="fixed inset-0 glass-overlay flex items-center justify-center z-50" onClick={() => !lipSync.executingLipSync && lipSync.closeLipSyncPanel()}>
-      <div className="glass-surface-modal rounded-xl p-6 max-w-md w-full mx-4" onClick={(event) => event.stopPropagation()}>
+      <div className="glass-surface-modal rounded-[var(--glass-radius-lg)] p-6 max-w-md w-full mx-4" onClick={(event) => event.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-[var(--glass-text-primary)]">{t('panelCard.lipSyncTitle')}</h3>
           {!lipSync.executingLipSync && (
@@ -21,7 +21,7 @@ export default function VideoPanelCardFooter({ runtime }: VideoPanelCardFooterPr
         </div>
 
         {lipSync.lipSyncError && (
-          <div className="mb-4 p-3 bg-[var(--glass-tone-danger-bg)] border border-[var(--glass-stroke-danger)] rounded-lg text-[var(--glass-tone-danger-fg)] text-sm">
+          <div className="mb-4 p-3 bg-[var(--glass-tone-danger-bg)] border border-[var(--glass-stroke-danger)] rounded-[var(--glass-radius-md)] text-[var(--glass-tone-danger-fg)] text-sm">
             {lipSync.lipSyncError}
           </div>
         )}
@@ -43,7 +43,7 @@ export default function VideoPanelCardFooter({ runtime }: VideoPanelCardFooterPr
                   <button
                     key={voiceLine.id}
                     onClick={() => void lipSync.executeLipSync(voiceLine)}
-                    className="w-full text-left p-3 border border-[var(--glass-stroke-base)] rounded-lg hover:border-[var(--glass-stroke-focus)] hover:bg-[var(--glass-tone-info-bg)] transition-colors"
+                    className="w-full text-left p-3 border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-md)] hover:border-[var(--glass-stroke-focus)] hover:bg-[var(--glass-tone-info-bg)] transition-colors"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-[var(--glass-text-tertiary)]">{voiceLine.speaker}</span>

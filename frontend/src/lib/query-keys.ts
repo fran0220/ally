@@ -1,4 +1,7 @@
 export const queryKeys = {
+  auth: {
+    session: () => ['auth', 'session'] as const,
+  },
   projects: {
     list: (page: number, pageSize: number, search: string) =>
       ['projects', 'list', page, pageSize, search] as const,

@@ -1,7 +1,6 @@
-import { useSyncExternalStore } from 'react';
-
-import { hasAuthToken, subscribeAuthToken } from '../api/client';
+import { useAuthSession } from './useAuthSession';
 
 export function useHasAuthToken(): boolean {
-  return useSyncExternalStore(subscribeAuthToken, hasAuthToken, () => false);
+  const { isAuthenticated } = useAuthSession();
+  return isAuthenticated;
 }

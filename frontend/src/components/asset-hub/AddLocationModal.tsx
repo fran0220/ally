@@ -102,7 +102,7 @@ export function AddLocationModal({ folderId, onClose, onSuccess }: AddLocationMo
 
                     <div className="space-y-5">
                         {/* AI 设计区域 */}
-                        <div className="glass-surface-soft border border-[var(--glass-stroke-base)] rounded-xl p-4 space-y-3">
+                        <div className="glass-surface-soft border border-[var(--glass-stroke-base)] rounded-[var(--glass-radius-lg)] p-4 space-y-3">
                             <div className="flex items-center gap-2 text-sm font-semibold text-[var(--glass-text-primary)]">
                                 <SparklesIcon className="w-4 h-4" />
                                 <span>{t('modal.aiDesign')}</span>
@@ -125,7 +125,7 @@ export function AddLocationModal({ folderId, onClose, onSuccess }: AddLocationMo
                                 <button
                                     onClick={handleAiDesign}
                                     disabled={isAiDesigning || !aiInstruction.trim()}
-                                    className="glass-btn-base glass-btn-tone-info px-4 py-2 rounded-lg text-sm"
+                                    className="glass-btn-base glass-btn-tone-info px-4 py-2 rounded-[var(--glass-radius-md)] text-sm"
                                 >
                                     {isAiDesigning ? (
                                         <TaskStatusInline state={aiDesigningState} className="text-white [&>span]:text-white [&_svg]:text-white" />
@@ -167,7 +167,7 @@ export function AddLocationModal({ folderId, onClose, onSuccess }: AddLocationMo
                                         key={style.value}
                                         type="button"
                                         onClick={() => setArtStyle(style.value)}
-                                        className={`glass-btn-base px-3 py-2 rounded-lg text-sm border flex items-center justify-start gap-2 transition-all ${artStyle === style.value
+                                        className={`glass-btn-base px-3 py-2 rounded-[var(--glass-radius-md)] text-sm border flex items-center justify-start gap-2 transition-all ${artStyle === style.value
                                             ? 'glass-btn-tone-info border-[var(--glass-stroke-focus)]'
                                             : 'glass-btn-soft border-[var(--glass-stroke-base)] text-[var(--glass-text-secondary)] hover:border-[var(--glass-stroke-strong)]'
                                             }`}
@@ -197,7 +197,7 @@ export function AddLocationModal({ folderId, onClose, onSuccess }: AddLocationMo
                     <div className="flex gap-3 justify-end mt-6 pt-4 border-t border-[var(--glass-stroke-base)]">
                         <button
                             onClick={onClose}
-                            className="glass-btn-base glass-btn-secondary px-4 py-2 rounded-lg text-sm"
+                            className="glass-btn-base glass-btn-secondary px-4 py-2 rounded-[var(--glass-radius-md)] text-sm"
                             disabled={isSubmitting}
                         >
                             {t('common.cancel')}
@@ -205,7 +205,7 @@ export function AddLocationModal({ folderId, onClose, onSuccess }: AddLocationMo
                         <button
                             onClick={handleSubmit}
                             disabled={isSubmitting || !name.trim() || !summary.trim()}
-                            className="glass-btn-base glass-btn-primary px-4 py-2 rounded-lg text-sm"
+                            className="glass-btn-base glass-btn-primary px-4 py-2 rounded-[var(--glass-radius-md)] text-sm"
                         >
                             {isSubmitting ? (
                                 <TaskStatusInline state={submittingState} className="text-white [&>span]:text-white [&_svg]:text-white" />

@@ -72,7 +72,7 @@ export default function CandidateSelector({
               const previewUrl = getImageUrl(originalImageUrl)
               if (previewUrl) onPreview(previewUrl)
             }}
-            className={`relative rounded-lg overflow-hidden border-3 transition-all hover:scale-105 ${selectedIndex === 0
+            className={`relative rounded-[var(--glass-radius-md)] overflow-hidden border-3 transition-all hover:scale-105 ${selectedIndex === 0
               ? 'border-[var(--glass-stroke-focus)] ring-2 ring-[var(--glass-focus-ring)] shadow-lg'
               : 'border-[var(--glass-stroke-strong)] hover:border-[var(--glass-stroke-focus)]'
               }`}
@@ -112,7 +112,7 @@ export default function CandidateSelector({
                 const previewUrl = getImageUrl(url)
                 if (previewUrl) onPreview(previewUrl)
               }}
-              className={`relative rounded-lg overflow-hidden border-3 transition-all hover:scale-105 ${selectedIndex === index + 1
+              className={`relative rounded-[var(--glass-radius-md)] overflow-hidden border-3 transition-all hover:scale-105 ${selectedIndex === index + 1
                 ? 'border-[var(--glass-stroke-focus)] ring-2 ring-[var(--glass-focus-ring)] shadow-lg'
                 : 'border-[var(--glass-stroke-strong)] hover:border-[var(--glass-stroke-focus)]'
                 }`}
@@ -148,7 +148,7 @@ export default function CandidateSelector({
           <button
             onClick={onCancel}
             disabled={isConfirming}
-            className="px-4 py-2 text-sm text-[var(--glass-text-secondary)] bg-[var(--glass-bg-muted)] rounded-lg hover:bg-[var(--glass-bg-muted)] transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm text-[var(--glass-text-secondary)] bg-[var(--glass-bg-muted)] rounded-[var(--glass-radius-md)] hover:bg-[var(--glass-bg-muted)] transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t("candidate.cancel")}
           </button>
@@ -158,7 +158,7 @@ export default function CandidateSelector({
               onConfirm()
             }}
             disabled={isConfirming}
-            className="px-5 py-2 text-sm bg-[var(--glass-accent-from)] text-white rounded-lg hover:bg-[var(--glass-accent-to)] transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-sm"
+            className="px-5 py-2 text-sm bg-[var(--glass-accent-from)] text-white rounded-[var(--glass-radius-md)] hover:bg-[var(--glass-accent-to)] transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-sm"
           >
             {isConfirming ? (
               <TaskStatusInline state={confirmingState} className="text-white [&>span]:text-white [&_svg]:text-white" />

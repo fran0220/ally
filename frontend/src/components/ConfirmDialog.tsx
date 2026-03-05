@@ -78,14 +78,14 @@ export function ConfirmDialog({
             <button
               type="button"
               onClick={onCancel}
-              className="glass-btn-base glass-btn-secondary flex-1 rounded-xl px-4 py-2.5 font-medium"
+              className="glass-btn-base glass-btn-secondary flex-1 rounded-[var(--glass-radius-lg)] px-4 py-2.5 font-medium"
             >
               {finalCancelText}
             </button>
             <button
               type="button"
               onClick={onConfirm}
-              className={`glass-btn-base flex-1 rounded-xl px-4 py-2.5 font-medium ${currentStyle.confirmBg}`}
+              className={`glass-btn-base flex-1 rounded-[var(--glass-radius-lg)] px-4 py-2.5 font-medium ${currentStyle.confirmBg}`}
             >
               {finalConfirmText}
             </button>

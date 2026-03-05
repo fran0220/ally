@@ -27,9 +27,11 @@ pub fn api_router(state: AppState) -> Router {
         .route("/api/system/boot-id", get(system::boot_id))
         .route("/api/auth/register", post(auth::register))
         .route("/api/auth/login", post(auth::login))
-        .route("/api/auth/refresh", post(auth::refresh));
+        .route("/api/auth/refresh", post(auth::refresh))
+        .route("/api/auth/logout", post(auth::logout));
 
     let protected_router = Router::new()
+        .route("/api/auth/session", get(auth::session))
         .route("/api/user/models", get(user::models))
         .route(
             "/api/user/api-config",
@@ -65,7 +67,7 @@ pub fn api_router(state: AppState) -> Router {
 mod tests {
     use axum::{
         body::Body,
-        http::{Request, StatusCode},
+        http::{Request, StatusCode, header},
     };
     use deadpool_redis::{Config as RedisConfig, Runtime as RedisRuntime};
     use sqlx::mysql::MySqlPoolOptions;
@@ -118,6 +120,7 @@ mod tests {
         let app = api_router(test_state());
 
         let protected_paths = [
+            "/api/auth/session",
             "/api/user/models",
             "/api/user/api-config",
             "/api/user-preference",
@@ -154,12 +157,18 @@ mod tests {
     async fn public_routes_remain_accessible_without_token() {
         let app = api_router(test_state());
 
-        for path in ["/healthz", "/api/system/boot-id"] {
+        let routes = [
+            ("GET", "/healthz"),
+            ("GET", "/api/system/boot-id"),
+            ("POST", "/api/auth/logout"),
+        ];
+
+        for (method, path) in routes {
             let response = app
                 .clone()
                 .oneshot(
                     Request::builder()
-                        .method("GET")
+                        .method(method)
                         .uri(path)
                         .body(Body::empty())
                         .expect("request should build"),
@@ -173,5 +182,33 @@ mod tests {
                 "expected public route to remain open: {path}"
             );
         }
+    }
+
+    #[tokio::test]
+    async fn logout_route_sets_cookie_clear_header() {
+        let app = api_router(test_state());
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/auth/logout")
+                    .body(Body::empty())
+                    .expect("request should build"),
+            )
+            .await
+            .expect("router should respond");
+
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let set_cookie = response
+            .headers()
+            .get(header::SET_COOKIE)
+            .and_then(|value| value.to_str().ok())
+            .expect("logout should emit set-cookie header");
+        assert!(set_cookie.starts_with("token=;"));
+        assert!(set_cookie.contains("Path=/"));
+        assert!(set_cookie.contains("Max-Age=0"));
+        assert!(set_cookie.contains("Expires=Thu, 01 Jan 1970 00:00:00 GMT"));
     }
 }

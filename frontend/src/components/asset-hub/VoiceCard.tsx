@@ -117,7 +117,7 @@ export function VoiceCard({ voice, onSelect, isSelected = false, selectionMode =
                     {!selectionMode && (
                         <button
                             onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true) }}
-                            className="glass-btn-base glass-btn-soft h-6 w-6 rounded-md text-[var(--glass-tone-danger-fg)] flex items-center justify-center opacity-0 group-hover:opacity-100"
+                            className="glass-btn-base glass-btn-soft h-6 w-6 rounded-[var(--glass-radius-sm)] text-[var(--glass-tone-danger-fg)] flex items-center justify-center opacity-0 group-hover:opacity-100"
                         >
                             <AppIcon name="trash" className="w-4 h-4" />
                         </button>
@@ -137,8 +137,8 @@ export function VoiceCard({ voice, onSelect, isSelected = false, selectionMode =
                     <div className="glass-surface-modal p-4 m-4" onClick={(e) => e.stopPropagation()}>
                         <p className="mb-4 text-sm text-[var(--glass-text-primary)]">{t('confirmDeleteVoice')}</p>
                         <div className="flex gap-2 justify-end">
-                            <button onClick={() => setShowDeleteConfirm(false)} className="glass-btn-base glass-btn-secondary px-3 py-1.5 rounded-lg text-sm">{t('cancel')}</button>
-                            <button onClick={handleDelete} className="glass-btn-base glass-btn-danger px-3 py-1.5 rounded-lg text-sm">{t('delete')}</button>
+                            <button onClick={() => setShowDeleteConfirm(false)} className="glass-btn-base glass-btn-secondary px-3 py-1.5 rounded-[var(--glass-radius-md)] text-sm">{t('cancel')}</button>
+                            <button onClick={handleDelete} className="glass-btn-base glass-btn-danger px-3 py-1.5 rounded-[var(--glass-radius-md)] text-sm">{t('delete')}</button>
                         </div>
                     </div>
                 </div>
