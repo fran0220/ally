@@ -1,4 +1,3 @@
-'use client'
 import { logError as _ulogError } from '@/lib/logging/core'
 
 import { useEffect, useMemo, useRef } from 'react'

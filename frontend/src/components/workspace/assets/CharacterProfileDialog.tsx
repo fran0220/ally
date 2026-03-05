@@ -1,11 +1,9 @@
-'use client'
-
 /**
  * 角色档案编辑对话框
  * 允许用户编辑角色档案的各项属性
  */
 
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { useState, useEffect } from 'react'
 import { CharacterProfileData, RoleLevel, CostumeTier } from '@/types/character-profile'
 import TaskStatusInline from '@/components/task/TaskStatusInline'

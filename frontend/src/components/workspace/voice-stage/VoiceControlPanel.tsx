@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import type { TaskPresentationState } from '@/lib/task/presentation'
 import TaskStatusInline from '@/components/task/TaskStatusInline'
 import VoiceToolbar from '../voice/VoiceToolbar'

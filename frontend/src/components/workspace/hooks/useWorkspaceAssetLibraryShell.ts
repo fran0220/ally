@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useRef, useEffect, useCallback } from 'react'
 
 type RefreshOptions = { scope?: string; mode?: string }

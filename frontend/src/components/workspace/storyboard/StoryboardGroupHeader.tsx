@@ -1,6 +1,4 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { NovelPromotionClip } from '@/types/project'
 import { AppIcon } from '@/components/ui/icons'
 

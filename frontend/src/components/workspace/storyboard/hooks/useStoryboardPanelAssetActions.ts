@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback } from 'react'
 import { Character, Location, NovelPromotionClip, NovelPromotionStoryboard } from '@/types/project'
 import { PanelEditData } from '../../PanelEditForm'

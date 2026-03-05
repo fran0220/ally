@@ -1,6 +1,4 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 /**
  * 资产确认阶段 - 小说推文模式专用
  * 包含TTS生成和资产分析

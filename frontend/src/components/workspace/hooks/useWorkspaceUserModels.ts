@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useMemo } from 'react'
 import { logError as _ulogError } from '@/lib/logging/core'
 import { useUserModels } from '@/lib/query/hooks'

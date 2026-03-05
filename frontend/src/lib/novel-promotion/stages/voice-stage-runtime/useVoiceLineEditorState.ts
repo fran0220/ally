@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useEffect, useState } from 'react'
 import { resolveTaskPresentationState } from '@/lib/task/presentation'
 import type { VoiceLine } from './types'

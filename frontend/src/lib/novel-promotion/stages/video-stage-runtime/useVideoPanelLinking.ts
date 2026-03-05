@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { logError as _ulogError } from '@/lib/logging/core'
-import type { VideoPanel } from '@/app/[locale]/workspace/[projectId]/modes/novel-promotion/components/video'
+import type { VideoPanel } from '@/components/workspace/video'
 
 interface MutationLike<TInput = unknown> {
   mutateAsync: (input: TInput) => Promise<unknown>

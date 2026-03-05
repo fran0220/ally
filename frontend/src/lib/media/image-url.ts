@@ -1,5 +1,6 @@
 const LOCAL_ORIGIN = 'http://localhost';
-const NEXT_IMAGE_PATH = '/_next/image';
+// Backward compatibility for historic Next.js optimizer URLs persisted in storage.
+const LEGACY_NEXT_IMAGE_PATH = '/_next/image';
 const COS_SIGN_PATH = '/api/cos/image';
 const MAX_NEXT_UNWRAP_DEPTH = 5;
 const STORAGE_KEY_PREFIXES = ['images/', 'video/', 'voice/'] as const;
@@ -24,7 +25,7 @@ export function unwrapNextImageUrl(input: string): string {
 
   for (let i = 0; i < MAX_NEXT_UNWRAP_DEPTH; i += 1) {
     const parsed = tryParseUrl(current);
-    if (!parsed || parsed.pathname !== NEXT_IMAGE_PATH) {
+    if (!parsed || parsed.pathname !== LEGACY_NEXT_IMAGE_PATH) {
       return current;
     }
 

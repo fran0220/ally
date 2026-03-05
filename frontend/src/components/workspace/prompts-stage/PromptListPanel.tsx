@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { TaskStatusInline } from '@/components/task/TaskStatusInline'
 import { AppIcon } from '@/components/ui/icons'
 import type { PromptStageRuntime } from './hooks/usePromptStageActions'

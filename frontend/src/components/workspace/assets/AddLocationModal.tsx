@@ -1,8 +1,7 @@
-'use client'
 import { logError as _ulogError } from '@/lib/logging/core'
 
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { ART_STYLES } from '@/lib/constants'
 import { shouldShowError } from '@/lib/error-utils'
 import { useAiCreateProjectLocation, useCreateProjectLocation } from '@/lib/query/hooks'

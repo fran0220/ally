@@ -1,5 +1,3 @@
-'use client'
-
 import PromptsStageLayout, { type PromptsStageShellProps } from './PromptsStageLayout'
 
 export type { PromptsStageShellProps }

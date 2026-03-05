@@ -1,5 +1,4 @@
-'use client'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { useRefreshProjectAssets } from '@/lib/query/hooks'
 import TaskStatusInline from '@/components/task/TaskStatusInline'
 import { resolveTaskPresentationState } from '@/lib/task/presentation'

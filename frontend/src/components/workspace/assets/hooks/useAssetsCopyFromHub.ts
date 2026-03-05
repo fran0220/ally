@@ -1,7 +1,5 @@
-'use client'
-
 import { useCallback, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { isAbortError } from '@/lib/error-utils'
 import { useCopyProjectAssetFromGlobal } from '@/lib/query/hooks'
 

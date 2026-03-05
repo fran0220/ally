@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { logInfo as _ulogInfo, logError as _ulogError } from '@/lib/logging/core'
 import { resolveTaskPresentationState } from '@/lib/task/presentation'

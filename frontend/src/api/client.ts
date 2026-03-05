@@ -1,9 +1,43 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
+const RAW_API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string | undefined;
 const AUTH_TOKEN_STORAGE_KEY = 'waoowaoo.auth_token';
 const AUTH_TOKEN_CHANGE_EVENT = 'waoowaoo:auth-token-changed';
 
 let authTokenCache: string | null = null;
 let authTokenLoaded = false;
+
+function normalizeApiBaseUrl(rawBaseUrl: string | undefined): string {
+  const trimmed = rawBaseUrl?.trim();
+  if (!trimmed || trimmed === 'null' || trimmed === 'undefined') {
+    return '';
+  }
+
+  return trimmed.replace(/\/+$/, '');
+}
+
+function resolveBrowserOrigin(): string {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  const origin = window.location.origin.trim();
+  return origin ? origin.replace(/\/+$/, '') : '';
+}
+
+export function getPageLocale(): string {
+  if (typeof window === 'undefined') {
+    return 'zh';
+  }
+
+  const match = window.location.pathname.match(/^\/(zh|en)(\/|$)/);
+  return match?.[1] ?? 'zh';
+}
+
+export function getApiBaseUrl(): string {
+  const envBaseUrl = normalizeApiBaseUrl(RAW_API_BASE_URL);
+  return envBaseUrl || resolveBrowserOrigin();
+}
+
+export const API_BASE_URL = getApiBaseUrl();
 
 function normalizeToken(token: string | null | undefined): string | null {
   if (!token) {
@@ -95,14 +129,35 @@ export function setAuthToken(token: string | null): void {
   emitAuthTokenChanged();
 }
 
+function toRecord(value: unknown): Record<string, unknown> | null {
+  return typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : null;
+}
+
+function extractRetryable(payload: unknown): boolean | null {
+  const payloadRecord = toRecord(payload);
+  if (!payloadRecord) {
+    return null;
+  }
+
+  const errorRecord = toRecord(payloadRecord.error);
+  if (!errorRecord) {
+    return null;
+  }
+
+  return typeof errorRecord.retryable === 'boolean' ? errorRecord.retryable : null;
+}
+
 export class ApiClientError extends Error {
   public readonly status: number;
   public readonly payload: unknown;
+  public readonly retryable: boolean | null;
 
   constructor(message: string, status: number, payload: unknown) {
     super(message);
+    this.name = 'ApiClientError';
     this.status = status;
     this.payload = payload;
+    this.retryable = extractRetryable(payload);
   }
 }
 
@@ -153,6 +208,10 @@ export function buildAuthHeaders(init: RequestInit = {}): Headers {
 
   if (!headers.has('Content-Type') && shouldSetJsonContentType(init)) {
     headers.set('Content-Type', 'application/json');
+  }
+
+  if (!headers.has('Accept-Language')) {
+    headers.set('Accept-Language', getPageLocale());
   }
 
   if (!headers.has('Authorization')) {

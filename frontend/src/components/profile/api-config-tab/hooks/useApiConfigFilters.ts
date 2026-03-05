@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import type { CustomModel, Provider } from '../../api-config'
 import { PRESET_PROVIDERS, getProviderKey } from '../../api-config'

@@ -1,4 +1,3 @@
-'use client'
 import { logError as _ulogError } from '@/lib/logging/core'
 
 /**
@@ -10,7 +9,7 @@ import { logError as _ulogError } from '@/lib/logging/core'
  */
 
 import { useState, useCallback, useMemo, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { CharacterAppearance } from '@/types/project'
 import { useProjectAssets, useRefreshProjectAssets, useGenerateProjectCharacterImage, useGenerateProjectLocationImage, type Character } from '@/lib/query/hooks'
 import {

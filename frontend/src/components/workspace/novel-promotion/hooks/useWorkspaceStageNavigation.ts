@@ -1,5 +1,3 @@
-'use client'
-
 import type { NovelPromotionPanel } from '@/types/project'
 
 interface EpisodeLike {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from '@/compat/next-navigation'
 import { useTranslations } from 'next-intl'
 import { useProjectAssets } from '@/lib/query/hooks/useProjectAssets'
 import { useEpisodeData } from '@/lib/query/hooks/useProjectData'

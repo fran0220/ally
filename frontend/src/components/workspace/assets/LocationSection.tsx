@@ -1,6 +1,5 @@
-'use client'
 import { logInfo as _ulogInfo } from '@/lib/logging/core'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 
 /**
  * LocationSection - 场景资产区块组件

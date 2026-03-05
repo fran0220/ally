@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import { useVoiceTaskPresentation } from '@/lib/query/hooks/useTaskPresentation'
 import { resolveTaskPresentationState, type TaskPresentationState } from '@/lib/task/presentation'

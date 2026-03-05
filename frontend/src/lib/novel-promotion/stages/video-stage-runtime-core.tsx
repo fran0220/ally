@@ -1,8 +1,6 @@
-'use client'
-
 import { logError as _ulogError } from '@/lib/logging/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import {
   VideoToolbar,
   type VideoGenerationOptionValue,

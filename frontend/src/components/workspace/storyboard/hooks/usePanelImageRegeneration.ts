@@ -1,4 +1,3 @@
-'use client'
 import { logInfo as _ulogInfo, logWarn as _ulogWarn } from '@/lib/logging/core'
 
 import { useCallback } from 'react'

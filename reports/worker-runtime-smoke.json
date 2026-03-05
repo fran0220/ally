@@ -1,118 +1,136 @@
 {
-  "generatedAt": "2026-03-01T13:41:51.459Z",
+  "generatedAt": "2026-03-04T08:26:54.392Z",
   "summary": {
     "total": 4,
     "executed": 4,
     "skipped": 0,
-    "pass": 4,
-    "fail": 0
+    "pass": 0,
+    "fail": 4
   },
   "rows": [
     {
       "id": "image-asset-hub-generate",
       "method": "POST",
       "path": "/api/asset-hub/generate-image",
-      "submitStatus": 200,
-      "submitUrl": "http://127.0.0.1:3001/api/asset-hub/generate-image",
+      "submitStatus": 400,
+      "submitUrl": "http://185.200.65.233/api/asset-hub/generate-image",
       "submitBody": {
-        "async": true,
-        "deduped": false,
-        "status": "queued",
-        "success": true,
-        "taskId": "e46e08a1-dbe2-43f7-9438-a067433eac09"
+        "success": false,
+        "requestId": "0048ce47-6046-47d8-b7a2-5e2ad688158f",
+        "error": {
+          "code": "INVALID_PARAMS",
+          "message": "meta.locale is required",
+          "retryable": false,
+          "category": "VALIDATION",
+          "user_message_key": "errors.INVALID_PARAMS"
+        },
+        "code": "INVALID_PARAMS",
+        "message": "meta.locale is required"
       },
-      "taskId": "e46e08a1-dbe2-43f7-9438-a067433eac09",
-      "finalStatus": "failed",
-      "errorCode": "NOT_FOUND",
-      "elapsedMs": 12537,
-      "polls": 3,
-      "eventTypes": [
-        "task.failed",
-        "task.processing",
-        "task.created"
-      ],
-      "status": "PASS",
-      "failures": []
+      "taskId": null,
+      "finalStatus": "unknown",
+      "errorCode": null,
+      "elapsedMs": 691,
+      "polls": 0,
+      "eventTypes": [],
+      "status": "FAIL",
+      "failures": [
+        "submit response missing taskId",
+        "submit status 400 != expected 200"
+      ]
     },
     {
       "id": "text-asset-hub-ai-design-character",
       "method": "POST",
       "path": "/api/asset-hub/ai-design-character",
-      "submitStatus": 200,
-      "submitUrl": "http://127.0.0.1:3001/api/asset-hub/ai-design-character",
+      "submitStatus": 400,
+      "submitUrl": "http://185.200.65.233/api/asset-hub/ai-design-character",
       "submitBody": {
-        "async": true,
-        "deduped": false,
-        "status": "queued",
-        "success": true,
-        "taskId": "5bc9509d-1a92-4ce2-8655-07353ec595d9"
+        "success": false,
+        "requestId": "28935c3a-c2ee-47ad-95cb-7513932461eb",
+        "error": {
+          "code": "INVALID_PARAMS",
+          "message": "userInstruction is required",
+          "retryable": false,
+          "category": "VALIDATION",
+          "user_message_key": "errors.INVALID_PARAMS"
+        },
+        "code": "INVALID_PARAMS",
+        "message": "userInstruction is required"
       },
-      "taskId": "5bc9509d-1a92-4ce2-8655-07353ec595d9",
-      "finalStatus": "failed",
-      "errorCode": "INVALID_PARAMS",
-      "elapsedMs": 6418,
-      "polls": 2,
-      "eventTypes": [
-        "task.failed",
-        "task.processing",
-        "task.created"
-      ],
-      "status": "PASS",
-      "failures": []
+      "taskId": null,
+      "finalStatus": "unknown",
+      "errorCode": null,
+      "elapsedMs": 659,
+      "polls": 0,
+      "eventTypes": [],
+      "status": "FAIL",
+      "failures": [
+        "submit response missing taskId",
+        "submit status 400 != expected 200"
+      ]
     },
     {
       "id": "voice-asset-hub-voice-design",
       "method": "POST",
       "path": "/api/asset-hub/voice-design",
-      "submitStatus": 200,
-      "submitUrl": "http://127.0.0.1:3001/api/asset-hub/voice-design",
+      "submitStatus": 400,
+      "submitUrl": "http://185.200.65.233/api/asset-hub/voice-design",
       "submitBody": {
-        "async": true,
-        "deduped": false,
-        "status": "queued",
-        "success": true,
-        "taskId": "7ec5a461-4c74-4739-b423-7ae57dadffd1"
+        "success": false,
+        "requestId": "3556522c-5f10-4367-bdb5-609a988c1035",
+        "error": {
+          "code": "INVALID_PARAMS",
+          "message": "meta.locale is required",
+          "retryable": false,
+          "category": "VALIDATION",
+          "user_message_key": "errors.INVALID_PARAMS"
+        },
+        "code": "INVALID_PARAMS",
+        "message": "meta.locale is required"
       },
-      "taskId": "7ec5a461-4c74-4739-b423-7ae57dadffd1",
-      "finalStatus": "failed",
-      "errorCode": "INVALID_PARAMS",
-      "elapsedMs": 8516,
-      "polls": 2,
-      "eventTypes": [
-        "task.failed",
-        "task.processing",
-        "task.created"
-      ],
-      "status": "PASS",
-      "failures": []
+      "taskId": null,
+      "finalStatus": "unknown",
+      "errorCode": null,
+      "elapsedMs": 255,
+      "polls": 0,
+      "eventTypes": [],
+      "status": "FAIL",
+      "failures": [
+        "submit response missing taskId",
+        "submit status 400 != expected 200"
+      ]
     },
     {
       "id": "video-novel-generate-video",
       "method": "POST",
-      "path": "/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/generate-video",
-      "submitStatus": 200,
-      "submitUrl": "http://127.0.0.1:3001/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/generate-video",
+      "path": "/api/novel-promotion/38ee4854-f3e0-4599-9135-e9483a1620ec/generate-video",
+      "submitStatus": 400,
+      "submitUrl": "http://185.200.65.233/api/novel-promotion/38ee4854-f3e0-4599-9135-e9483a1620ec/generate-video",
       "submitBody": {
-        "async": true,
-        "deduped": false,
-        "status": "queued",
-        "success": true,
-        "taskId": "d31614d2-47ab-43b5-94de-800beca77a6b",
-        "tasks": [],
-        "total": 1
+        "success": false,
+        "requestId": "ef132256-8658-4df9-96dc-48e1cf198217",
+        "error": {
+          "code": "INVALID_PARAMS",
+          "message": "meta.locale is required",
+          "retryable": false,
+          "category": "VALIDATION",
+          "user_message_key": "errors.INVALID_PARAMS"
+        },
+        "code": "INVALID_PARAMS",
+        "message": "meta.locale is required"
       },
-      "taskId": "d31614d2-47ab-43b5-94de-800beca77a6b",
-      "finalStatus": "failed",
-      "errorCode": "NOT_FOUND",
-      "elapsedMs": 8633,
-      "polls": 2,
-      "eventTypes": [
-        "task.failed",
-        "task.processing",
-        "task.created"
-      ],
-      "status": "PASS",
-      "failures": []
+      "taskId": null,
+      "finalStatus": "unknown",
+      "errorCode": null,
+      "elapsedMs": 251,
+      "polls": 0,
+      "eventTypes": [],
+      "status": "FAIL",
+      "failures": [
+        "submit response missing taskId",
+        "submit status 400 != expected 200"
+      ]
     }
   ],
   "skippedCases": []

@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useEffect, useState } from 'react'
 import { logInfo as _ulogInfo, logWarn as _ulogWarn, logError as _ulogError } from '@/lib/logging/core'
 import { detectEpisodeMarkers, type EpisodeMarkerResult } from '@/lib/episode-marker-detector'

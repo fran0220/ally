@@ -1,5 +1,3 @@
-'use client'
-
 import { fetchWithAuth } from '@/api/client'
 import { useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'

@@ -1,4 +1,3 @@
-'use client'
 import { logInfo as _ulogInfo, logError as _ulogError } from '@/lib/logging/core'
 import { useTranslations } from '@/compat/next-intl'
 

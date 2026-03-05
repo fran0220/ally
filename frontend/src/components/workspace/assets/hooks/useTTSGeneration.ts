@@ -1,6 +1,5 @@
-'use client'
 import { logError as _ulogError } from '@/lib/logging/core'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 
 /**
  * useTTSGeneration - TTS 和音色相关逻辑

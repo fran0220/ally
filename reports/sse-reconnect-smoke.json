@@ -1,107 +1,14 @@
 {
-  "generatedAt": "2026-03-01T13:41:58.243Z",
-  "success": true,
-  "baseUrl": "http://127.0.0.1:3001/",
+  "generatedAt": "2026-03-04T08:30:12.135Z",
+  "success": false,
+  "baseUrl": "http://185.200.65.233/",
   "projectId": "global-asset-hub",
-  "firstTask": {
-    "url": "http://127.0.0.1:3001/api/asset-hub/generate-image",
-    "taskId": "24e7ed72-a519-4b41-ae4a-a2756d6d494a",
-    "body": {
-      "async": true,
-      "deduped": false,
-      "status": "queued",
-      "success": true,
-      "taskId": "24e7ed72-a519-4b41-ae4a-a2756d6d494a"
-    }
-  },
-  "secondTask": {
-    "url": "http://127.0.0.1:3001/api/asset-hub/generate-image",
-    "taskId": "0b1dbac8-941c-44b4-81c1-f4cb7231240f",
-    "body": {
-      "async": true,
-      "deduped": false,
-      "status": "queued",
-      "success": true,
-      "taskId": "0b1dbac8-941c-44b4-81c1-f4cb7231240f"
-    }
-  },
-  "firstConnection": {
-    "url": "http://127.0.0.1:3001/api/sse?projectId=global-asset-hub",
-    "firstEvent": {
-      "id": "1",
-      "event": "task.lifecycle",
-      "data": "{\"eventType\":\"task.created\",\"id\":\"1\",\"payload\":{\"id\":\"phase8-task-seed\",\"prompt\":\"phase8 seed image task\",\"targetId\":\"phase8-task-seed\",\"targetType\":\"character\",\"type\":\"character\"},\"projectId\":\"global-asset-hub\",\"taskId\":\"224c689b-0b73-49fa-bf22-b94f247476a9\",\"ts\":\"2026-03-01T11:57:17.814\",\"type\":\"task.lifecycle\",\"userId\":\"e0ede349-14d2-45cc-811d-3961779e94d2\"}",
-      "json": {
-        "eventType": "task.created",
-        "id": "1",
-        "payload": {
-          "id": "phase8-task-seed",
-          "prompt": "phase8 seed image task",
-          "targetId": "phase8-task-seed",
-          "targetType": "character",
-          "type": "character"
-        },
-        "projectId": "global-asset-hub",
-        "taskId": "224c689b-0b73-49fa-bf22-b94f247476a9",
-        "ts": "2026-03-01T11:57:17.814",
-        "type": "task.lifecycle",
-        "userId": "e0ede349-14d2-45cc-811d-3961779e94d2"
-      }
-    },
-    "lifecycleEvent": {
-      "id": "87",
-      "event": "task.lifecycle",
-      "data": "{\"eventType\":\"task.created\",\"id\":\"87\",\"payload\":{\"id\":\"sse-smoke-first-1772372520487\",\"prompt\":\"SSE reconnect smoke test image generation\",\"targetId\":\"sse-smoke-first-1772372520487\",\"targetType\":\"character\",\"type\":\"character\"},\"projectId\":\"global-asset-hub\",\"taskId\":\"24e7ed72-a519-4b41-ae4a-a2756d6d494a\",\"ts\":\"2026-03-01T13:42:01.706\",\"type\":\"task.lifecycle\",\"userId\":\"760accdf-c72b-4e5a-8ad4-819c96bd74ac\"}",
-      "json": {
-        "eventType": "task.created",
-        "id": "87",
-        "payload": {
-          "id": "sse-smoke-first-1772372520487",
-          "prompt": "SSE reconnect smoke test image generation",
-          "targetId": "sse-smoke-first-1772372520487",
-          "targetType": "character",
-          "type": "character"
-        },
-        "projectId": "global-asset-hub",
-        "taskId": "24e7ed72-a519-4b41-ae4a-a2756d6d494a",
-        "ts": "2026-03-01T13:42:01.706",
-        "type": "task.lifecycle",
-        "userId": "760accdf-c72b-4e5a-8ad4-819c96bd74ac"
-      }
-    },
-    "lastEventId": "87"
-  },
-  "secondConnection": {
-    "url": "http://127.0.0.1:3001/api/sse?projectId=global-asset-hub",
-    "replayedEventId": "89",
-    "replayedEvent": {
-      "id": "89",
-      "event": "task.lifecycle",
-      "data": "{\"eventType\":\"task.created\",\"id\":\"89\",\"payload\":{\"id\":\"sse-smoke-second-1772372523951\",\"prompt\":\"SSE reconnect smoke test image generation\",\"targetId\":\"sse-smoke-second-1772372523951\",\"targetType\":\"character\",\"type\":\"character\"},\"projectId\":\"global-asset-hub\",\"taskId\":\"0b1dbac8-941c-44b4-81c1-f4cb7231240f\",\"ts\":\"2026-03-01T13:42:05.863\",\"type\":\"task.lifecycle\",\"userId\":\"760accdf-c72b-4e5a-8ad4-819c96bd74ac\"}",
-      "json": {
-        "eventType": "task.created",
-        "id": "89",
-        "payload": {
-          "id": "sse-smoke-second-1772372523951",
-          "prompt": "SSE reconnect smoke test image generation",
-          "targetId": "sse-smoke-second-1772372523951",
-          "targetType": "character",
-          "type": "character"
-        },
-        "projectId": "global-asset-hub",
-        "taskId": "0b1dbac8-941c-44b4-81c1-f4cb7231240f",
-        "ts": "2026-03-01T13:42:05.863",
-        "type": "task.lifecycle",
-        "userId": "760accdf-c72b-4e5a-8ad4-819c96bd74ac"
-      }
-    }
-  },
+  "firstTask": null,
+  "secondTask": null,
+  "firstConnection": null,
+  "secondConnection": null,
   "assertions": [
-    "first connection established via event task.lifecycle",
-    "first lifecycle event received for task 24e7ed72-a519-4b41-ae4a-a2756d6d494a with id=87",
-    "first connection closed intentionally",
-    "reconnect received task lifecycle event for 0b1dbac8-941c-44b4-81c1-f4cb7231240f",
-    "replayed event id 89 > last-event-id 87"
+    "first connection established via event heartbeat"
   ],
-  "error": null
+  "error": "task submit failed status=500 body={\"success\":false,\"requestId\":\"a54f85ae-661a-41db-9672-143d6f2d614a\",\"error\":{\"code\":\"INTERNAL_ERROR\",\"message\":\"database error: error returned from database: 1054 (42S22): Unknown column 'billingInfo' in 'field list'\",\"retryable\":false,\"category\":\"SYSTEM\",\"user_message_key\":\"errors.INTERNAL_ERROR\"},\"code\":\"INTERNAL_ERROR\",\"message\":\"database error: error returned from database: 1054 (42S22): Unknown column 'billingInfo' in 'field list'\"}"
 }

@@ -1,5 +1,3 @@
-'use client'
-
 import { useRef, useState } from 'react'
 import { shouldShowError } from '@/lib/error-utils'
 import { getErrorMessage } from '../promptStageRuntime.utils'

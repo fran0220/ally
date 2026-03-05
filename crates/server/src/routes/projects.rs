@@ -606,14 +606,16 @@ pub async fn update(
 
     if let Some(name) = payload.name {
         touched = true;
-        separated.push("name = ");
-        separated.push_bind(name.trim().to_string());
+        separated
+            .push("name = ")
+            .push_bind_unseparated(name.trim().to_string());
     }
 
     if let Some(description) = payload.description {
         touched = true;
-        separated.push("description = ");
-        separated.push_bind(description.trim().to_string());
+        separated
+            .push("description = ")
+            .push_bind_unseparated(description.trim().to_string());
     }
 
     if !touched {

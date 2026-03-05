@@ -1,6 +1,4 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 /**
  * 场景卡片组件 - 支持多图片选择
  * 布局：上面名字+描述，下面三张图片

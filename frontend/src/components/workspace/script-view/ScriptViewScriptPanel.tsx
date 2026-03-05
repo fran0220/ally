@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState } from 'react'
 import { logWarn as _ulogWarn } from '@/lib/logging/core'
 import { AppIcon } from '@/components/ui/icons'

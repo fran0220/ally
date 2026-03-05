@@ -5,7 +5,7 @@ import type {
   Clip,
   Storyboard,
   VideoPanel,
-} from '@/app/[locale]/workspace/[projectId]/modes/novel-promotion/components/video'
+} from '@/components/workspace/video'
 
 interface TaskStateLike {
   phase?: string | null

@@ -1,5 +1,5 @@
 import { TaskStatusInline } from '@/components/task/TaskStatusInline'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import type { PromptStageRuntime } from './hooks/usePromptStageActions'
 
 interface PromptEditorPanelProps {

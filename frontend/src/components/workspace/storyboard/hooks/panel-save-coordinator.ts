@@ -1,5 +1,3 @@
-'use client'
-
 import type { PanelEditData } from '../../PanelEditForm'
 
 export type PanelSaveStatus = 'idle' | 'saving' | 'error'

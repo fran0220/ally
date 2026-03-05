@@ -1,5 +1,3 @@
-'use client'
-
 import { useState } from 'react'
 import { useTranslations } from '@/compat/next-intl'
 import { AppIcon } from '@/components/ui/icons'

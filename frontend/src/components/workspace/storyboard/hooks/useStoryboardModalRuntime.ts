@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import type { NovelPromotionStoryboard } from '@/types/project'
 import type { PanelEditData } from '../../PanelEditForm'

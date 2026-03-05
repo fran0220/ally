@@ -1,5 +1,3 @@
-'use client'
-
 import VoiceDesignDialogBase, {
   type VoiceDesignMutationPayload,
   type VoiceDesignMutationResult,

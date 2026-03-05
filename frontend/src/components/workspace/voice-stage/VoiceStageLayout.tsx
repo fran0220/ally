@@ -1,5 +1,3 @@
-'use client'
-
 import { useVoiceStageRuntime, type VoiceStageShellProps } from './hooks/useVoiceStageRuntime'
 
 export type { VoiceStageShellProps }

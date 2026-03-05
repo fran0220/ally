@@ -5,10 +5,8 @@
  * 🔥 V6.5 重构：直接订阅 useProjectAssets，消除 props drilling
  */
 
-'use client'
-
 import { useState, useCallback, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { CharacterProfileData, parseProfileData } from '@/types/character-profile'
 import {
     useProjectAssets,

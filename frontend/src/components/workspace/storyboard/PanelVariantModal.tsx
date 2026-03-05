@@ -1,5 +1,4 @@
-'use client'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import TaskStatusInline from '@/components/task/TaskStatusInline'

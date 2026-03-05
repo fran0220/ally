@@ -1,5 +1,3 @@
-'use client'
-
 export {
   useVideoPanelActions,
   type VideoPanelRuntime,

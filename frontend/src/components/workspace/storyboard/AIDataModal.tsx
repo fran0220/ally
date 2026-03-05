@@ -1,6 +1,4 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import AIDataModalFormPane from './AIDataModalFormPane'
 import AIDataModalPreviewPane from './AIDataModalPreviewPane'
 import type { AIDataModalProps } from './AIDataModal.types'

@@ -1,4 +1,3 @@
-'use client'
 import { logInfo as _ulogInfo } from '@/lib/logging/core'
 import { resolveErrorDisplay } from '@/lib/errors/display'
 

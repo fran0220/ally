@@ -15,14 +15,14 @@ export function Landing() {
             {t('landing:title')}
           </h1>
           <p className="mt-4 text-base text-[var(--glass-text-secondary)] md:text-lg">{t('landing:subtitle')}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link className="glass-btn-base glass-btn-primary h-11 px-6" to="/auth/signin">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link className="glass-btn-base glass-btn-primary h-11 w-full justify-center px-6 sm:w-auto" to="/auth/signin">
               {t('nav:signin')}
             </Link>
-            <Link className="glass-btn-base glass-btn-secondary h-11 px-6" to="/auth/signup">
+            <Link className="glass-btn-base glass-btn-secondary h-11 w-full justify-center px-6 sm:w-auto" to="/auth/signup">
               {t('nav:signup')}
             </Link>
-            <Link className="glass-btn-base glass-btn-soft h-11 px-6" to="/workspace">
+            <Link className="glass-btn-base glass-btn-soft h-11 w-full justify-center px-6 sm:w-auto" to="/workspace">
               {t('landing:enterWorkspace')}
             </Link>
           </div>

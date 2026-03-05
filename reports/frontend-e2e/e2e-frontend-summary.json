@@ -1,0 +1,311 @@
+{
+  "generatedAt": "2026-03-04T16:27:52.936Z",
+  "baseUrl": "http://127.0.0.1:9/",
+  "timeoutMs": 1500,
+  "headless": true,
+  "cleanRequested": false,
+  "identity": {
+    "username": "e2e-frontend-1772641672936-e3ecd00f@test.local"
+  },
+  "projectId": null,
+  "phases": [
+    {
+      "id": "auth-flow",
+      "status": "FAIL",
+      "startedAt": "2026-03-04T16:27:54.023Z",
+      "endedAt": "2026-03-04T16:27:54.123Z",
+      "durationMs": 100,
+      "steps": [
+        {
+          "id": "landing-route-render",
+          "method": "BROWSER",
+          "path": "/",
+          "result": "FAIL",
+          "httpStatus": "",
+          "durationMs": 73,
+          "note": "page.goto: net::ERR_UNSAFE_PORT at http://127.0.0.1:9/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:9/\", waiting until \"domcontentloaded\"\u001b[22m\n",
+          "screenshot": "reports/frontend-e2e/01-auth-flow-landing-route-render-fail.png",
+          "consoleErrors": 0,
+          "consoleWarnings": 0,
+          "pageErrors": 0,
+          "requestFailed": 1
+        },
+        {
+          "id": "signup-form-render",
+          "method": "BROWSER",
+          "path": "/auth/signup",
+          "result": "FAIL",
+          "httpStatus": "",
+          "durationMs": 27,
+          "note": "page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+          "screenshot": "reports/frontend-e2e/02-auth-flow-signup-form-render-fail.png",
+          "consoleErrors": 0,
+          "consoleWarnings": 0,
+          "pageErrors": 0,
+          "requestFailed": 0
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "workspace",
+      "status": "FAIL",
+      "startedAt": "2026-03-04T16:27:54.123Z",
+      "endedAt": "2026-03-04T16:27:54.148Z",
+      "durationMs": 25,
+      "steps": [
+        {
+          "id": "workspace-list-render",
+          "method": "BROWSER",
+          "path": "/workspace",
+          "result": "FAIL",
+          "httpStatus": "",
+          "durationMs": 25,
+          "note": "page.goto: net::ERR_UNSAFE_PORT at http://127.0.0.1:9/workspace\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:9/workspace\", waiting until \"domcontentloaded\"\u001b[22m\n",
+          "screenshot": "reports/frontend-e2e/03-workspace-workspace-list-render-fail.png",
+          "consoleErrors": 0,
+          "consoleWarnings": 0,
+          "pageErrors": 0,
+          "requestFailed": 1
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "project-workbench",
+      "status": "FAIL",
+      "startedAt": "2026-03-04T16:27:54.148Z",
+      "endedAt": "2026-03-04T16:27:54.148Z",
+      "durationMs": 0,
+      "steps": [],
+      "error": "project id is missing; workspace phase did not complete successfully"
+    },
+    {
+      "id": "asset-hub",
+      "status": "FAIL",
+      "startedAt": "2026-03-04T16:27:54.148Z",
+      "endedAt": "2026-03-04T16:27:54.182Z",
+      "durationMs": 34,
+      "steps": [
+        {
+          "id": "asset-hub-load-without-crash",
+          "method": "BROWSER",
+          "path": "/workspace/asset-hub",
+          "result": "FAIL",
+          "httpStatus": "",
+          "durationMs": 34,
+          "note": "page.goto: net::ERR_UNSAFE_PORT at http://127.0.0.1:9/workspace/asset-hub\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:9/workspace/asset-hub\", waiting until \"domcontentloaded\"\u001b[22m\n",
+          "screenshot": "reports/frontend-e2e/04-asset-hub-asset-hub-load-without-crash-fail.png",
+          "consoleErrors": 0,
+          "consoleWarnings": 0,
+          "pageErrors": 0,
+          "requestFailed": 1
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "profile",
+      "status": "FAIL",
+      "startedAt": "2026-03-04T16:27:54.182Z",
+      "endedAt": "2026-03-04T16:27:54.206Z",
+      "durationMs": 24,
+      "steps": [
+        {
+          "id": "profile-route-load",
+          "method": "BROWSER",
+          "path": "/profile",
+          "result": "FAIL",
+          "httpStatus": "",
+          "durationMs": 24,
+          "note": "page.goto: net::ERR_UNSAFE_PORT at http://127.0.0.1:9/profile\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:9/profile\", waiting until \"domcontentloaded\"\u001b[22m\n",
+          "screenshot": "reports/frontend-e2e/05-profile-profile-route-load-fail.png",
+          "consoleErrors": 0,
+          "consoleWarnings": 0,
+          "pageErrors": 0,
+          "requestFailed": 1
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "admin-non-admin",
+      "status": "FAIL",
+      "startedAt": "2026-03-04T16:27:54.206Z",
+      "endedAt": "2026-03-04T16:27:54.239Z",
+      "durationMs": 33,
+      "steps": [
+        {
+          "id": "admin-ai-config-route-load",
+          "method": "BROWSER",
+          "path": "/admin/ai-config",
+          "result": "FAIL",
+          "httpStatus": "",
+          "durationMs": 33,
+          "note": "page.goto: net::ERR_UNSAFE_PORT at http://127.0.0.1:9/admin/ai-config\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:9/admin/ai-config\", waiting until \"domcontentloaded\"\u001b[22m\n",
+          "screenshot": "reports/frontend-e2e/06-admin-non-admin-admin-ai-config-route-load-fail.png",
+          "consoleErrors": 0,
+          "consoleWarnings": 0,
+          "pageErrors": 0,
+          "requestFailed": 1
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "i18n-redirect",
+      "status": "FAIL",
+      "startedAt": "2026-03-04T16:27:54.239Z",
+      "endedAt": "2026-03-04T16:27:54.264Z",
+      "durationMs": 25,
+      "steps": [
+        {
+          "id": "locale-zh-workspace-redirect",
+          "method": "BROWSER",
+          "path": "/zh/workspace",
+          "result": "FAIL",
+          "httpStatus": "",
+          "durationMs": 25,
+          "note": "page.goto: net::ERR_UNSAFE_PORT at http://127.0.0.1:9/zh/workspace\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:9/zh/workspace\", waiting until \"domcontentloaded\"\u001b[22m\n",
+          "screenshot": "reports/frontend-e2e/07-i18n-redirect-locale-zh-workspace-redirect-fail.png",
+          "consoleErrors": 0,
+          "consoleWarnings": 0,
+          "pageErrors": 0,
+          "requestFailed": 1
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "not-found",
+      "status": "FAIL",
+      "startedAt": "2026-03-04T16:27:54.264Z",
+      "endedAt": "2026-03-04T16:27:54.300Z",
+      "durationMs": 36,
+      "steps": [
+        {
+          "id": "not-found-route",
+          "method": "BROWSER",
+          "path": "/nonexistent-page",
+          "result": "FAIL",
+          "httpStatus": "",
+          "durationMs": 36,
+          "note": "page.goto: net::ERR_UNSAFE_PORT at http://127.0.0.1:9/nonexistent-page\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:9/nonexistent-page\", waiting until \"domcontentloaded\"\u001b[22m\n",
+          "screenshot": "reports/frontend-e2e/08-not-found-not-found-route-fail.png",
+          "consoleErrors": 0,
+          "consoleWarnings": 0,
+          "pageErrors": 0,
+          "requestFailed": 1
+        }
+      ],
+      "error": null
+    }
+  ],
+  "cleanup": {
+    "requested": false,
+    "startedAt": "2026-03-04T16:27:54.300Z",
+    "endedAt": "2026-03-04T16:27:54.301Z",
+    "steps": []
+  },
+  "diagnostics": [
+    {
+      "ts": "2026-03-04T16:27:54.028Z",
+      "phaseId": "auth-flow",
+      "stepId": "landing-route-render",
+      "kind": "requestfailed",
+      "text": "GET http://127.0.0.1:9/ :: net::ERR_UNSAFE_PORT",
+      "url": "http://127.0.0.1:9/",
+      "line": null,
+      "column": null
+    },
+    {
+      "ts": "2026-03-04T16:27:54.125Z",
+      "phaseId": "workspace",
+      "stepId": "workspace-list-render",
+      "kind": "requestfailed",
+      "text": "GET http://127.0.0.1:9/workspace :: net::ERR_UNSAFE_PORT",
+      "url": "http://127.0.0.1:9/workspace",
+      "line": null,
+      "column": null
+    },
+    {
+      "ts": "2026-03-04T16:27:54.149Z",
+      "phaseId": "asset-hub",
+      "stepId": "asset-hub-load-without-crash",
+      "kind": "requestfailed",
+      "text": "GET http://127.0.0.1:9/workspace/asset-hub :: net::ERR_UNSAFE_PORT",
+      "url": "http://127.0.0.1:9/workspace/asset-hub",
+      "line": null,
+      "column": null
+    },
+    {
+      "ts": "2026-03-04T16:27:54.183Z",
+      "phaseId": "profile",
+      "stepId": "profile-route-load",
+      "kind": "requestfailed",
+      "text": "GET http://127.0.0.1:9/profile :: net::ERR_UNSAFE_PORT",
+      "url": "http://127.0.0.1:9/profile",
+      "line": null,
+      "column": null
+    },
+    {
+      "ts": "2026-03-04T16:27:54.208Z",
+      "phaseId": "admin-non-admin",
+      "stepId": "admin-ai-config-route-load",
+      "kind": "requestfailed",
+      "text": "GET http://127.0.0.1:9/admin/ai-config :: net::ERR_UNSAFE_PORT",
+      "url": "http://127.0.0.1:9/admin/ai-config",
+      "line": null,
+      "column": null
+    },
+    {
+      "ts": "2026-03-04T16:27:54.240Z",
+      "phaseId": "i18n-redirect",
+      "stepId": "locale-zh-workspace-redirect",
+      "kind": "requestfailed",
+      "text": "GET http://127.0.0.1:9/zh/workspace :: net::ERR_UNSAFE_PORT",
+      "url": "http://127.0.0.1:9/zh/workspace",
+      "line": null,
+      "column": null
+    },
+    {
+      "ts": "2026-03-04T16:27:54.266Z",
+      "phaseId": "not-found",
+      "stepId": "not-found-route",
+      "kind": "requestfailed",
+      "text": "GET http://127.0.0.1:9/nonexistent-page :: net::ERR_UNSAFE_PORT",
+      "url": "http://127.0.0.1:9/nonexistent-page",
+      "line": null,
+      "column": null
+    }
+  ],
+  "artifacts": {
+    "screenshots": [
+      "reports/frontend-e2e/01-auth-flow-landing-route-render-fail.png",
+      "reports/frontend-e2e/02-auth-flow-signup-form-render-fail.png",
+      "reports/frontend-e2e/03-workspace-workspace-list-render-fail.png",
+      "reports/frontend-e2e/04-asset-hub-asset-hub-load-without-crash-fail.png",
+      "reports/frontend-e2e/05-profile-profile-route-load-fail.png",
+      "reports/frontend-e2e/06-admin-non-admin-admin-ai-config-route-load-fail.png",
+      "reports/frontend-e2e/07-i18n-redirect-locale-zh-workspace-redirect-fail.png",
+      "reports/frontend-e2e/08-not-found-not-found-route-fail.png"
+    ],
+    "consoleLog": "reports/frontend-e2e/e2e-frontend-console.log"
+  },
+  "summary": {
+    "phaseTotal": 8,
+    "phasePass": 0,
+    "phaseFail": 8,
+    "stepTotal": 8,
+    "stepPass": 0,
+    "stepFail": 8,
+    "cleanupTotal": 0,
+    "cleanupPass": 0,
+    "cleanupFail": 0,
+    "screenshotTotal": 8,
+    "consoleErrors": 0,
+    "consoleWarnings": 0,
+    "pageErrors": 0,
+    "requestFailed": 7
+  }
+}

@@ -1,5 +1,3 @@
-'use client'
-
 /**
  * 音色设置组件 - 从 CharacterCard 提取
  * 支持上传自定义音频和 AI 声音设计

@@ -1,6 +1,4 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import type { DeleteConfirmState, SplitEpisode } from '../types'
 import { AppIcon } from '@/components/ui/icons'
 

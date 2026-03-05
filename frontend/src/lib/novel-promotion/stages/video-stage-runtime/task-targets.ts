@@ -1,6 +1,6 @@
 'use client'
 
-import type { Storyboard } from '@/app/[locale]/workspace/[projectId]/modes/novel-promotion/components/video'
+import type { Storyboard } from '@/components/workspace/video'
 import type { VoiceLine } from './types'
 
 interface VideoTaskTarget {

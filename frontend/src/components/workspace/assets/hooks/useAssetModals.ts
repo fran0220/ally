@@ -1,5 +1,3 @@
-'use client'
-
 /**
  * useAssetModals - 资产编辑弹窗状态管理
  * 从 AssetsStage.tsx 提取

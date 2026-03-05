@@ -1,6 +1,4 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import type { VideoPanelCardShellProps } from '../types'
 import { EMPTY_RUNNING_VOICE_LINE_IDS } from './shared'
 import { usePanelTaskStatus } from './hooks/usePanelTaskStatus'

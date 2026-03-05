@@ -1,5 +1,3 @@
-'use client'
-
 import type { AssetLibraryCharacter, AssetLibraryLocation, NovelPromotionShot } from '@/types/project'
 
 export interface PromptsStageShellProps {

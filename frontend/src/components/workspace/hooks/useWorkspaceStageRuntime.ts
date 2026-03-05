@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import type { WorkspaceStageRuntimeValue } from '../WorkspaceStageRuntimeContext'
 import type { CapabilitySelections, ModelCapabilities } from '@/lib/model-config-contract'

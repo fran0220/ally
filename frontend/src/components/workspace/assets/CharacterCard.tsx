@@ -1,7 +1,6 @@
-'use client'
 import { logInfo as _ulogInfo } from '@/lib/logging/core'
 
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 /**
  * 角色卡片组件 - 支持多图片选择和音色设置
  * 布局：上面名字+描述，下面三张图片（每张图片有独立的编辑和重新生成按钮）

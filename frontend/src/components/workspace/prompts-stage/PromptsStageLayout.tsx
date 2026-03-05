@@ -1,5 +1,3 @@
-'use client'
-
 import { ImagePreviewModal } from '@/components/ui/ImagePreviewModal'
 import PromptListPanel from './PromptListPanel'
 import PromptEditorPanel from './PromptEditorPanel'

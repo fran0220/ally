@@ -175,30 +175,7 @@ pub fn chunk_content(text: &str, max_size: usize) -> Vec<String> {
 }
 
 pub fn count_words_like_word(text: &str) -> usize {
-    let mut english_words = 0usize;
-    let mut in_english = false;
-    let mut chinese_chars = 0usize;
-
-    for ch in text.chars() {
-        if ch.is_ascii_alphanumeric() {
-            if !in_english {
-                english_words += 1;
-                in_english = true;
-            }
-            continue;
-        }
-        in_english = false;
-
-        let code = ch as u32;
-        if (0x4e00..=0x9fa5).contains(&code)
-            || (0x3400..=0x4dbf).contains(&code)
-            || (0x20000..=0x2a6df).contains(&code)
-        {
-            chinese_chars += 1;
-        }
-    }
-
-    english_words + chinese_chars
+    waoowaoo_core::episode_marker::count_words_like_word(text)
 }
 
 pub fn read_string(payload: &Value, key: &str) -> Option<String> {

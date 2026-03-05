@@ -1,5 +1,4 @@
-'use client'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 
 import { useCallback, useMemo } from 'react'
 import ScreenplayDisplay from './ScreenplayDisplay'

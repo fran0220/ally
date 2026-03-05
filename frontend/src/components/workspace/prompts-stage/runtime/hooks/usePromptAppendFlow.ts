@@ -1,5 +1,3 @@
-'use client'
-
 import { useState } from 'react'
 import { shouldShowError } from '@/lib/error-utils'
 import { resolveTaskPresentationState } from '@/lib/task/presentation'

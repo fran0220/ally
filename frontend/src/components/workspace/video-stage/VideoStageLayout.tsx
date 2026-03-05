@@ -1,5 +1,3 @@
-'use client'
-
 import { useVideoStageRuntime, type VideoStageShellProps } from './hooks/useVideoStageRuntime'
 
 export type { VideoStageShellProps }

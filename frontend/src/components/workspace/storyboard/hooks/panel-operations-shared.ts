@@ -1,5 +1,3 @@
-'use client'
-
 import type { NovelPromotionPanel, NovelPromotionStoryboard } from '@/types/project'
 import { extractErrorMessage } from '@/lib/errors/extract'
 

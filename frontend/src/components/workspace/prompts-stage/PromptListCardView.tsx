@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { AppIcon } from '@/components/ui/icons'
 import { TaskStatusOverlay } from '@/components/task/TaskStatusOverlay'
 import { TaskStatusInline } from '@/components/task/TaskStatusInline'

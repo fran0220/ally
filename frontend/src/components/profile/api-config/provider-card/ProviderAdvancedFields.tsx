@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useMemo, useState } from 'react'
 import { AppIcon } from '@/components/ui/icons'
 import { getProviderKey, isPresetComingSoonModel, type CustomModel } from '../types'

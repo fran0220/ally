@@ -1,5 +1,3 @@
-'use client'
-
 import type { CustomModel, Provider } from '../api-config'
 import { ProviderCard, ProviderSection } from '../api-config'
 import { AppIcon } from '@/components/ui/icons'

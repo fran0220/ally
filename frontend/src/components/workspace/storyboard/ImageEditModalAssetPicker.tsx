@@ -1,7 +1,5 @@
-'use client'
-
 import type { Character, Location } from '@/types/project'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { toDisplayImageUrl } from '@/lib/media/image-url'
 import { MediaImageWithLoading } from '@/components/media/MediaImageWithLoading'
 import type { SelectedAsset } from './hooks/useImageGeneration'

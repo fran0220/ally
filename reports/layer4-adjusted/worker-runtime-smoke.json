@@ -1,0 +1,137 @@
+{
+  "generatedAt": "2026-03-04T08:28:29.983Z",
+  "summary": {
+    "total": 4,
+    "executed": 4,
+    "skipped": 0,
+    "pass": 0,
+    "fail": 4
+  },
+  "rows": [
+    {
+      "id": "image-asset-hub-generate",
+      "method": "POST",
+      "path": "/api/asset-hub/generate-image",
+      "submitStatus": 400,
+      "submitUrl": "http://185.200.65.233/api/asset-hub/generate-image",
+      "submitBody": {
+        "success": false,
+        "requestId": "1385572b-402d-4c60-a12d-c831d93a1b54",
+        "error": {
+          "code": "INVALID_PARAMS",
+          "message": "missing server-generated billingInfo for billable task type: asset_hub_image",
+          "retryable": false,
+          "category": "VALIDATION",
+          "user_message_key": "errors.INVALID_PARAMS"
+        },
+        "code": "INVALID_PARAMS",
+        "message": "missing server-generated billingInfo for billable task type: asset_hub_image"
+      },
+      "taskId": null,
+      "finalStatus": "unknown",
+      "errorCode": null,
+      "elapsedMs": 692,
+      "polls": 0,
+      "eventTypes": [],
+      "status": "FAIL",
+      "failures": [
+        "submit response missing taskId",
+        "submit status 400 != expected 200"
+      ]
+    },
+    {
+      "id": "text-asset-hub-ai-design-character",
+      "method": "POST",
+      "path": "/api/asset-hub/ai-design-character",
+      "submitStatus": 400,
+      "submitUrl": "http://185.200.65.233/api/asset-hub/ai-design-character",
+      "submitBody": {
+        "success": false,
+        "requestId": "680e0859-b3fb-4f27-a504-9ec34d282b88",
+        "error": {
+          "code": "INVALID_PARAMS",
+          "message": "missing server-generated billingInfo for billable task type: asset_hub_ai_design_character",
+          "retryable": false,
+          "category": "VALIDATION",
+          "user_message_key": "errors.INVALID_PARAMS"
+        },
+        "code": "INVALID_PARAMS",
+        "message": "missing server-generated billingInfo for billable task type: asset_hub_ai_design_character"
+      },
+      "taskId": null,
+      "finalStatus": "unknown",
+      "errorCode": null,
+      "elapsedMs": 666,
+      "polls": 0,
+      "eventTypes": [],
+      "status": "FAIL",
+      "failures": [
+        "submit response missing taskId",
+        "submit status 400 != expected 200"
+      ]
+    },
+    {
+      "id": "voice-asset-hub-voice-design",
+      "method": "POST",
+      "path": "/api/asset-hub/voice-design",
+      "submitStatus": 500,
+      "submitUrl": "http://185.200.65.233/api/asset-hub/voice-design",
+      "submitBody": {
+        "success": false,
+        "requestId": "be877496-44e2-4322-8c8a-e5ed146dc52a",
+        "error": {
+          "code": "INTERNAL_ERROR",
+          "message": "database error: error returned from database: 1054 (42S22): Unknown column 'billingInfo' in 'field list'",
+          "retryable": false,
+          "category": "SYSTEM",
+          "user_message_key": "errors.INTERNAL_ERROR"
+        },
+        "code": "INTERNAL_ERROR",
+        "message": "database error: error returned from database: 1054 (42S22): Unknown column 'billingInfo' in 'field list'"
+      },
+      "taskId": null,
+      "finalStatus": "unknown",
+      "errorCode": null,
+      "elapsedMs": 260,
+      "polls": 0,
+      "eventTypes": [],
+      "status": "FAIL",
+      "failures": [
+        "submit response missing taskId",
+        "submit status 500 != expected 200"
+      ]
+    },
+    {
+      "id": "video-novel-generate-video",
+      "method": "POST",
+      "path": "/api/novel-promotion/undefined/generate-video",
+      "submitStatus": 404,
+      "submitUrl": "http://185.200.65.233/api/novel-promotion/undefined/generate-video",
+      "submitBody": {
+        "success": false,
+        "requestId": "02504787-b67f-4e3a-ab42-255e7e7aa5ee",
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "project not found",
+          "retryable": false,
+          "category": "VALIDATION",
+          "user_message_key": "errors.NOT_FOUND"
+        },
+        "code": "NOT_FOUND",
+        "message": "project not found"
+      },
+      "taskId": null,
+      "finalStatus": "unknown",
+      "errorCode": null,
+      "elapsedMs": 252,
+      "polls": 0,
+      "eventTypes": [],
+      "status": "FAIL",
+      "failures": [
+        "submit response missing taskId",
+        "submit status 404 != expected 200"
+      ]
+    }
+  ],
+  "skippedCases": []
+}

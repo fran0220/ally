@@ -1,5 +1,3 @@
-'use client'
-
 import ScriptView from './ScriptView'
 import { useWorkspaceStageRuntime } from './WorkspaceStageRuntimeContext'
 import { useWorkspaceEpisodeStageData } from './hooks/useWorkspaceEpisodeStageData'

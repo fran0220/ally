@@ -1,7 +1,5 @@
-'use client'
-
 import React, { useMemo, useRef, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { Player, PlayerRef } from '@remotion/player'
 import { AppIcon } from '@/components/ui/icons'
 import { VideoComposition } from '../../remotion/VideoComposition'

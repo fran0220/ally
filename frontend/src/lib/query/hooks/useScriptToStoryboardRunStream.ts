@@ -1,5 +1,3 @@
-'use client'
-
 import { fetchWithAuth } from '@/api/client'
 import { useRunStreamState, type RunResult } from './useRunStreamState'
 import { TASK_TYPE } from '@/lib/task/types'

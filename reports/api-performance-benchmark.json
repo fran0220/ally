@@ -1,17 +1,17 @@
 {
-  "generatedAt": "2026-03-01T13:43:45.212Z",
+  "generatedAt": "2026-03-04T08:31:13.535Z",
   "summary": {
     "total": 7,
-    "executed": 7,
-    "skipped": 0,
-    "pass": 5,
-    "fail": 2
+    "executed": 6,
+    "skipped": 1,
+    "pass": 1,
+    "fail": 5
   },
   "options": {
     "durationMs": 5000,
     "concurrency": 2,
-    "requestTimeoutMs": 5000,
-    "warmupRequests": 1
+    "requestTimeoutMs": 10000,
+    "warmupRequests": 3
   },
   "rows": [
     {
@@ -24,50 +24,50 @@
       ],
       "legacy": {
         "side": "legacy",
-        "totalRequests": 131,
+        "totalRequests": 168,
         "successRequests": 0,
-        "failedRequests": 131,
+        "failedRequests": 168,
         "successRate": 0,
-        "rps": 26.2,
+        "rps": 33.6,
         "latency": {
-          "min": 49.39,
-          "avg": 76.91,
-          "p50": 70.46,
-          "p95": 121.3,
-          "p99": 157.97,
-          "max": 159.08
+          "min": 53.51,
+          "avg": 59.85,
+          "p50": 58.48,
+          "p95": 72.46,
+          "p99": 93.4,
+          "max": 95.16
         },
         "statusCounts": {
-          "404": 131
+          "404": 168
         },
         "errorCounts": {
-          "HTTP 404": 131
+          "HTTP 404": 168
         }
       },
       "rust": {
         "side": "rust",
-        "totalRequests": 65438,
-        "successRequests": 65438,
+        "totalRequests": 39,
+        "successRequests": 39,
         "failedRequests": 0,
         "successRate": 100,
-        "rps": 13087.6,
+        "rps": 7.8,
         "latency": {
-          "min": 0.07,
-          "avg": 0.15,
-          "p50": 0.1,
-          "p95": 0.32,
-          "p99": 1.25,
-          "max": 13.28
+          "min": 248.49,
+          "avg": 262.09,
+          "p50": 251,
+          "p95": 255.74,
+          "p99": 667.04,
+          "max": 667.04
         },
         "statusCounts": {
-          "200": 65438
+          "200": 39
         },
         "errorCounts": {}
       },
       "deltas": {
-        "rpsPercent": 49852.67,
-        "p95Percent": -99.74,
-        "p99Percent": -99.21,
+        "rpsPercent": -76.79,
+        "p95Percent": 252.94,
+        "p99Percent": 614.18,
         "successRatePercent": null
       }
     },
@@ -79,48 +79,48 @@
       "failures": [],
       "legacy": {
         "side": "legacy",
-        "totalRequests": 38,
-        "successRequests": 38,
+        "totalRequests": 40,
+        "successRequests": 40,
         "failedRequests": 0,
         "successRate": 100,
-        "rps": 7.6,
+        "rps": 8,
         "latency": {
-          "min": 248.73,
-          "avg": 271.74,
-          "p50": 265.01,
-          "p95": 319.05,
-          "p99": 322.34,
-          "max": 322.34
+          "min": 247.87,
+          "avg": 252.83,
+          "p50": 252.56,
+          "p95": 257.22,
+          "p99": 258.18,
+          "max": 258.18
         },
         "statusCounts": {
-          "200": 38
+          "200": 40
         },
         "errorCounts": {}
       },
       "rust": {
         "side": "rust",
-        "totalRequests": 58546,
-        "successRequests": 58546,
+        "totalRequests": 40,
+        "successRequests": 40,
         "failedRequests": 0,
         "successRate": 100,
-        "rps": 11709.2,
+        "rps": 8,
         "latency": {
-          "min": 0.07,
-          "avg": 0.17,
-          "p50": 0.1,
-          "p95": 0.37,
-          "p99": 1.43,
-          "max": 29.02
+          "min": 247.85,
+          "avg": 250.5,
+          "p50": 250.48,
+          "p95": 253.03,
+          "p99": 253.43,
+          "max": 253.43
         },
         "statusCounts": {
-          "200": 58546
+          "200": 40
         },
         "errorCounts": {}
       },
       "deltas": {
-        "rpsPercent": 153968.42,
-        "p95Percent": -99.88,
-        "p99Percent": -99.56,
+        "rpsPercent": 0,
+        "p95Percent": -1.63,
+        "p99Percent": -1.84,
         "successRatePercent": 0
       }
     },
@@ -128,112 +128,63 @@
       "id": "projects-list-auth",
       "method": "GET",
       "path": "/api/projects?page=1&pageSize=5",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "legacy side has zero successful responses"
+      ],
       "legacy": {
         "side": "legacy",
-        "totalRequests": 7,
-        "successRequests": 7,
-        "failedRequests": 0,
-        "successRate": 100,
-        "rps": 1.4,
+        "totalRequests": 42,
+        "successRequests": 0,
+        "failedRequests": 42,
+        "successRate": 0,
+        "rps": 8.4,
         "latency": {
-          "min": 1249.77,
-          "avg": 1671.73,
-          "p50": 1588.32,
-          "p95": 2711.29,
-          "p99": 2711.29,
-          "max": 2711.29
+          "min": 233.52,
+          "avg": 244.85,
+          "p50": 238.19,
+          "p95": 274.67,
+          "p99": 308.96,
+          "max": 308.96
         },
         "statusCounts": {
-          "200": 7
+          "401": 42
         },
-        "errorCounts": {}
+        "errorCounts": {
+          "HTTP 401": 42
+        }
       },
       "rust": {
         "side": "rust",
-        "totalRequests": 8,
-        "successRequests": 8,
+        "totalRequests": 39,
+        "successRequests": 39,
         "failedRequests": 0,
         "successRate": 100,
-        "rps": 1.6,
+        "rps": 7.8,
         "latency": {
-          "min": 1348.89,
-          "avg": 1449.19,
-          "p50": 1362.84,
-          "p95": 1719.13,
-          "p99": 1719.13,
-          "max": 1719.13
+          "min": 249.42,
+          "avg": 263.98,
+          "p50": 252.85,
+          "p95": 256.25,
+          "p99": 676.37,
+          "max": 676.37
         },
         "statusCounts": {
-          "200": 8
+          "200": 39
         },
         "errorCounts": {}
       },
       "deltas": {
-        "rpsPercent": 14.29,
-        "p95Percent": -36.59,
-        "p99Percent": -36.59,
-        "successRatePercent": 0
+        "rpsPercent": -7.14,
+        "p95Percent": -6.71,
+        "p99Percent": 118.92,
+        "successRatePercent": null
       }
     },
     {
       "id": "tasks-list-auth",
       "method": "GET",
       "path": "/api/tasks?limit=5",
-      "status": "PASS",
-      "failures": [],
-      "legacy": {
-        "side": "legacy",
-        "totalRequests": 17,
-        "successRequests": 17,
-        "failedRequests": 0,
-        "successRate": 100,
-        "rps": 3.4,
-        "latency": {
-          "min": 580.33,
-          "avg": 611.18,
-          "p50": 587.22,
-          "p95": 946.52,
-          "p99": 946.52,
-          "max": 946.52
-        },
-        "statusCounts": {
-          "200": 17
-        },
-        "errorCounts": {}
-      },
-      "rust": {
-        "side": "rust",
-        "totalRequests": 13,
-        "successRequests": 13,
-        "failedRequests": 0,
-        "successRate": 100,
-        "rps": 2.6,
-        "latency": {
-          "min": 670.6,
-          "avg": 812.64,
-          "p50": 686.34,
-          "p95": 1035.33,
-          "p99": 1035.33,
-          "max": 1035.33
-        },
-        "statusCounts": {
-          "200": 13
-        },
-        "errorCounts": {}
-      },
-      "deltas": {
-        "rpsPercent": -23.53,
-        "p95Percent": 9.38,
-        "p99Percent": 9.38,
-        "successRatePercent": 0
-      }
-    },
-    {
-      "id": "runs-list-auth",
-      "method": "GET",
-      "path": "/api/runs?limit=5",
       "status": "FAIL",
       "failures": [
         "legacy side has zero successful responses"
@@ -246,44 +197,101 @@
         "successRate": 0,
         "rps": 8,
         "latency": {
-          "min": 249.39,
-          "avg": 256.02,
-          "p50": 254.47,
-          "p95": 264.95,
-          "p99": 281.66,
-          "max": 281.66
+          "min": 250.57,
+          "avg": 256.5,
+          "p50": 255.18,
+          "p95": 260.86,
+          "p99": 280.3,
+          "max": 280.3
         },
         "statusCounts": {
-          "500": 40
+          "401": 40
         },
         "errorCounts": {
-          "HTTP 500": 40
+          "HTTP 401": 40
         }
       },
       "rust": {
         "side": "rust",
-        "totalRequests": 13,
-        "successRequests": 13,
+        "totalRequests": 40,
+        "successRequests": 40,
         "failedRequests": 0,
         "successRate": 100,
-        "rps": 2.6,
+        "rps": 8,
         "latency": {
-          "min": 672.24,
-          "avg": 812.16,
-          "p50": 688,
-          "p95": 1032.64,
-          "p99": 1032.64,
-          "max": 1032.64
+          "min": 249.35,
+          "avg": 252.32,
+          "p50": 251.6,
+          "p95": 254.47,
+          "p99": 264.04,
+          "max": 264.04
         },
         "statusCounts": {
-          "200": 13
+          "200": 40
         },
         "errorCounts": {}
       },
       "deltas": {
-        "rpsPercent": -67.5,
-        "p95Percent": 289.75,
-        "p99Percent": 266.63,
+        "rpsPercent": 0,
+        "p95Percent": -2.45,
+        "p99Percent": -5.8,
+        "successRatePercent": null
+      }
+    },
+    {
+      "id": "runs-list-auth",
+      "method": "GET",
+      "path": "/api/runs?limit=5",
+      "status": "FAIL",
+      "failures": [
+        "legacy side has zero successful responses"
+      ],
+      "legacy": {
+        "side": "legacy",
+        "totalRequests": 36,
+        "successRequests": 0,
+        "failedRequests": 36,
+        "successRate": 0,
+        "rps": 7.2,
+        "latency": {
+          "min": 246.86,
+          "avg": 285.24,
+          "p50": 252.69,
+          "p95": 841.47,
+          "p99": 841.95,
+          "max": 841.95
+        },
+        "statusCounts": {
+          "401": 36
+        },
+        "errorCounts": {
+          "HTTP 401": 36
+        }
+      },
+      "rust": {
+        "side": "rust",
+        "totalRequests": 39,
+        "successRequests": 39,
+        "failedRequests": 0,
+        "successRate": 100,
+        "rps": 7.8,
+        "latency": {
+          "min": 249.83,
+          "avg": 263.72,
+          "p50": 252.37,
+          "p95": 260.58,
+          "p99": 678.11,
+          "max": 678.11
+        },
+        "statusCounts": {
+          "200": 39
+        },
+        "errorCounts": {}
+      },
+      "deltas": {
+        "rpsPercent": 8.33,
+        "p95Percent": -69.03,
+        "p99Percent": -19.46,
         "successRatePercent": null
       }
     },
@@ -291,108 +299,66 @@
       "id": "asset-hub-picker-auth",
       "method": "GET",
       "path": "/api/asset-hub/picker?type=character",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "legacy side has zero successful responses"
+      ],
       "legacy": {
         "side": "legacy",
-        "totalRequests": 17,
-        "successRequests": 17,
-        "failedRequests": 0,
-        "successRate": 100,
-        "rps": 3.4,
+        "totalRequests": 40,
+        "successRequests": 0,
+        "failedRequests": 40,
+        "successRate": 0,
+        "rps": 8,
         "latency": {
-          "min": 573.49,
-          "avg": 621.28,
-          "p50": 577.76,
-          "p95": 1268.22,
-          "p99": 1268.22,
-          "max": 1268.22
+          "min": 253.35,
+          "avg": 259.64,
+          "p50": 257.92,
+          "p95": 265.13,
+          "p99": 289.91,
+          "max": 289.91
         },
         "statusCounts": {
-          "200": 17
+          "401": 40
         },
-        "errorCounts": {}
+        "errorCounts": {
+          "HTTP 401": 40
+        }
       },
       "rust": {
         "side": "rust",
-        "totalRequests": 15,
-        "successRequests": 15,
+        "totalRequests": 40,
+        "successRequests": 40,
         "failedRequests": 0,
         "successRate": 100,
-        "rps": 3,
+        "rps": 8,
         "latency": {
-          "min": 670.9,
-          "avg": 705.75,
-          "p50": 684.16,
-          "p95": 1012.95,
-          "p99": 1012.95,
-          "max": 1012.95
+          "min": 249.45,
+          "avg": 251.95,
+          "p50": 251.44,
+          "p95": 254.78,
+          "p99": 256.11,
+          "max": 256.11
         },
         "statusCounts": {
-          "200": 15
+          "200": 40
         },
         "errorCounts": {}
       },
       "deltas": {
-        "rpsPercent": -11.76,
-        "p95Percent": -20.13,
-        "p99Percent": -20.13,
-        "successRatePercent": 0
-      }
-    },
-    {
-      "id": "novel-root-auth",
-      "method": "GET",
-      "path": "/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3",
-      "status": "PASS",
-      "failures": [],
-      "legacy": {
-        "side": "legacy",
-        "totalRequests": 10,
-        "successRequests": 10,
-        "failedRequests": 0,
-        "successRate": 100,
-        "rps": 2,
-        "latency": {
-          "min": 912.93,
-          "avg": 1004.75,
-          "p50": 935.94,
-          "p95": 1274.12,
-          "p99": 1274.12,
-          "max": 1274.12
-        },
-        "statusCounts": {
-          "200": 10
-        },
-        "errorCounts": {}
-      },
-      "rust": {
-        "side": "rust",
-        "totalRequests": 4,
-        "successRequests": 4,
-        "failedRequests": 0,
-        "successRate": 100,
-        "rps": 0.8,
-        "latency": {
-          "min": 4107.7,
-          "avg": 4347.38,
-          "p50": 4419.46,
-          "p95": 4439.67,
-          "p99": 4439.67,
-          "max": 4439.67
-        },
-        "statusCounts": {
-          "200": 4
-        },
-        "errorCounts": {}
-      },
-      "deltas": {
-        "rpsPercent": -60,
-        "p95Percent": 248.45,
-        "p99Percent": 248.45,
-        "successRatePercent": 0
+        "rpsPercent": 0,
+        "p95Percent": -3.9,
+        "p99Percent": -11.66,
+        "successRatePercent": null
       }
     }
   ],
-  "skippedCases": []
+  "skippedCases": [
+    {
+      "id": "novel-root-auth",
+      "method": "GET",
+      "path": "/api/novel-promotion/{{WW_PROJECT_ID}}",
+      "reason": "missing env: WW_PROJECT_ID"
+    }
+  ]
 }

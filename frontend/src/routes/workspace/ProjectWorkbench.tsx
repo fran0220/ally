@@ -427,7 +427,7 @@ export function ProjectWorkbench() {
       ) : null}
 
       {episodes.length > 0 ? (
-      <div className="grid gap-4 xl:grid-cols-[280px_minmax(0,1fr)]">
+      <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
         <GlassSurface>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-[var(--glass-text-secondary)]">Episodes</h2>
@@ -482,11 +482,15 @@ export function ProjectWorkbench() {
 
         <div className="space-y-4">
           <GlassSurface>
-            <div className="flex flex-wrap gap-2">
+            <div
+              className="flex flex-nowrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible md:pb-0"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
               {STAGES.map((stage) => (
                 <GlassButton
                   key={stage}
                   size="sm"
+                  className="shrink-0 whitespace-nowrap"
                   variant={stage === currentStage ? 'primary' : 'soft'}
                   onClick={() => updateUrl({ stage })}
                 >

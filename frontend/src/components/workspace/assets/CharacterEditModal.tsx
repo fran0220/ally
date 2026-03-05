@@ -1,5 +1,3 @@
-'use client'
-
 import {
   CharacterEditModal as SharedCharacterEditModal,
   type CharacterEditModalProps as SharedCharacterEditModalProps,

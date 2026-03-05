@@ -1,11 +1,9 @@
-'use client'
-
-import { useTranslations } from '@/compat/next-intl'
+import { useTranslation } from 'react-i18next'
 import { ProviderAdvancedFields } from './provider-card/ProviderAdvancedFields'
 import { ProviderBaseFields } from './provider-card/ProviderBaseFields'
 import { ProviderCardShell } from './provider-card/ProviderCardShell'
 import { useProviderCardState } from './provider-card/hooks/useProviderCardState'
-import type { ProviderCardProps } from './provider-card/types'
+import type { ProviderCardProps, ProviderCardTranslator } from './provider-card/types'
 
 export function ProviderCard({
   provider,
@@ -20,7 +18,11 @@ export function ProviderCard({
   onDeleteProvider,
   onAddModel,
 }: ProviderCardProps) {
-  const t = useTranslations('apiConfig')
+  const { t: translate } = useTranslation('apiConfig')
+  const t: ProviderCardTranslator = (key, values) => {
+    const translated = translate(key, values as Record<string, unknown> | undefined)
+    return typeof translated === 'string' ? translated : String(translated)
+  }
 
   const state = useProviderCardState({
     provider,

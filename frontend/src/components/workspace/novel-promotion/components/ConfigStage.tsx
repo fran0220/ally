@@ -1,5 +1,3 @@
-'use client'
-
 import NovelInputStage from './NovelInputStage'
 import { useWorkspaceStageRuntime } from '@/contexts/WorkspaceStageRuntimeContext'
 import { useWorkspaceEpisodeStageData } from '../hooks/useWorkspaceEpisodeStageData'

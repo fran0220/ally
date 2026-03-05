@@ -1,7 +1,5 @@
-'use client'
-
 import { useCallback } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import type { NovelPromotionStoryboard } from '@/types/project'
 import { extractErrorMessage } from '@/lib/errors/extract'
 

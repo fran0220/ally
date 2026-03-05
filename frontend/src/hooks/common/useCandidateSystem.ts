@@ -1,5 +1,3 @@
-'use client'
-
 /**
  * useCandidateSystem - 统一候选图片管理 Hook
  * 适用于 Panel、Character、Location 等所有需要候选图片选择的实体

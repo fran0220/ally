@@ -1,7 +1,6 @@
-'use client'
-
 import { useState } from 'react'
-import { useLocale, useTranslations } from '@/compat/next-intl'
+import { useTranslation } from 'react-i18next'
+import { useToast } from '@/contexts/ToastContext'
 import { GlassModalShell } from '@/components/ui/primitives'
 import { resolveTaskPresentationState } from '@/lib/task/presentation'
 import type { CapabilityValue } from '@/lib/model-config-contract'
@@ -92,7 +91,11 @@ function toCapabilityFieldLabel(field: string): string {
 }
 
 export function ApiConfigTabContainer() {
-  const locale = useLocale()
+  const { t, i18n } = useTranslation('apiConfig')
+  const { t: tc } = useTranslation('common')
+  const { t: tp } = useTranslation('providerSection')
+  const { showToast } = useToast()
+  const locale = i18n.language
   const {
     providers,
     models,
@@ -111,10 +114,6 @@ export function ApiConfigTabContainer() {
     updateDefaultModel,
     updateCapabilityDefault,
   } = useProviders()
-
-  const t = useTranslations('apiConfig')
-  const tc = useTranslations('common')
-  const tp = useTranslations('providerSection')
 
   const savingState =
     saveStatus === 'saving'
@@ -151,7 +150,7 @@ export function ApiConfigTabContainer() {
 
   const handleAddGeminiProvider = () => {
     if (!newGeminiProvider.name || !newGeminiProvider.baseUrl) {
-      alert(tp('fillRequired'))
+      showToast(tp('fillRequired'), 'warning')
       return
     }
 

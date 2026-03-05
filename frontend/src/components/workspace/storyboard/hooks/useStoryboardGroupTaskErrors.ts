@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useMemo } from 'react'
 import { useTaskList } from '@/lib/query/hooks/useTaskStatus'
 import { resolveErrorDisplay } from '@/lib/errors/display'

@@ -1,5 +1,3 @@
-'use client'
-
 import { logInfo as _ulogInfo, logError as _ulogError } from '@/lib/logging/core'
 import { useGenerateVideo, useBatchGenerateVideos } from '@/lib/query/hooks/useStoryboards'
 import { useUpdateProjectPanelVideoPrompt, useUpdateProjectClip, useUpdateProjectConfig } from '@/lib/query/hooks'

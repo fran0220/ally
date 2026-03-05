@@ -1,7 +1,6 @@
-'use client'
 import { logInfo as _ulogInfo } from '@/lib/logging/core'
 
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Character, Location } from '@/types/project'
 import { useProjectAssets } from '@/lib/query/hooks/useProjectAssets'

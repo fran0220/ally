@@ -2,7 +2,7 @@
 
 import { logInfo as _ulogInfo } from '@/lib/logging/core'
 import { useEffect, useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter } from '@/compat/next-navigation'
 import { useTranslations } from 'next-intl'
 import { resolveTaskPresentationState } from '@/lib/task/presentation'
 import { useWorkspaceProvider } from '../WorkspaceProvider'

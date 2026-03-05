@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import type { Storyboard } from '@/app/[locale]/workspace/[projectId]/modes/novel-promotion/components/video'
+import type { Storyboard } from '@/components/workspace/video'
 import { useVideoTaskPresentation } from '@/lib/query/hooks/useTaskPresentation'
 import { buildPanelLipTargets, buildPanelVideoTargets } from './task-targets'
 

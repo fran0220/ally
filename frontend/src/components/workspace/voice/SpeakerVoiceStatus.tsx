@@ -1,5 +1,4 @@
-'use client'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 
 interface SpeakerVoiceStatusProps {
     speakers: string[]

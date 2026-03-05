@@ -1,6 +1,5 @@
-'use client'
 import { logInfo as _ulogInfo, logError as _ulogError } from '@/lib/logging/core'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 
 import { useState, useCallback } from 'react'
 import { useCreateProjectPanelVariant, useRefreshEpisodeData } from '@/lib/query/hooks'

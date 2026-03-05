@@ -1,11 +1,9 @@
-'use client'
-
 /**
  * 小说推文模式 - 故事输入阶段 (Story View)
  * V3.2 UI: 极简版，专注剧本输入，资产管理移至资产库
  */
 
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { useState, useRef, useEffect } from 'react'
 import '@/styles/animations.css'
 import { ART_STYLES, VIDEO_RATIOS } from '@/lib/constants'

@@ -3,8 +3,8 @@
 import { useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
-import VoicePickerDialog from '@/app/[locale]/workspace/asset-hub/components/VoicePickerDialog'
-import VoiceCreationModal from '@/app/[locale]/workspace/asset-hub/components/VoiceCreationModal'
+import VoicePickerDialog from './VoicePickerDialog'
+import VoiceCreationModal from '@/components/asset-hub/voice-creation/VoiceCreationModalShell'
 import { AppIcon } from '@/components/ui/icons'
 
 type BindingTab = 'select' | 'upload' | 'design'

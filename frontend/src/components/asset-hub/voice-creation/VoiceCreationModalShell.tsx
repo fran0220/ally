@@ -1,5 +1,3 @@
-'use client'
-
 import VoiceCreationModalLayout, { type VoiceCreationModalShellProps } from './VoiceCreationModalLayout'
 
 export type { VoiceCreationModalShellProps }

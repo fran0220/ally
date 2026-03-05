@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import VideoPanelCardShell, { type VideoPanelCardShellProps } from './panel-card/VideoPanelCardShell'
 

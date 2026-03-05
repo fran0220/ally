@@ -1,7 +1,5 @@
-'use client'
-
 import { useCallback, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 
 import { ProgressToast } from '@/components/ProgressToast'
 import { WorkspaceProvider, useWorkspaceProvider } from '@/contexts/WorkspaceProvider'

@@ -1,13 +1,12 @@
-'use client'
-
-import React, { useState } from 'react'
-import { useTranslations } from '@/compat/next-intl'
+import { useState, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useToast } from '@/contexts/ToastContext'
 import { Provider, PRESET_PROVIDERS } from './types'
 import { AppIcon } from '@/components/ui/icons'
 
 interface ProviderSectionProps {
     title: string
-    icon: React.ReactNode
+    icon: ReactNode
     type: 'audio' | 'lipsync'
     providers: Provider[]
     onUpdateApiKey: (providerId: string, apiKey: string) => void
@@ -34,8 +33,9 @@ export function ProviderSection({
     const [editData, setEditData] = useState({ name: '', baseUrl: '' })
     const [showAddForm, setShowAddForm] = useState(false)
     const [newProvider, setNewProvider] = useState({ name: '', baseUrl: '', apiKey: '' })
-    const t = useTranslations('providerSection')
-    const tc = useTranslations('common')
+    const { t } = useTranslation('providerSection')
+    const { t: tc } = useTranslation('common')
+    const { showToast } = useToast()
 
     const isPreset = (id: string) => PRESET_PROVIDERS.some(p => p.id === id)
 
@@ -46,7 +46,7 @@ export function ProviderSection({
 
     const handleAdd = () => {
         if (!newProvider.name) {
-            alert(t('fillRequired'))
+            showToast(t('fillRequired'), 'warning')
             return
         }
         onAdd?.({

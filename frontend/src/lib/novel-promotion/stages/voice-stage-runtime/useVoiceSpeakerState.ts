@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useMemo } from 'react'
 import type { Character, SpeakerVoiceEntry, VoiceLine } from './types'
 

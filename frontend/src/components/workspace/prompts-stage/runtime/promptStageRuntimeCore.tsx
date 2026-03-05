@@ -1,6 +1,4 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { useCallback, useMemo, useState } from 'react'
 import { ART_STYLES } from '@/lib/constants'
 import { resolveTaskPresentationState } from '@/lib/task/presentation'

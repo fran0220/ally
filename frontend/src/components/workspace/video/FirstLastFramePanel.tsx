@@ -1,5 +1,4 @@
-'use client'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 
 import type { VideoGenerationOptions, VideoModelOption, VideoPanel } from './types'
 import type { CapabilityValue } from '@/lib/model-config-contract'

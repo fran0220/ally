@@ -1,5 +1,3 @@
-'use client'
-
 import ImagePreviewModal from '@/components/ui/ImagePreviewModal'
 import ImageEditModal from './ImageEditModal'
 import VoiceDesignDialog from '../voice/VoiceDesignDialog'

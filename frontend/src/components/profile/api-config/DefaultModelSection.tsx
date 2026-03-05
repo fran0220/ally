@@ -1,7 +1,4 @@
-'use client'
-
-import React from 'react'
-import { useTranslations } from '@/compat/next-intl'
+import { useTranslation } from 'react-i18next'
 import { CustomModel } from './types'
 import { AppIcon } from '@/components/ui/icons'
 
@@ -23,7 +20,7 @@ export function DefaultModelSection({
     defaultModels,
     onUpdateDefault
 }: DefaultModelSectionProps) {
-    const t = useTranslations('apiConfig')
+    const { t } = useTranslation('apiConfig')
 
     // 只显示已启用的模型
     const enabledModels = models.filter(m => m.enabled)

@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useState } from 'react'
 import type { StoryboardPanel } from './useStoryboardState'
 import type { VariantData, VariantOptions } from './usePanelVariant'

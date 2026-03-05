@@ -1,5 +1,3 @@
-'use client'
-
 import type { PanelEditData } from '../../PanelEditForm'
 import { useRefreshProjectAssets } from '@/lib/query/hooks'
 import { usePanelCrudActions } from './usePanelCrudActions'

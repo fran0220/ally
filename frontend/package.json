@@ -27,6 +27,7 @@
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^5.1.0",
     "agentation": "^2.2.1",
+    "playwright": "^1.58.2",
     "remotion": "^4.0.431",
     "tailwindcss": "^4.1.16",
     "typescript": "^5.9.3",

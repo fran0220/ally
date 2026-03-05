@@ -7,10 +7,11 @@ use aws_sdk_s3::{
     primitives::ByteStream,
 };
 use base64::{Engine as _, engine::general_purpose::STANDARD};
+use reqwest::Url;
 use tokio::fs;
 use uuid::Uuid;
 
-use crate::errors::AppError;
+use crate::{errors::AppError, image_cache};
 
 fn storage_type() -> String {
     env::var("STORAGE_TYPE")
@@ -92,6 +93,37 @@ fn content_type_to_extension(content_type: &str) -> &'static str {
     }
 }
 
+fn storage_key_to_content_type(storage_key: &str) -> String {
+    let extension = storage_key
+        .rsplit('.')
+        .next()
+        .map(|value| value.trim().to_ascii_lowercase())
+        .unwrap_or_default();
+
+    match extension.as_str() {
+        "jpg" | "jpeg" => "image/jpeg",
+        "png" => "image/png",
+        "webp" => "image/webp",
+        "gif" => "image/gif",
+        "mp4" => "video/mp4",
+        "mov" => "video/quicktime",
+        "webm" => "video/webm",
+        "wav" => "audio/wav",
+        "mp3" => "audio/mpeg",
+        "ogg" => "audio/ogg",
+        _ => "application/octet-stream",
+    }
+    .to_string()
+}
+
+fn decode_storage_key(raw_key: &str) -> Option<String> {
+    let decoded = urlencoding::decode(raw_key).ok()?.trim().to_string();
+    if decoded.is_empty() {
+        return None;
+    }
+    Some(normalize_storage_key(&decoded))
+}
+
 pub fn to_fetchable_url(input_url: &str) -> String {
     let trimmed = input_url.trim();
     if trimmed.is_empty() {
@@ -126,6 +158,37 @@ pub fn to_public_media_url(input_url_or_key: Option<&str>) -> Option<String> {
         return None;
     }
     Some(to_fetchable_url(value))
+}
+
+pub fn resolve_storage_key_from_media_value(value: &str) -> Option<String> {
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+
+    if let Some(path) = trimmed.strip_prefix("/api/files/") {
+        return decode_storage_key(path);
+    }
+
+    if !trimmed.starts_with("http://")
+        && !trimmed.starts_with("https://")
+        && !trimmed.starts_with("data:")
+        && !trimmed.starts_with('/')
+    {
+        return Some(normalize_storage_key(trimmed));
+    }
+
+    if trimmed.starts_with('/') {
+        return None;
+    }
+
+    let parsed = Url::parse(trimmed).ok()?;
+    let raw_path = parsed.path().trim_start_matches('/');
+    if raw_path.is_empty() {
+        return None;
+    }
+
+    decode_storage_key(raw_path)
 }
 
 pub fn parse_data_url(value: &str) -> Option<(String, String)> {
@@ -182,6 +245,96 @@ pub async fn download_source_bytes(source: &str) -> Result<(Vec<u8>, String), Ap
     Ok((bytes, content_type))
 }
 
+pub async fn download_storage_key_bytes(storage_key: &str) -> Result<(Vec<u8>, String), AppError> {
+    let normalized_key = normalize_storage_key(storage_key);
+    if normalized_key.is_empty() {
+        return Err(AppError::invalid_params("storage key cannot be empty"));
+    }
+
+    let storage = storage_type();
+    if storage == "local" {
+        let file_path = upload_dir().join(&normalized_key);
+        let bytes = fs::read(&file_path).await.map_err(|err| {
+            AppError::internal(format!(
+                "failed to read local media object from {}: {err}",
+                file_path.display()
+            ))
+        })?;
+        let content_type = storage_key_to_content_type(&normalized_key);
+        return Ok((bytes, content_type));
+    }
+
+    if storage == "cos" {
+        let secret_id = env::var("COS_SECRET_ID")
+            .ok()
+            .map(|value| value.trim().to_string())
+            .filter(|value| !value.is_empty())
+            .ok_or_else(|| AppError::internal("COS_SECRET_ID is required in cos mode"))?;
+        let secret_key = env::var("COS_SECRET_KEY")
+            .ok()
+            .map(|value| value.trim().to_string())
+            .filter(|value| !value.is_empty())
+            .ok_or_else(|| AppError::internal("COS_SECRET_KEY is required in cos mode"))?;
+        let bucket = env::var("COS_BUCKET")
+            .ok()
+            .map(|value| value.trim().to_string())
+            .filter(|value| !value.is_empty())
+            .ok_or_else(|| AppError::internal("COS_BUCKET is required in cos mode"))?;
+        let region = env::var("COS_REGION")
+            .ok()
+            .map(|value| value.trim().to_string())
+            .filter(|value| !value.is_empty())
+            .ok_or_else(|| AppError::internal("COS_REGION is required in cos mode"))?;
+        let endpoint = env::var("COS_S3_ENDPOINT")
+            .ok()
+            .map(|value| value.trim().to_string())
+            .filter(|value| !value.is_empty())
+            .unwrap_or_else(|| format!("https://{bucket}.cos.{region}.myqcloud.com"));
+
+        let credentials = Credentials::new(secret_id, secret_key, None, None, "cos-env");
+        let config = S3ConfigBuilder::new()
+            .region(Region::new(region))
+            .endpoint_url(endpoint)
+            .credentials_provider(SharedCredentialsProvider::new(credentials))
+            .force_path_style(false)
+            .build();
+        let client = S3Client::from_conf(config);
+
+        let response = client
+            .get_object()
+            .bucket(bucket)
+            .key(&normalized_key)
+            .send()
+            .await
+            .map_err(|err| {
+                AppError::internal(format!(
+                    "failed to download object from COS for key {}: {err}",
+                    normalized_key
+                ))
+            })?;
+
+        let content_type = response
+            .content_type()
+            .map(|value| value.split(';').next().unwrap_or(value).trim().to_string())
+            .filter(|value| !value.is_empty())
+            .unwrap_or_else(|| storage_key_to_content_type(&normalized_key));
+
+        let body = response
+            .body
+            .collect()
+            .await
+            .map_err(|err| AppError::internal(format!("failed to read COS object bytes: {err}")))?
+            .into_bytes()
+            .to_vec();
+
+        return Ok((body, content_type));
+    }
+
+    Err(AppError::internal(format!(
+        "unsupported storage type: {storage}"
+    )))
+}
+
 pub async fn normalize_source_to_data_url(source: &str) -> Result<String, AppError> {
     if source.trim().starts_with("data:") {
         return Ok(source.trim().to_string());
@@ -204,7 +357,13 @@ pub async fn normalize_reference_sources_to_data_urls(
         if value.is_empty() {
             continue;
         }
-        normalized.push(normalize_source_to_data_url(value).await?);
+        normalized.push(
+            image_cache::get_image_base64_cached(
+                value,
+                image_cache::GetImageBase64Options::default(),
+            )
+            .await?,
+        );
     }
     Ok(normalized)
 }

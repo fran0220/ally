@@ -89,35 +89,6 @@ function inferCodeFromMessage(message: string): UnifiedErrorCode | null {
   return null
 }
 
-function getPrismaErrorCode(input: unknown): string | null {
-  const code = pickRecord(input).code
-  if (typeof code !== 'string') return null
-  const normalized = code.trim().toUpperCase()
-  return /^P\d{4}$/.test(normalized) ? normalized : null
-}
-
-function isPrismaRetryableCode(prismaCode: string): boolean {
-  return ['P1001', 'P1002', 'P1008', 'P1017', 'P2024'].includes(prismaCode)
-}
-
-function isLikelyPrismaDisconnectError(input: unknown): boolean {
-  const message = toLowerMessage(input)
-  return containsAny(message, [
-    'can\'t reach database server',
-    'database is closed',
-    'connection pool',
-    'connection terminated',
-    'lost connection',
-  ])
-}
-
-function inferCodeFromPrismaCode(prismaCode: string): UnifiedErrorCode {
-  if (prismaCode === 'P2002') return 'CONFLICT'
-  if (prismaCode === 'P2001' || prismaCode === 'P2025') return 'NOT_FOUND'
-  if (isPrismaRetryableCode(prismaCode)) return 'EXTERNAL_ERROR'
-  return 'INTERNAL_ERROR'
-}
-
 export function normalizeAnyError(input: unknown, options: NormalizeOptions = {}): NormalizedError {
   const fallbackCode = options.fallbackCode || DEFAULT_ERROR_CODE
   const errorLike = pickRecord(input) as ErrorLike
@@ -134,28 +105,6 @@ export function normalizeAnyError(input: unknown, options: NormalizeOptions = {}
         provider,
       )
     }
-  }
-
-  const prismaCode = getPrismaErrorCode(input)
-  if (prismaCode) {
-    return buildNormalizedError(
-      inferCodeFromPrismaCode(prismaCode),
-      message || `Database request failed (${prismaCode})`,
-      {
-        prismaCode,
-        ...(options.details || {}),
-      },
-      provider,
-    )
-  }
-
-  if (isLikelyPrismaDisconnectError(input)) {
-    return buildNormalizedError(
-      'EXTERNAL_ERROR',
-      message || 'Database connection unavailable',
-      options.details,
-      provider,
-    )
   }
 
   const resolvedCode = resolveUnifiedErrorCode(errorLike.code)

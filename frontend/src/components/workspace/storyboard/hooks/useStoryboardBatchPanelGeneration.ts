@@ -1,7 +1,5 @@
-'use client'
-
 import { useCallback, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { logInfo as _ulogInfo, logError as _ulogError } from '@/lib/logging/core'
 import type { NovelPromotionStoryboard } from '@/types/project'
 import type { StoryboardPanel } from './useStoryboardState'

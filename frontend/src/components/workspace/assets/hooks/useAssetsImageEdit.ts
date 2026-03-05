@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback } from 'react'
 import { logInfo as _ulogInfo } from '@/lib/logging/core'
 import { isAbortError } from '@/lib/error-utils'

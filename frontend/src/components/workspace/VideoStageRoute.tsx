@@ -1,5 +1,3 @@
-'use client'
-
 import VideoStage from './VideoStage'
 import { useWorkspaceStageRuntime } from './WorkspaceStageRuntimeContext'
 import { useWorkspaceEpisodeStageData } from './hooks/useWorkspaceEpisodeStageData'

@@ -1,18 +1,18 @@
 # Worker Runtime Smoke Report
 
-- Generated at: 2026-03-01T13:41:51.460Z
+- Generated at: 2026-03-04T08:26:54.395Z
 - Total: 4
 - Executed: 4
 - Skipped: 0
-- Pass: 4
-- Fail: 0
+- Pass: 0
+- Fail: 4
 
 | Case | Result | Submit Status | Final Status | Task ID | Elapsed(ms) | Polls | Error Code |
 |---|---|---|---|---|---|---|---|
-| image-asset-hub-generate | PASS | 200 | failed | e46e08a1-dbe2-43f7-9438-a067433eac09 | 12537 | 3 | NOT_FOUND |
-| text-asset-hub-ai-design-character | PASS | 200 | failed | 5bc9509d-1a92-4ce2-8655-07353ec595d9 | 6418 | 2 | INVALID_PARAMS |
-| voice-asset-hub-voice-design | PASS | 200 | failed | 7ec5a461-4c74-4739-b423-7ae57dadffd1 | 8516 | 2 | INVALID_PARAMS |
-| video-novel-generate-video | PASS | 200 | failed | d31614d2-47ab-43b5-94de-800beca77a6b | 8633 | 2 | NOT_FOUND |
+| image-asset-hub-generate | FAIL | 400 | unknown |  | 691 | 0 |  |
+| text-asset-hub-ai-design-character | FAIL | 400 | unknown |  | 659 | 0 |  |
+| voice-asset-hub-voice-design | FAIL | 400 | unknown |  | 255 | 0 |  |
+| video-novel-generate-video | FAIL | 400 | unknown |  | 251 | 0 |  |
 
 ## Skipped Cases
 
@@ -20,5 +20,16 @@
 
 ## Failures
 
-- none
+- image-asset-hub-generate (POST /api/asset-hub/generate-image)
+  - submit response missing taskId
+  - submit status 400 != expected 200
+- text-asset-hub-ai-design-character (POST /api/asset-hub/ai-design-character)
+  - submit response missing taskId
+  - submit status 400 != expected 200
+- voice-asset-hub-voice-design (POST /api/asset-hub/voice-design)
+  - submit response missing taskId
+  - submit status 400 != expected 200
+- video-novel-generate-video (POST /api/novel-promotion/38ee4854-f3e0-4599-9135-e9483a1620ec/generate-video)
+  - submit response missing taskId
+  - submit status 400 != expected 200
 

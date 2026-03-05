@@ -1,5 +1,3 @@
-'use client'
-
 import { LocationEditModal as SharedLocationEditModal } from '@/components/shared/assets/LocationEditModal'
 
 interface LocationEditModalProps {

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { logError as _ulogError } from '@/lib/logging/core'
 import { useVoiceTaskPresentation } from '@/lib/query/hooks/useTaskPresentation'
-import type { MatchedVoiceLine } from '@/app/[locale]/workspace/[projectId]/modes/novel-promotion/components/video'
+import type { MatchedVoiceLine } from '@/components/workspace/video'
 import type { VoiceLine } from './types'
 import { buildVoiceLineTargets } from './task-targets'
 

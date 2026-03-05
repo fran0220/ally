@@ -1,5 +1,4 @@
-'use client'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'

@@ -1,12 +1,10 @@
-'use client'
-
 /**
  * 音色设置组件 - 从 CharacterCard 提取
  * 支持上传自定义音频和 AI 声音设计
  */
 
 import { useRef, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { shouldShowError } from '@/lib/error-utils'
 import { useUploadProjectCharacterVoice } from '@/lib/query/mutations'
 import { AppIcon } from '@/components/ui/icons'

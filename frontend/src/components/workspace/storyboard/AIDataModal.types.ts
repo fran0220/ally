@@ -1,5 +1,3 @@
-'use client'
-
 export interface PhotographyCharacter {
   name: string
   screen_position: string

@@ -1,4 +1,3 @@
-'use client'
 import { fetchWithAuth } from '@/api/client'
 import { logInfo as _ulogInfo } from '@/lib/logging/core'
 

@@ -773,9 +773,9 @@ pub async fn update_preference(
     let mut separated = builder.separated(", ");
 
     for (field, value) in updates {
-        separated.push(field);
-        separated.push(" = ");
-        separated.push_bind(value);
+        separated
+            .push(format!("{field} = "))
+            .push_bind_unseparated(value);
     }
 
     separated.push("updatedAt = NOW(3)");

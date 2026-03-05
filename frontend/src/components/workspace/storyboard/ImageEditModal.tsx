@@ -1,4 +1,3 @@
-'use client'
 import { useTranslations } from '@/compat/next-intl'
 import { useState, useRef, useCallback } from 'react'
 import { Character, Location } from '@/types/project'

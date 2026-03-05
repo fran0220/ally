@@ -1,5 +1,3 @@
-'use client'
-
 import { extractErrorMessage, extractErrorStatus } from '@/lib/errors/extract'
 
 export function getErrorMessage(error: unknown): string {

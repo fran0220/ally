@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useState } from 'react'
 import { shouldShowError } from '@/lib/error-utils'
 import { getErrorMessage, getErrorStatus } from './utils'

@@ -1,6 +1,4 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import PanelEditFormV2 from '@/components/ui/patterns/PanelEditFormV2'
 import { GlassButton, GlassModalShell, GlassSurface } from '@/components/ui/primitives'
 import { Character, Location } from '@/types/project'

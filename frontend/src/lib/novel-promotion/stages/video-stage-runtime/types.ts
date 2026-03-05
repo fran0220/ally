@@ -6,7 +6,7 @@ import type {
   FirstLastFrameParams,
   VideoGenerationOptions,
   Storyboard,
-} from '@/app/[locale]/workspace/[projectId]/modes/novel-promotion/components/video'
+} from '@/components/workspace/video'
 import type { CapabilitySelections, ModelCapabilities } from '@/lib/model-config-contract'
 import type { VideoPricingTier } from '@/lib/model-pricing/video-tier'
 

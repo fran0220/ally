@@ -1,5 +1,3 @@
-'use client'
-
 import { logError as _ulogError } from '@/lib/logging/core'
 import { useCallback } from 'react'
 import {

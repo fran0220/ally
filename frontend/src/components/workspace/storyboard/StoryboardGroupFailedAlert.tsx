@@ -1,5 +1,3 @@
-'use client'
-
 import { AppIcon } from '@/components/ui/icons'
 
 interface StoryboardGroupFailedAlertProps {

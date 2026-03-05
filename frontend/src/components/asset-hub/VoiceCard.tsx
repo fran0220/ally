@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useRef } from 'react'
 import { useTranslations } from '@/compat/next-intl'
 import { useDeleteVoice } from '@/lib/query/mutations'

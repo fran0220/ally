@@ -1,6 +1,4 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { resolveTaskPresentationState } from '@/lib/task/presentation'
 import { useWizardState } from './smart-import/hooks/useWizardState'
 import StepSource from './smart-import/steps/StepSource'

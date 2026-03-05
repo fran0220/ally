@@ -1,5 +1,3 @@
-'use client'
-
 import { fetchWithAuth } from '@/api/client'
 import { useQuery } from '@tanstack/react-query'
 import type { ModelCapabilities } from '@/lib/model-config-contract'

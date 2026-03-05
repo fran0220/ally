@@ -63,7 +63,52 @@
     }
   },
   {
-    "id": "user-models-auth",
+    "id": "user-models-unauthorized",
+    "method": "GET",
+    "path": "/api/user/models",
+    "expectedStatus": 401,
+    "requireAuth": false,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "user-api-config-unauthorized",
+    "method": "GET",
+    "path": "/api/user/api-config",
+    "expectedStatus": 401,
+    "requireAuth": false,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "user-api-config-test-connection-unauthorized",
+    "method": "POST",
+    "path": "/api/user/api-config/test-connection",
+    "expectedStatus": 401,
+    "requireAuth": false,
+    "body": {},
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "user-preference-unauthorized",
+    "method": "GET",
+    "path": "/api/user-preference",
+    "expectedStatus": 401,
+    "requireAuth": false,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "user-models-auth-success",
     "method": "GET",
     "path": "/api/user/models",
     "expectedStatus": 200,
@@ -74,7 +119,7 @@
     }
   },
   {
-    "id": "user-api-config-auth",
+    "id": "user-api-config-auth-success",
     "method": "GET",
     "path": "/api/user/api-config",
     "expectedStatus": 200,
@@ -85,23 +130,23 @@
     }
   },
   {
-    "id": "user-api-config-test-connection-invalid",
-    "method": "POST",
-    "path": "/api/user/api-config/test-connection",
-    "expectedStatus": 400,
-    "requireAuth": false,
-    "body": {},
+    "id": "user-preference-auth-success",
+    "method": "GET",
+    "path": "/api/user-preference",
+    "expectedStatus": 200,
+    "requireAuth": true,
     "compare": {
       "strictStatus": true,
       "topLevelKeys": true
     }
   },
   {
-    "id": "user-preference-auth",
-    "method": "GET",
-    "path": "/api/user-preference",
-    "expectedStatus": 200,
+    "id": "user-api-config-test-connection-invalid-auth",
+    "method": "POST",
+    "path": "/api/user/api-config/test-connection",
+    "expectedStatus": 400,
     "requireAuth": true,
+    "body": {},
     "compare": {
       "strictStatus": true,
       "topLevelKeys": true
@@ -335,6 +380,111 @@
     }
   },
   {
+    "id": "asset-hub-locations-auth",
+    "method": "GET",
+    "path": "/api/asset-hub/locations",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "asset-hub-voices-auth",
+    "method": "GET",
+    "path": "/api/asset-hub/voices",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "asset-hub-character-create-auth",
+    "method": "POST",
+    "path": "/api/asset-hub/characters",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "body": {
+      "name": "Runtime Compare Character",
+      "profileData": {
+        "style": "runtime-compare"
+      }
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "asset-hub-location-create-auth",
+    "method": "POST",
+    "path": "/api/asset-hub/locations",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "body": {
+      "name": "Runtime Compare Location",
+      "summary": "runtime compare location summary",
+      "description": "runtime compare location description"
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "asset-hub-voice-create-auth",
+    "method": "POST",
+    "path": "/api/asset-hub/voices",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "body": {
+      "name": "Runtime Compare Voice",
+      "description": "runtime compare voice",
+      "voiceType": "qwen-designed",
+      "language": "zh"
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "asset-hub-character-update-by-id",
+    "method": "PATCH",
+    "path": "/api/asset-hub/characters/{{WW_ASSET_CHARACTER_ID}}",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_ASSET_CHARACTER_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "body": {
+      "name": "Runtime Compare Character Updated"
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "asset-hub-character-delete-by-id",
+    "method": "DELETE",
+    "path": "/api/asset-hub/characters/{{WW_ASSET_CHARACTER_ID}}",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_ASSET_CHARACTER_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
     "id": "asset-hub-generate-image-submit",
     "method": "POST",
     "path": "/api/asset-hub/generate-image",
@@ -438,6 +588,89 @@
     }
   },
   {
+    "id": "novel-episodes-by-id",
+    "method": "GET",
+    "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/episodes",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "novel-characters-by-id",
+    "method": "GET",
+    "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/characters",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "novel-locations-by-id",
+    "method": "GET",
+    "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/locations",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "novel-storyboards-by-id",
+    "method": "GET",
+    "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/storyboards?episodeId={{WW_EPISODE_ID}}",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID",
+      "WW_EPISODE_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "novel-characters-create",
+    "method": "POST",
+    "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/characters",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "requiresEnv": [
+      "WW_PROJECT_ID"
+    ],
+    "skipIfEnvMissing": true,
+    "body": {
+      "name": "Runtime Compare Novel Character",
+      "description": "runtime compare novel character",
+      "meta": {
+        "locale": "zh-CN"
+      }
+    },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
     "id": "novel-generate-image-submit",
     "method": "POST",
     "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/generate-image",
@@ -480,6 +713,50 @@
         "locale": "zh-CN"
       }
     },
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "billing-user-balance-auth",
+    "method": "GET",
+    "path": "/api/user/balance",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "billing-user-costs-auth",
+    "method": "GET",
+    "path": "/api/user/costs",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "billing-user-costs-details-auth",
+    "method": "GET",
+    "path": "/api/user/costs/details?page=1&pageSize=10",
+    "expectedStatus": 200,
+    "requireAuth": true,
+    "compare": {
+      "strictStatus": true,
+      "topLevelKeys": true
+    }
+  },
+  {
+    "id": "billing-user-transactions-auth",
+    "method": "GET",
+    "path": "/api/user/transactions?page=1&pageSize=10",
+    "expectedStatus": 200,
+    "requireAuth": true,
     "compare": {
       "strictStatus": true,
       "topLevelKeys": true

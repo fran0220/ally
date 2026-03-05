@@ -1,5 +1,3 @@
-'use client'
-
 import TaskStatusInline from '@/components/task/TaskStatusInline'
 import CharacterProfileCard from './CharacterProfileCard'
 import { parseProfileData } from '@/types/character-profile'

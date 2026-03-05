@@ -1508,21 +1508,21 @@ async fn patch_root(
     ] {
         if body.get(body_key).is_some() {
             touched = true;
-            separated.push(db_col);
-            separated.push_unseparated(" = ");
-            separated.push_bind(normalize_optional_string(
-                body.get(body_key)
-                    .and_then(Value::as_str)
-                    .map(|item| item.to_string()),
-            ));
+            separated
+                .push(format!("{db_col} = "))
+                .push_bind_unseparated(normalize_optional_string(
+                    body.get(body_key)
+                        .and_then(Value::as_str)
+                        .map(|item| item.to_string()),
+                ));
         }
     }
 
     if let Some(value) = body.get("capabilityOverrides") {
         touched = true;
-        separated.push("capabilityOverrides");
-        separated.push_unseparated(" = ");
-        separated.push_bind(normalize_optional_json(Some(value.clone())));
+        separated
+            .push("capabilityOverrides = ")
+            .push_bind_unseparated(normalize_optional_json(Some(value.clone())));
     }
 
     if !touched {
@@ -1981,24 +1981,24 @@ async fn handle_episode_patch(
     ] {
         if body.get(body_key).is_some() {
             touched = true;
-            separated.push(db_col);
-            separated.push_unseparated(" = ");
-            separated.push_bind(body_string(&body, body_key));
+            separated
+                .push(format!("{db_col} = "))
+                .push_bind_unseparated(body_string(&body, body_key));
         }
     }
 
     if body.get("speakerVoices").is_some() {
         touched = true;
-        separated.push("speakerVoices");
-        separated.push_unseparated(" = ");
-        separated.push_bind(normalize_optional_json(body.get("speakerVoices").cloned()));
+        separated
+            .push("speakerVoices = ")
+            .push_bind_unseparated(normalize_optional_json(body.get("speakerVoices").cloned()));
     }
 
     if body.get("episodeNumber").is_some() {
         touched = true;
-        separated.push("episodeNumber");
-        separated.push_unseparated(" = ");
-        separated.push_bind(body_i32(&body, "episodeNumber"));
+        separated
+            .push("episodeNumber = ")
+            .push_bind_unseparated(body_i32(&body, "episodeNumber"));
     }
 
     if !touched {
@@ -2240,23 +2240,25 @@ async fn handle_character_route(
             ] {
                 if body.get(key).is_some() {
                     touched = true;
-                    separated.push(db_col);
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(body_string(&body, key));
+                    separated
+                        .push(format!("{db_col} = "))
+                        .push_bind_unseparated(body_string(&body, key));
                 }
             }
 
             if body.get("aliases").is_some() {
                 touched = true;
-                separated.push("aliases");
-                separated.push_unseparated(" = ");
-                separated.push_bind(normalize_optional_json(body.get("aliases").cloned()));
+                separated
+                    .push("aliases = ")
+                    .push_bind_unseparated(normalize_optional_json(body.get("aliases").cloned()));
             }
             if body.get("profileData").is_some() {
                 touched = true;
-                separated.push("profileData");
-                separated.push_unseparated(" = ");
-                separated.push_bind(normalize_optional_json(body.get("profileData").cloned()));
+                separated
+                    .push("profileData = ")
+                    .push_bind_unseparated(normalize_optional_json(
+                        body.get("profileData").cloned(),
+                    ));
             }
 
             if !touched {
@@ -2430,21 +2432,21 @@ async fn handle_location_route(
 
             if body.get("name").is_some() {
                 touched = true;
-                separated.push("name");
-                separated.push_unseparated(" = ");
-                separated.push_bind(body_string(&body, "name"));
+                separated
+                    .push("name = ")
+                    .push_bind_unseparated(body_string(&body, "name"));
             }
             if body.get("summary").is_some() {
                 touched = true;
-                separated.push("summary");
-                separated.push_unseparated(" = ");
-                separated.push_bind(body_string(&body, "summary"));
+                separated
+                    .push("summary = ")
+                    .push_bind_unseparated(body_string(&body, "summary"));
             }
             if body.get("selectedImageId").is_some() {
                 touched = true;
-                separated.push("selectedImageId");
-                separated.push_unseparated(" = ");
-                separated.push_bind(body_string(&body, "selectedImageId"));
+                separated
+                    .push("selectedImageId = ")
+                    .push_bind_unseparated(body_string(&body, "selectedImageId"));
             }
 
             if !touched {
@@ -2674,9 +2676,7 @@ async fn handle_voice_lines(
                         return Err(AppError::invalid_params("speaker cannot be empty"));
                     };
                     touched = true;
-                    separated.push("speaker");
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(speaker);
+                    separated.push("speaker = ").push_bind_unseparated(speaker);
                 }
 
                 if let Some(value) = body.get("content") {
@@ -2688,17 +2688,13 @@ async fn handle_voice_lines(
                         return Err(AppError::invalid_params("content cannot be empty"));
                     };
                     touched = true;
-                    separated.push("content");
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(content);
+                    separated.push("content = ").push_bind_unseparated(content);
                 }
 
                 for key in ["voicePresetId", "emotionPrompt"] {
                     if let Some(value) = body.get(key) {
                         touched = true;
-                        separated.push(key);
-                        separated.push_unseparated(" = ");
-                        separated.push_bind(
+                        separated.push(format!("{key} = ")).push_bind_unseparated(
                             value
                                 .as_str()
                                 .map(|item| item.trim().to_string())
@@ -2721,28 +2717,28 @@ async fn handle_voice_lines(
                     };
 
                     touched = true;
-                    separated.push("audioUrl");
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(audio_url);
-                    separated.push("audioMediaId");
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(resolved_media_id);
+                    separated
+                        .push("audioUrl = ")
+                        .push_bind_unseparated(audio_url);
+                    separated
+                        .push("audioMediaId = ")
+                        .push_bind_unseparated(resolved_media_id);
                 }
 
                 for key in ["lineIndex", "audioDuration"] {
                     if let Some(value) = body.get(key) {
                         touched = true;
-                        separated.push(key);
-                        separated.push_unseparated(" = ");
-                        separated.push_bind(parse_nullable_i32_field(value, key)?);
+                        separated
+                            .push(format!("{key} = "))
+                            .push_bind_unseparated(parse_nullable_i32_field(value, key)?);
                     }
                 }
 
                 if let Some(value) = body.get("emotionStrength") {
                     touched = true;
-                    separated.push("emotionStrength");
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(parse_nullable_f64_field(value, "emotionStrength")?);
+                    separated
+                        .push("emotionStrength = ")
+                        .push_bind_unseparated(parse_nullable_f64_field(value, "emotionStrength")?);
                 }
 
                 if body.get("matchedPanelId").is_some() {
@@ -2778,30 +2774,33 @@ async fn handle_voice_lines(
                     }
 
                     touched = true;
-                    separated.push("matchedPanelId");
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(matched_panel_id);
-                    separated.push("matchedStoryboardId");
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(matched_storyboard_id);
-                    separated.push("matchedPanelIndex");
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(matched_panel_index);
+                    separated
+                        .push("matchedPanelId = ")
+                        .push_bind_unseparated(matched_panel_id);
+                    separated
+                        .push("matchedStoryboardId = ")
+                        .push_bind_unseparated(matched_storyboard_id);
+                    separated
+                        .push("matchedPanelIndex = ")
+                        .push_bind_unseparated(matched_panel_index);
                 } else if let Some(value) = body.get("matchedStoryboardId") {
                     touched = true;
-                    separated.push("matchedStoryboardId");
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(
-                        value
-                            .as_str()
-                            .map(|item| item.trim().to_string())
-                            .filter(|item| !item.is_empty()),
-                    );
+                    separated
+                        .push("matchedStoryboardId = ")
+                        .push_bind_unseparated(
+                            value
+                                .as_str()
+                                .map(|item| item.trim().to_string())
+                                .filter(|item| !item.is_empty()),
+                        );
                 } else if let Some(value) = body.get("matchedPanelIndex") {
                     touched = true;
-                    separated.push("matchedPanelIndex");
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(parse_nullable_i32_field(value, "matchedPanelIndex")?);
+                    separated
+                        .push("matchedPanelIndex = ")
+                        .push_bind_unseparated(parse_nullable_i32_field(
+                            value,
+                            "matchedPanelIndex",
+                        )?);
                 }
 
                 if !touched {
@@ -3444,9 +3443,7 @@ async fn handle_panel(
             ] {
                 if let Some(value) = body.get(key) {
                     touched = true;
-                    separated.push(key);
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(
+                    separated.push(format!("{key} = ")).push_bind_unseparated(
                         value
                             .as_str()
                             .map(|item| item.trim().to_string())
@@ -3458,54 +3455,54 @@ async fn handle_panel(
             for key in ["panelIndex", "panelNumber"] {
                 if let Some(value) = body.get(key) {
                     touched = true;
-                    separated.push(key);
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(parse_nullable_i32_field(value, key)?);
+                    separated
+                        .push(format!("{key} = "))
+                        .push_bind_unseparated(parse_nullable_i32_field(value, key)?);
                 }
             }
             for key in ["srtStart", "srtEnd", "duration"] {
                 if let Some(value) = body.get(key) {
                     touched = true;
-                    separated.push(key);
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(parse_nullable_f64_field(value, key)?);
+                    separated
+                        .push(format!("{key} = "))
+                        .push_bind_unseparated(parse_nullable_f64_field(value, key)?);
                 }
             }
 
             if body.get("linkedToNextPanel").is_some() {
                 touched = true;
-                separated.push("linkedToNextPanel");
-                separated.push_unseparated(" = ");
-                separated.push_bind(body_bool(&body, "linkedToNextPanel"));
+                separated
+                    .push("linkedToNextPanel = ")
+                    .push_bind_unseparated(body_bool(&body, "linkedToNextPanel"));
             }
 
             if body.get("characters").is_some() {
                 touched = true;
-                separated.push("characters");
-                separated.push_unseparated(" = ");
-                separated.push_bind(normalize_optional_json(body.get("characters").cloned()));
+                separated
+                    .push("characters = ")
+                    .push_bind_unseparated(normalize_optional_json(
+                        body.get("characters").cloned(),
+                    ));
             }
             if body.get("candidateImages").is_some() {
                 touched = true;
-                separated.push("candidateImages");
-                separated.push_unseparated(" = ");
-                separated.push_bind(normalize_optional_json(
-                    body.get("candidateImages").cloned(),
-                ));
+                separated.push("candidateImages = ").push_bind_unseparated(
+                    normalize_optional_json(body.get("candidateImages").cloned()),
+                );
             }
             if body.get("actingNotes").is_some() {
                 touched = true;
-                separated.push("actingNotes");
-                separated.push_unseparated(" = ");
-                separated.push_bind(normalize_optional_json(body.get("actingNotes").cloned()));
+                separated
+                    .push("actingNotes = ")
+                    .push_bind_unseparated(normalize_optional_json(
+                        body.get("actingNotes").cloned(),
+                    ));
             }
             if body.get("photographyRules").is_some() {
                 touched = true;
-                separated.push("photographyRules");
-                separated.push_unseparated(" = ");
-                separated.push_bind(normalize_optional_json(
-                    body.get("photographyRules").cloned(),
-                ));
+                separated.push("photographyRules = ").push_bind_unseparated(
+                    normalize_optional_json(body.get("photographyRules").cloned()),
+                );
             }
 
             if !touched {
@@ -3927,17 +3924,17 @@ async fn handle_clips(
             ] {
                 if body.get(key).is_some() {
                     touched = true;
-                    separated.push(key);
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(body_string(&body, key));
+                    separated
+                        .push(format!("{key} = "))
+                        .push_bind_unseparated(body_string(&body, key));
                 }
             }
             for key in ["start", "end", "duration", "shotCount"] {
                 if body.get(key).is_some() {
                     touched = true;
-                    separated.push(key);
-                    separated.push_unseparated(" = ");
-                    separated.push_bind(body_i32(&body, key));
+                    separated
+                        .push(format!("{key} = "))
+                        .push_bind_unseparated(body_i32(&body, key));
                 }
             }
 
@@ -5000,6 +4997,22 @@ pub async fn dispatch(
 
     match (method.as_str(), segments.as_slice()) {
         ("GET", ["assets"]) => handle_assets(&state, &user, &project_id).await,
+        ("GET", ["characters"]) => {
+            let assets = handle_assets(&state, &user, &project_id).await?.0;
+            let characters = assets
+                .get("characters")
+                .cloned()
+                .unwrap_or_else(|| json!([]));
+            Ok(Json(json!({ "characters": characters })))
+        }
+        ("GET", ["locations"]) => {
+            let assets = handle_assets(&state, &user, &project_id).await?.0;
+            let locations = assets
+                .get("locations")
+                .cloned()
+                .unwrap_or_else(|| json!([]));
+            Ok(Json(json!({ "locations": locations })))
+        }
         ("GET", ["episodes"]) => handle_episodes_get(&state, &user, &project_id).await,
         ("POST", ["episodes"]) => handle_episodes_post(&state, &user, &project_id, body_json).await,
         ("POST", ["episodes", "batch"]) => {
@@ -5087,7 +5100,31 @@ pub async fn dispatch(
             )
             .await
         }
+        (method, ["characters"]) if method == "POST" || method == "PATCH" || method == "DELETE" => {
+            handle_character_route(
+                &state,
+                &user,
+                &project_id,
+                method,
+                &query,
+                &headers,
+                body_json,
+            )
+            .await
+        }
         (method, ["location"]) if method == "POST" || method == "PATCH" || method == "DELETE" => {
+            handle_location_route(
+                &state,
+                &user,
+                &project_id,
+                method,
+                &query,
+                &headers,
+                body_json,
+            )
+            .await
+        }
+        (method, ["locations"]) if method == "POST" || method == "PATCH" || method == "DELETE" => {
             handle_location_route(
                 &state,
                 &user,

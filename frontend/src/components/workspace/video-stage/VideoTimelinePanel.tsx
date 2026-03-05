@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import VoiceStage from '../VoiceStage'
 import { AppIcon } from '@/components/ui/icons'
 

@@ -2,11 +2,28 @@ import { QueryClient } from '@tanstack/react-query';
 
 import { ApiClientError } from '../api/client';
 
+const MAX_QUERY_RETRIES = 2;
+
 function shouldRetry(failureCount: number, error: unknown): boolean {
-  if (error instanceof ApiClientError && error.status >= 400 && error.status < 500) {
+  if (failureCount >= MAX_QUERY_RETRIES) {
     return false;
   }
-  return failureCount < 2;
+
+  if (error instanceof TypeError) {
+    return true;
+  }
+
+  if (error instanceof ApiClientError) {
+    if (error.retryable === true) {
+      return true;
+    }
+    if (error.retryable === false) {
+      return false;
+    }
+    return !(error.status >= 400 && error.status < 500);
+  }
+
+  return true;
 }
 
 export function createQueryClient(): QueryClient {

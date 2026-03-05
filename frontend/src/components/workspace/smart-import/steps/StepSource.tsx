@@ -1,6 +1,4 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { countWords } from '@/lib/word-count'
 import type { EpisodeMarkerResult } from '@/lib/episode-marker-detector'
 import { AppIcon } from '@/components/ui/icons'

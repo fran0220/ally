@@ -1,5 +1,3 @@
-'use client'
-
 import VoiceStage from './VoiceStage'
 import { useWorkspaceStageRuntime } from './WorkspaceStageRuntimeContext'
 import { useWorkspaceProvider } from './WorkspaceProvider'

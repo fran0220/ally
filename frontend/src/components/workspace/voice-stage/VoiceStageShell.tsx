@@ -1,5 +1,3 @@
-'use client'
-
 import VoiceStageLayout, { type VoiceStageShellProps } from './VoiceStageLayout'
 
 export type { VoiceStageShellProps }

@@ -1,5 +1,3 @@
-'use client'
-
 export {
   useVideoStageRuntime,
   type VideoStageShellProps,

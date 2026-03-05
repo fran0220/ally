@@ -1,5 +1,3 @@
-'use client'
-
 import { useEpisodeData } from '@/lib/query/hooks'
 import type { NovelPromotionClip, NovelPromotionStoryboard } from '@/types/project'
 import { useWorkspaceProvider } from '../WorkspaceProvider'

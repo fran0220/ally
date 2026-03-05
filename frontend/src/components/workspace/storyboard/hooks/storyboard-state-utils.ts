@@ -1,5 +1,3 @@
-'use client'
-
 import type { NovelPromotionClip, NovelPromotionPanel, NovelPromotionStoryboard } from '@/types/project'
 
 export function getStoryboardPanels(storyboard: NovelPromotionStoryboard): NovelPromotionPanel[] {

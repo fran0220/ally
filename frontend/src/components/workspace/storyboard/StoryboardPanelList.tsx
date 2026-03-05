@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import { NovelPromotionPanel } from '@/types/project'
 import { StoryboardPanel } from './hooks/useStoryboardState'

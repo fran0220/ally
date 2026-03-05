@@ -24,7 +24,17 @@ const ProjectWorkbench = lazy(() =>
 );
 const AssetHub = lazy(() => import('./routes/workspace/AssetHub').then((module) => ({ default: module.AssetHub })));
 const Profile = lazy(() => import('./routes/profile/Profile').then((module) => ({ default: module.Profile })));
+const ProfileAccount = lazy(() => import('./routes/profile/AccountTab').then((module) => ({ default: module.AccountTab })));
+const ProfileApiConfig = lazy(() =>
+  import('./routes/profile/ProfileApiConfig').then((module) => ({ default: module.ProfileApiConfig })),
+);
+const ProfilePreferences = lazy(() =>
+  import('./routes/profile/ProfilePreferences').then((module) => ({ default: module.ProfilePreferences })),
+);
+const AdminLayout = lazy(() => import('./routes/admin/AdminLayout').then((module) => ({ default: module.AdminLayout })));
 const AiConfig = lazy(() => import('./routes/admin/AiConfig').then((module) => ({ default: module.AiConfig })));
+const AdminUsers = lazy(() => import('./routes/admin/AdminUsers').then((module) => ({ default: module.AdminUsers })));
+const AdminSystem = lazy(() => import('./routes/admin/AdminSystem').then((module) => ({ default: module.AdminSystem })));
 
 function RouteFallback() {
   return (
@@ -151,10 +161,46 @@ const router = createBrowserRouter([
           {
             path: '/profile',
             element: <Profile />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to="api-config" replace />,
+              },
+              {
+                path: 'account',
+                element: <ProfileAccount />,
+              },
+              {
+                path: 'api-config',
+                element: <ProfileApiConfig />,
+              },
+              {
+                path: 'preferences',
+                element: <ProfilePreferences />,
+              },
+            ],
           },
           {
-            path: '/admin/ai-config',
-            element: <AiConfig />,
+            path: '/admin',
+            element: <AdminLayout />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to="ai-config" replace />,
+              },
+              {
+                path: 'ai-config',
+                element: <AiConfig />,
+              },
+              {
+                path: 'users',
+                element: <AdminUsers />,
+              },
+              {
+                path: 'system',
+                element: <AdminSystem />,
+              },
+            ],
           },
         ],
       },

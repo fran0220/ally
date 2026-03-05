@@ -1,5 +1,3 @@
-'use client'
-
 import type { ReactNode } from 'react'
 import type { ProviderCardProps, ProviderCardTranslator } from './types'
 import type { UseProviderCardStateResult } from './hooks/useProviderCardState'

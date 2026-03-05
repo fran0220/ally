@@ -1,6 +1,6 @@
-'use client'
 import { logError as _ulogError } from '@/lib/logging/core'
-import { useLocale, useTranslations } from '@/compat/next-intl'
+import { useTranslation } from 'react-i18next'
+import { useToast } from '@/contexts/ToastContext'
 import { getUserApiConfig, updateUserApiConfig } from '@/api/user'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
@@ -141,8 +141,9 @@ function applyPricingDisplay(model: CustomModel, map: PricingDisplayMap): Custom
 }
 
 export function useProviders(): UseProvidersReturn {
-    const locale = useLocale()
-    const t = useTranslations('apiConfig')
+    const { t, i18n } = useTranslation('apiConfig')
+    const { showToast } = useToast()
+    const locale = i18n.language
     const presetProviders = PRESET_PROVIDERS.map((provider) => ({
         ...provider,
         name: resolvePresetProviderName(provider.id, provider.name, locale),
@@ -393,7 +394,7 @@ export function useProviders(): UseProvidersReturn {
         setProviders(prev => {
             const normalizedProviderId = provider.id.toLowerCase()
             if (prev.some((p) => p.id.toLowerCase() === normalizedProviderId)) {
-                alert(t('providerIdExists'))
+                showToast(t('providerIdExists'), 'warning')
                 return prev
             }
             const newProvider: Provider = { ...provider, hasApiKey: !!provider.apiKey }
@@ -410,40 +411,42 @@ export function useProviders(): UseProvidersReturn {
             return next
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [t, performSave])
+    }, [performSave, showToast, t])
 
     const deleteProvider = useCallback((providerId: string) => {
         if (PRESET_PROVIDERS.find(p => p.id === providerId)) {
-            alert(t('presetProviderCannotDelete'))
+            showToast(t('presetProviderCannotDelete'), 'warning')
             return
         }
-        if (confirm(t('confirmDeleteProvider'))) {
-            setProviders(prev => {
-                const next = prev.filter(p => p.id !== providerId)
-                latestProvidersRef.current = next
-                return next
-            })
-            setModels(prev => {
-                const nextModels = prev.filter(m => m.provider !== providerId)
-                setDefaultModels(prevDefaults => {
-                    const updates: DefaultModels = { ...prevDefaults }
-                    const remainingModelKeys = new Set(nextModels.map(m => m.modelKey))
-                        ; (['analysisModel', 'characterModel', 'locationModel', 'storyboardModel', 'editModel', 'videoModel', 'lipSyncModel'] as const)
-                            .forEach(field => {
-                                const current = updates[field]
-                                if (current && !remainingModelKeys.has(current)) {
-                                    updates[field] = ''
-                                }
-                            })
-                    latestDefaultModelsRef.current = updates
-                    return updates
-                })
-                latestModelsRef.current = nextModels
-                void performSave(undefined, true) // 删除提供商：立刻保存
-                return nextModels
-            })
+        // TODO: Replace blocking browser confirm with shared confirmation modal.
+        if (typeof window === 'undefined' || !window.confirm(t('confirmDeleteProvider'))) {
+            return
         }
-    }, [t, performSave])
+        setProviders(prev => {
+            const next = prev.filter(p => p.id !== providerId)
+            latestProvidersRef.current = next
+            return next
+        })
+        setModels(prev => {
+            const nextModels = prev.filter(m => m.provider !== providerId)
+            setDefaultModels(prevDefaults => {
+                const updates: DefaultModels = { ...prevDefaults }
+                const remainingModelKeys = new Set(nextModels.map(m => m.modelKey))
+                    ; (['analysisModel', 'characterModel', 'locationModel', 'storyboardModel', 'editModel', 'videoModel', 'lipSyncModel'] as const)
+                        .forEach(field => {
+                            const current = updates[field]
+                            if (current && !remainingModelKeys.has(current)) {
+                                updates[field] = ''
+                            }
+                        })
+                latestDefaultModelsRef.current = updates
+                return updates
+            })
+            latestModelsRef.current = nextModels
+            void performSave(undefined, true) // 删除提供商：立刻保存
+            return nextModels
+        })
+    }, [performSave, showToast, t])
 
     const updateProviderInfo = useCallback((providerId: string, name: string, baseUrl?: string) => {
         setProviders(prev => {
@@ -536,33 +539,35 @@ export function useProviders(): UseProvidersReturn {
             const presetModelKey = encodeModelKey(model.provider, model.modelId)
             return presetModelKey === modelKey && (providerId ? model.provider === providerId : true)
         })) {
-            alert(t('presetModelCannotDelete'))
+            showToast(t('presetModelCannotDelete'), 'warning')
             return
         }
-        if (confirm(t('confirmDeleteModel'))) {
-            setModels(prev => {
-                const nextModels = prev.filter(m =>
-                    !(m.modelKey === modelKey && (providerId ? m.provider === providerId : true))
-                )
-                setDefaultModels(prevDefaults => {
-                    const nextDefaults = { ...prevDefaults }
-                    const remainingModelKeys = new Set(nextModels.map(m => m.modelKey))
-                        ; (['analysisModel', 'characterModel', 'locationModel', 'storyboardModel', 'editModel', 'videoModel', 'lipSyncModel'] as const)
-                            .forEach(field => {
-                                const current = nextDefaults[field]
-                                if (current && !remainingModelKeys.has(current)) {
-                                    nextDefaults[field] = ''
-                                }
-                            })
-                    latestDefaultModelsRef.current = nextDefaults
-                    return nextDefaults
-                })
-                latestModelsRef.current = nextModels
-                void performSave(undefined, true) // 删除模型：立刻保存
-                return nextModels
-            })
+        // TODO: Replace blocking browser confirm with shared confirmation modal.
+        if (typeof window === 'undefined' || !window.confirm(t('confirmDeleteModel'))) {
+            return
         }
-    }, [t, performSave])
+        setModels(prev => {
+            const nextModels = prev.filter(m =>
+                !(m.modelKey === modelKey && (providerId ? m.provider === providerId : true))
+            )
+            setDefaultModels(prevDefaults => {
+                const nextDefaults = { ...prevDefaults }
+                const remainingModelKeys = new Set(nextModels.map(m => m.modelKey))
+                    ; (['analysisModel', 'characterModel', 'locationModel', 'storyboardModel', 'editModel', 'videoModel', 'lipSyncModel'] as const)
+                        .forEach(field => {
+                            const current = nextDefaults[field]
+                            if (current && !remainingModelKeys.has(current)) {
+                                nextDefaults[field] = ''
+                            }
+                        })
+                latestDefaultModelsRef.current = nextDefaults
+                return nextDefaults
+            })
+            latestModelsRef.current = nextModels
+            void performSave(undefined, true) // 删除模型：立刻保存
+            return nextModels
+        })
+    }, [performSave, showToast, t])
 
     // 过滤器
     const getModelsByType = useCallback((type: CustomModel['type']) => {

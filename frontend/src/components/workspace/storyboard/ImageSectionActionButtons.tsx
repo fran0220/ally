@@ -1,7 +1,6 @@
-'use client'
 import { logInfo as _ulogInfo } from '@/lib/logging/core'
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { AppIcon } from '@/components/ui/icons'
 
 interface ImageSectionActionButtonsProps {

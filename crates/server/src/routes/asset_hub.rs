@@ -13,6 +13,7 @@ use serde_json::{Value, json};
 use sqlx::{MySql, QueryBuilder};
 use tokio::fs;
 use uuid::Uuid;
+use waoowaoo_core::image_label::{UpdateImageLabelOptions, update_image_label};
 
 use crate::{
     app_state::AppState, error::AppError, extractors::auth::AuthUser, routes::task_submit,
@@ -509,6 +510,8 @@ struct CharacterLabelRow {
     id: String,
     #[sqlx(rename = "appearanceIndex")]
     appearance_index: i32,
+    #[sqlx(rename = "changeReason")]
+    change_reason: Option<String>,
     #[sqlx(rename = "imageUrl")]
     image_url: Option<String>,
     #[sqlx(rename = "imageUrls")]
@@ -614,6 +617,24 @@ fn normalize_file_extension(raw: Option<&str>) -> Option<String> {
     }
 
     Some(normalized)
+}
+
+fn image_mime_type_by_extension(ext: &str) -> &'static str {
+    match ext.trim().to_ascii_lowercase().as_str() {
+        "jpg" | "jpeg" => "image/jpeg",
+        "png" => "image/png",
+        "webp" => "image/webp",
+        "gif" => "image/gif",
+        _ => "image/jpeg",
+    }
+}
+
+fn build_character_image_label(character_name: &str, change_reason: Option<&str>) -> String {
+    let reason = change_reason
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .unwrap_or("形象");
+    format!("{} - {}", character_name.trim(), reason)
 }
 
 fn parse_optional_i32_text(raw: Option<String>, field_name: &str) -> Result<Option<i32>, AppError> {
@@ -1112,48 +1133,57 @@ async fn update_character(
 
     if let Some(name) = body.name {
         touched = true;
-        separated.push("name = ");
-        separated.push_bind(name.trim().to_string());
+        separated
+            .push("name = ")
+            .push_bind_unseparated(name.trim().to_string());
     }
     if let Some(aliases) = body.aliases {
         touched = true;
-        separated.push("aliases = ");
-        separated.push_bind(normalize_optional_json(Some(aliases)));
+        separated
+            .push("aliases = ")
+            .push_bind_unseparated(normalize_optional_json(Some(aliases)));
     }
     if let Some(profile_data) = body.profile_data {
         touched = true;
-        separated.push("profileData = ");
-        separated.push_bind(normalize_optional_json(Some(profile_data)));
+        separated
+            .push("profileData = ")
+            .push_bind_unseparated(normalize_optional_json(Some(profile_data)));
     }
     if body.folder_id.is_some() {
         touched = true;
-        separated.push("folderId = ");
-        separated.push_bind(normalize_optional_string(body.folder_id));
+        separated
+            .push("folderId = ")
+            .push_bind_unseparated(normalize_optional_string(body.folder_id));
     }
     if body.voice_id.is_some() {
         touched = true;
-        separated.push("voiceId = ");
-        separated.push_bind(normalize_optional_string(body.voice_id));
+        separated
+            .push("voiceId = ")
+            .push_bind_unseparated(normalize_optional_string(body.voice_id));
     }
     if body.voice_type.is_some() {
         touched = true;
-        separated.push("voiceType = ");
-        separated.push_bind(normalize_optional_string(body.voice_type));
+        separated
+            .push("voiceType = ")
+            .push_bind_unseparated(normalize_optional_string(body.voice_type));
     }
     if body.custom_voice_url.is_some() {
         touched = true;
-        separated.push("customVoiceUrl = ");
-        separated.push_bind(normalize_optional_string(body.custom_voice_url));
+        separated
+            .push("customVoiceUrl = ")
+            .push_bind_unseparated(normalize_optional_string(body.custom_voice_url));
     }
     if body.custom_voice_media_id.is_some() {
         touched = true;
-        separated.push("customVoiceMediaId = ");
-        separated.push_bind(normalize_optional_string(body.custom_voice_media_id));
+        separated
+            .push("customVoiceMediaId = ")
+            .push_bind_unseparated(normalize_optional_string(body.custom_voice_media_id));
     }
     if body.global_voice_id.is_some() {
         touched = true;
-        separated.push("globalVoiceId = ");
-        separated.push_bind(normalize_optional_string(body.global_voice_id));
+        separated
+            .push("globalVoiceId = ")
+            .push_bind_unseparated(normalize_optional_string(body.global_voice_id));
     }
 
     if !touched {
@@ -1260,35 +1290,37 @@ async fn patch_character_appearance(
 
     if body.description.is_some() {
         touched = true;
-        separated.push("description = ");
-        separated.push_bind(normalize_optional_string(body.description));
+        separated
+            .push("description = ")
+            .push_bind_unseparated(normalize_optional_string(body.description));
     }
     if body.descriptions.is_some() {
         touched = true;
-        separated.push("descriptions = ");
-        separated.push_bind(normalize_optional_json(body.descriptions));
+        separated
+            .push("descriptions = ")
+            .push_bind_unseparated(normalize_optional_json(body.descriptions));
     }
     if body.image_url.is_some() {
         touched = true;
-        separated.push("previousImageUrl = imageUrl");
-        separated.push_unseparated(", imageUrl = ");
-        separated.push_bind(normalize_optional_string(body.image_url));
+        separated.push("previousImageUrl = imageUrl, imageUrl = ");
+        separated.push_bind_unseparated(normalize_optional_string(body.image_url));
     }
     if body.image_urls.is_some() {
         touched = true;
-        separated.push("previousImageUrls = imageUrls");
-        separated.push_unseparated(", imageUrls = ");
-        separated.push_bind(normalize_optional_json(body.image_urls));
+        separated.push("previousImageUrls = imageUrls, imageUrls = ");
+        separated.push_bind_unseparated(normalize_optional_json(body.image_urls));
     }
     if body.selected_index.is_some() {
         touched = true;
-        separated.push("selectedIndex = ");
-        separated.push_bind(body.selected_index);
+        separated
+            .push("selectedIndex = ")
+            .push_bind_unseparated(body.selected_index);
     }
     if body.change_reason.is_some() {
         touched = true;
-        separated.push("changeReason = ");
-        separated.push_bind(normalize_optional_string(body.change_reason));
+        separated
+            .push("changeReason = ")
+            .push_bind_unseparated(normalize_optional_string(body.change_reason));
     }
 
     if !touched {
@@ -1531,18 +1563,21 @@ async fn update_location(
 
     if body.name.is_some() {
         touched = true;
-        separated.push("name = ");
-        separated.push_bind(normalize_optional_string(body.name));
+        separated
+            .push("name = ")
+            .push_bind_unseparated(normalize_optional_string(body.name));
     }
     if body.summary.is_some() {
         touched = true;
-        separated.push("summary = ");
-        separated.push_bind(normalize_optional_string(body.summary));
+        separated
+            .push("summary = ")
+            .push_bind_unseparated(normalize_optional_string(body.summary));
     }
     if body.folder_id.is_some() {
         touched = true;
-        separated.push("folderId = ");
-        separated.push_bind(normalize_optional_string(body.folder_id));
+        separated
+            .push("folderId = ")
+            .push_bind_unseparated(normalize_optional_string(body.folder_id));
     }
 
     if !touched {
@@ -1680,53 +1715,63 @@ async fn update_voice(
 
     if body.name.is_some() {
         touched = true;
-        separated.push("name = ");
-        separated.push_bind(normalize_optional_string(body.name));
+        separated
+            .push("name = ")
+            .push_bind_unseparated(normalize_optional_string(body.name));
     }
     if body.description.is_some() {
         touched = true;
-        separated.push("description = ");
-        separated.push_bind(normalize_optional_string(body.description));
+        separated
+            .push("description = ")
+            .push_bind_unseparated(normalize_optional_string(body.description));
     }
     if body.folder_id.is_some() {
         touched = true;
-        separated.push("folderId = ");
-        separated.push_bind(normalize_optional_string(body.folder_id));
+        separated
+            .push("folderId = ")
+            .push_bind_unseparated(normalize_optional_string(body.folder_id));
     }
     if body.voice_id.is_some() {
         touched = true;
-        separated.push("voiceId = ");
-        separated.push_bind(normalize_optional_string(body.voice_id));
+        separated
+            .push("voiceId = ")
+            .push_bind_unseparated(normalize_optional_string(body.voice_id));
     }
     if body.voice_type.is_some() {
         touched = true;
-        separated.push("voiceType = ");
-        separated.push_bind(normalize_optional_string(body.voice_type));
+        separated
+            .push("voiceType = ")
+            .push_bind_unseparated(normalize_optional_string(body.voice_type));
     }
     if body.custom_voice_url.is_some() {
         touched = true;
-        separated.push("customVoiceUrl = ");
-        separated.push_bind(normalize_optional_string(body.custom_voice_url));
+        separated
+            .push("customVoiceUrl = ")
+            .push_bind_unseparated(normalize_optional_string(body.custom_voice_url));
     }
     if body.custom_voice_media_id.is_some() {
         touched = true;
-        separated.push("customVoiceMediaId = ");
-        separated.push_bind(normalize_optional_string(body.custom_voice_media_id));
+        separated
+            .push("customVoiceMediaId = ")
+            .push_bind_unseparated(normalize_optional_string(body.custom_voice_media_id));
     }
     if body.voice_prompt.is_some() {
         touched = true;
-        separated.push("voicePrompt = ");
-        separated.push_bind(normalize_optional_string(body.voice_prompt));
+        separated
+            .push("voicePrompt = ")
+            .push_bind_unseparated(normalize_optional_string(body.voice_prompt));
     }
     if body.gender.is_some() {
         touched = true;
-        separated.push("gender = ");
-        separated.push_bind(normalize_optional_string(body.gender));
+        separated
+            .push("gender = ")
+            .push_bind_unseparated(normalize_optional_string(body.gender));
     }
     if body.language.is_some() {
         touched = true;
-        separated.push("language = ");
-        separated.push_bind(normalize_optional_string(body.language));
+        separated
+            .push("language = ")
+            .push_bind_unseparated(normalize_optional_string(body.language));
     }
 
     if !touched {
@@ -2165,7 +2210,7 @@ async fn update_asset_label(
     user: AuthUser,
     Json(body): Json<UpdateAssetLabelBody>,
 ) -> Result<Json<Value>, AppError> {
-    let _new_name = normalize_optional_string(body.new_name)
+    let new_name = normalize_optional_string(body.new_name)
         .ok_or_else(|| AppError::invalid_params("newName is required"))?;
 
     let asset_type = body.asset_type.trim().to_lowercase();
@@ -2174,7 +2219,7 @@ async fn update_asset_label(
         ensure_character_belongs_to_user(&state, &body.id, &user.id).await?;
 
         let mut qb: QueryBuilder<'_, MySql> = QueryBuilder::new(
-            "SELECT id, appearanceIndex, imageUrl, imageUrls FROM global_character_appearances WHERE characterId = ",
+            "SELECT id, appearanceIndex, changeReason, imageUrl, imageUrls FROM global_character_appearances WHERE characterId = ",
         );
         qb.push_bind(&body.id);
         if let Some(appearance_index) = body.appearance_index {
@@ -2200,8 +2245,20 @@ async fn update_asset_label(
                 continue;
             }
 
-            let first_url = image_urls.first().cloned();
-            let encoded = encode_image_urls(&image_urls).ok_or_else(|| {
+            let label_text = build_character_image_label(&new_name, row.change_reason.as_deref());
+            let mut updated_urls = Vec::with_capacity(image_urls.len());
+            for image_url in image_urls {
+                let updated = update_image_label(
+                    &image_url,
+                    &label_text,
+                    Some(UpdateImageLabelOptions::with_new_key("labeled-rename")),
+                )
+                .await?;
+                updated_urls.push(updated);
+            }
+
+            let first_url = updated_urls.iter().find(|value| !value.is_empty()).cloned();
+            let encoded = encode_image_urls(&updated_urls).ok_or_else(|| {
                 AppError::internal("failed to encode appearance image urls".to_string())
             })?;
             sqlx::query(
@@ -2215,7 +2272,7 @@ async fn update_asset_label(
 
             results.push(json!({
               "appearanceIndex": row.appearance_index,
-              "imageUrls": image_urls,
+              "imageUrls": updated_urls,
             }));
         }
 
@@ -2238,17 +2295,24 @@ async fn update_asset_label(
                 continue;
             };
 
+            let updated_image_url = update_image_label(
+                &image_url,
+                &new_name,
+                Some(UpdateImageLabelOptions::with_new_key("labeled-rename")),
+            )
+            .await?;
+
             sqlx::query(
                 "UPDATE global_location_images SET imageUrl = ?, updatedAt = NOW(3) WHERE id = ?",
             )
-            .bind(&image_url)
+            .bind(&updated_image_url)
             .bind(&row.id)
             .execute(&state.mysql)
             .await?;
 
             results.push(json!({
               "imageIndex": row.image_index,
-              "imageUrl": image_url,
+              "imageUrl": updated_image_url,
             }));
         }
 
@@ -2424,7 +2488,8 @@ async fn parse_upload_image_multipart(
     } else {
         let bytes = file_bytes.ok_or_else(|| AppError::invalid_params("file is required"))?;
         let ext = file_ext.unwrap_or_else(|| "jpg".to_string());
-        store_uploaded_blob(&bytes, &ext).await?
+        let mime_type = image_mime_type_by_extension(&ext);
+        format!("data:{mime_type};base64,{}", STANDARD.encode(bytes))
     };
 
     Ok(UploadImageInput {
@@ -2480,9 +2545,23 @@ async fn upload_image(
     request: Request,
 ) -> Result<Json<Value>, AppError> {
     let input = parse_upload_image_input(&headers, &state, request).await?;
-    let image_url = input.image_url.clone();
-
     let asset_type = input.asset_type.trim().to_lowercase();
+    let image_url = if let Some(label_text) = input.label_text.as_deref() {
+        let key_prefix = match asset_type.as_str() {
+            "character" => "asset-hub-character",
+            "location" => "asset-hub-location",
+            _ => "asset-hub-image",
+        };
+        update_image_label(
+            &input.image_url,
+            label_text,
+            Some(UpdateImageLabelOptions::with_new_key(key_prefix)),
+        )
+        .await?
+    } else {
+        input.image_url.clone()
+    };
+
     if asset_type == "character" {
         ensure_character_belongs_to_user(&state, &input.id, &user.id).await?;
         let appearance_index = input.appearance_index.unwrap_or(0);

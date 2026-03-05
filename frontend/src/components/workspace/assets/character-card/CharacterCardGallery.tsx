@@ -1,7 +1,5 @@
-'use client'
-
 import type { ReactNode } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { resolveErrorDisplay } from '@/lib/errors/display'
 import TaskStatusOverlay from '@/components/task/TaskStatusOverlay'
 import type { TaskPresentationState } from '@/lib/task/presentation'

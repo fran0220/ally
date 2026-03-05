@@ -5,7 +5,7 @@ import type {
   VideoGenerationOptions,
   VideoModelOption,
   VideoPanel,
-} from '@/app/[locale]/workspace/[projectId]/modes/novel-promotion/components/video'
+} from '@/components/workspace/video'
 import {
   normalizeVideoGenerationSelections,
   resolveEffectiveVideoCapabilityDefinitions,

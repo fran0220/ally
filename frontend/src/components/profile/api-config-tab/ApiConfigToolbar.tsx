@@ -1,5 +1,3 @@
-'use client'
-
 import type { ComponentProps } from 'react'
 import { TaskStatusInline } from '@/components/task/TaskStatusInline'
 import { AppIcon } from '@/components/ui/icons'

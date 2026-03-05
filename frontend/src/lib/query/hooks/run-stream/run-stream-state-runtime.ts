@@ -1,5 +1,3 @@
-'use client'
-
 import { fetchWithAuth } from '@/api/client'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { RunStreamEvent } from '@/lib/novel-promotion/run-stream/types'

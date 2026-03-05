@@ -1,5 +1,3 @@
-'use client'
-
 import StoryboardStageView from './storyboard'
 import { useWorkspaceStageRuntime } from './WorkspaceStageRuntimeContext'
 import { useWorkspaceEpisodeStageData } from './hooks/useWorkspaceEpisodeStageData'

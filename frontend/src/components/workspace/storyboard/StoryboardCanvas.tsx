@@ -1,5 +1,3 @@
-'use client'
-
 import { useTranslations } from '@/compat/next-intl'
 import { NovelPromotionClip, NovelPromotionPanel, NovelPromotionStoryboard } from '@/types/project'
 import StoryboardGroup from './StoryboardGroup'

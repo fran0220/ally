@@ -1,18 +1,18 @@
 # SSE Reconnect Smoke Report
 
-- Generated at: 2026-03-01T13:41:58.243Z
-- Result: PASS
+- Generated at: 2026-03-04T08:30:12.135Z
+- Result: FAIL
 - Project ID: global-asset-hub
-- First Task ID: 24e7ed72-a519-4b41-ae4a-a2756d6d494a
-- Second Task ID: 0b1dbac8-941c-44b4-81c1-f4cb7231240f
-- Last Event ID Before Disconnect: 87
-- Reconnect Event ID: 89
+- First Task ID: N/A
+- Second Task ID: N/A
+- Last Event ID Before Disconnect: N/A
+- Reconnect Event ID: N/A
 
 ## Assertions
 
-- first connection established via event task.lifecycle
-- first lifecycle event received for task 24e7ed72-a519-4b41-ae4a-a2756d6d494a with id=87
-- first connection closed intentionally
-- reconnect received task lifecycle event for 0b1dbac8-941c-44b4-81c1-f4cb7231240f
-- replayed event id 89 > last-event-id 87
+- first connection established via event heartbeat
+
+## Error
+
+- task submit failed status=500 body={"success":false,"requestId":"a54f85ae-661a-41db-9672-143d6f2d614a","error":{"code":"INTERNAL_ERROR","message":"database error: error returned from database: 1054 (42S22): Unknown column 'billingInfo' in 'field list'","retryable":false,"category":"SYSTEM","user_message_key":"errors.INTERNAL_ERROR"},"code":"INTERNAL_ERROR","message":"database error: error returned from database: 1054 (42S22): Unknown column 'billingInfo' in 'field list'"}
 

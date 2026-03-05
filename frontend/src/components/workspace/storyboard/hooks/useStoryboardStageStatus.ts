@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import { resolveTaskPresentationState, type TaskPresentationState } from '@/lib/task/presentation'
 

@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { logWarn as _ulogWarn } from '@/lib/logging/core'
 

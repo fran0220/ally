@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-03-01T13:42:46.535Z",
+  "generatedAt": "2026-03-04T08:30:28.680Z",
   "summary": {
     "total": 39,
-    "executed": 39,
-    "skipped": 0,
-    "pass": 17,
-    "fail": 22
+    "executed": 29,
+    "skipped": 10,
+    "pass": 5,
+    "fail": 24
   },
   "rows": [
     {
@@ -29,7 +29,7 @@
         "topLevelKeys": null
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/healthz",
+        "url": "http://185.200.65.233/healthz",
         "status": 200,
         "topLevelKeys": [
           "status"
@@ -57,7 +57,7 @@
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/system/boot-id",
+        "url": "http://185.200.65.233/api/system/boot-id",
         "status": 200,
         "topLevelKeys": [
           "bootId"
@@ -70,10 +70,8 @@
       "id": "auth-register-invalid",
       "method": "POST",
       "path": "/api/auth/register",
-      "status": "FAIL",
-      "failures": [
-        "top-level key mismatch missing=[requestId] extra=[]"
-      ],
+      "status": "PASS",
+      "failures": [],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -91,17 +89,16 @@
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/auth/register",
+        "url": "http://185.200.65.233/api/auth/register",
         "status": 400,
         "topLevelKeys": [
           "code",
           "error",
           "message",
+          "requestId",
           "success"
         ],
-        "missingInRust": [
-          "requestId"
-        ],
+        "missingInRust": [],
         "extraInRust": []
       }
     },
@@ -124,12 +121,13 @@
         "topLevelKeys": null
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/auth/login",
+        "url": "http://185.200.65.233/api/auth/login",
         "status": 400,
         "topLevelKeys": [
           "code",
           "error",
           "message",
+          "requestId",
           "success"
         ],
         "missingInRust": [],
@@ -157,12 +155,13 @@
         "topLevelKeys": null
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/auth/refresh",
+        "url": "http://185.200.65.233/api/auth/refresh",
         "status": 401,
         "topLevelKeys": [
           "code",
           "error",
           "message",
+          "requestId",
           "success"
         ],
         "missingInRust": [],
@@ -173,8 +172,12 @@
       "id": "user-models-auth",
       "method": "GET",
       "path": "/api/user/models",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "legacy status 401 != expected 200",
+        "status mismatch legacy=401 rust=200",
+        "top-level key mismatch missing=[code, error, message, success] extra=[audio, image, lipsync, llm, video]"
+      ],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -182,17 +185,16 @@
       "expectedStatus": 200,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/user/models",
-        "status": 200,
+        "status": 401,
         "topLevelKeys": [
-          "audio",
-          "image",
-          "lipsync",
-          "llm",
-          "video"
+          "code",
+          "error",
+          "message",
+          "success"
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/user/models",
+        "url": "http://185.200.65.233/api/user/models",
         "status": 200,
         "topLevelKeys": [
           "audio",
@@ -201,16 +203,31 @@
           "llm",
           "video"
         ],
-        "missingInRust": [],
-        "extraInRust": []
+        "missingInRust": [
+          "code",
+          "error",
+          "message",
+          "success"
+        ],
+        "extraInRust": [
+          "audio",
+          "image",
+          "lipsync",
+          "llm",
+          "video"
+        ]
       }
     },
     {
       "id": "user-api-config-auth",
       "method": "GET",
       "path": "/api/user/api-config",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "legacy status 401 != expected 200",
+        "status mismatch legacy=401 rust=200",
+        "top-level key mismatch missing=[code, error, message, success] extra=[capabilityDefaults, defaultModels, models, providers]"
+      ],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -218,16 +235,16 @@
       "expectedStatus": 200,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/user/api-config",
-        "status": 200,
+        "status": 401,
         "topLevelKeys": [
-          "capabilityDefaults",
-          "defaultModels",
-          "models",
-          "providers"
+          "code",
+          "error",
+          "message",
+          "success"
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/user/api-config",
+        "url": "http://185.200.65.233/api/user/api-config",
         "status": 200,
         "topLevelKeys": [
           "capabilityDefaults",
@@ -235,8 +252,18 @@
           "models",
           "providers"
         ],
-        "missingInRust": [],
-        "extraInRust": []
+        "missingInRust": [
+          "code",
+          "error",
+          "message",
+          "success"
+        ],
+        "extraInRust": [
+          "capabilityDefaults",
+          "defaultModels",
+          "models",
+          "providers"
+        ]
       }
     },
     {
@@ -246,7 +273,8 @@
       "status": "FAIL",
       "failures": [
         "legacy status 401 != expected 400",
-        "status mismatch legacy=401 rust=400"
+        "rust status 401 != expected 400",
+        "top-level key mismatch missing=[] extra=[requestId]"
       ],
       "compare": {
         "strictStatus": true,
@@ -264,24 +292,31 @@
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/user/api-config/test-connection",
-        "status": 400,
+        "url": "http://185.200.65.233/api/user/api-config/test-connection",
+        "status": 401,
         "topLevelKeys": [
           "code",
           "error",
           "message",
+          "requestId",
           "success"
         ],
         "missingInRust": [],
-        "extraInRust": []
+        "extraInRust": [
+          "requestId"
+        ]
       }
     },
     {
       "id": "user-preference-auth",
       "method": "GET",
       "path": "/api/user-preference",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "legacy status 401 != expected 200",
+        "status mismatch legacy=401 rust=200",
+        "top-level key mismatch missing=[code, error, message, success] extra=[preference]"
+      ],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -289,27 +324,41 @@
       "expectedStatus": 200,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/user-preference",
-        "status": 200,
+        "status": 401,
         "topLevelKeys": [
-          "preference"
+          "code",
+          "error",
+          "message",
+          "success"
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/user-preference",
+        "url": "http://185.200.65.233/api/user-preference",
         "status": 200,
         "topLevelKeys": [
           "preference"
         ],
-        "missingInRust": [],
-        "extraInRust": []
+        "missingInRust": [
+          "code",
+          "error",
+          "message",
+          "success"
+        ],
+        "extraInRust": [
+          "preference"
+        ]
       }
     },
     {
       "id": "projects-list-auth",
       "method": "GET",
       "path": "/api/projects?page=1&pageSize=5",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "legacy status 401 != expected 200",
+        "status mismatch legacy=401 rust=200",
+        "top-level key mismatch missing=[code, error, message, success] extra=[pagination, projects]"
+      ],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -317,21 +366,31 @@
       "expectedStatus": 200,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/projects?page=1&pageSize=5",
-        "status": 200,
+        "status": 401,
         "topLevelKeys": [
-          "pagination",
-          "projects"
+          "code",
+          "error",
+          "message",
+          "success"
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/projects?page=1&pageSize=5",
+        "url": "http://185.200.65.233/api/projects?page=1&pageSize=5",
         "status": 200,
         "topLevelKeys": [
           "pagination",
           "projects"
         ],
-        "missingInRust": [],
-        "extraInRust": []
+        "missingInRust": [
+          "code",
+          "error",
+          "message",
+          "success"
+        ],
+        "extraInRust": [
+          "pagination",
+          "projects"
+        ]
       }
     },
     {
@@ -340,7 +399,9 @@
       "path": "/api/projects",
       "status": "FAIL",
       "failures": [
-        "top-level key mismatch missing=[requestId] extra=[]"
+        "legacy status 401 != expected 400",
+        "status mismatch legacy=401 rust=400",
+        "top-level key mismatch missing=[] extra=[requestId]"
       ],
       "compare": {
         "strictStatus": true,
@@ -349,6 +410,16 @@
       "expectedStatus": 400,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/projects",
+        "status": 401,
+        "topLevelKeys": [
+          "code",
+          "error",
+          "message",
+          "success"
+        ]
+      },
+      "rust": {
+        "url": "http://185.200.65.233/api/projects",
         "status": 400,
         "topLevelKeys": [
           "code",
@@ -356,115 +427,23 @@
           "message",
           "requestId",
           "success"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/projects",
-        "status": 400,
-        "topLevelKeys": [
-          "code",
-          "error",
-          "message",
-          "success"
         ],
-        "missingInRust": [
+        "missingInRust": [],
+        "extraInRust": [
           "requestId"
-        ],
-        "extraInRust": []
-      }
-    },
-    {
-      "id": "projects-get-by-id",
-      "method": "GET",
-      "path": "/api/projects/82359bde-da63-4da6-af6b-19c33114f5c3",
-      "status": "PASS",
-      "failures": [],
-      "compare": {
-        "strictStatus": true,
-        "topLevelKeys": true
-      },
-      "expectedStatus": 200,
-      "legacy": {
-        "url": "http://127.0.0.1:3000/api/projects/82359bde-da63-4da6-af6b-19c33114f5c3",
-        "status": 200,
-        "topLevelKeys": [
-          "project"
         ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/projects/82359bde-da63-4da6-af6b-19c33114f5c3",
-        "status": 200,
-        "topLevelKeys": [
-          "project"
-        ],
-        "missingInRust": [],
-        "extraInRust": []
-      }
-    },
-    {
-      "id": "projects-assets-by-id",
-      "method": "GET",
-      "path": "/api/projects/82359bde-da63-4da6-af6b-19c33114f5c3/assets",
-      "status": "PASS",
-      "failures": [],
-      "compare": {
-        "strictStatus": true,
-        "topLevelKeys": true
-      },
-      "expectedStatus": 200,
-      "legacy": {
-        "url": "http://127.0.0.1:3000/api/projects/82359bde-da63-4da6-af6b-19c33114f5c3/assets",
-        "status": 200,
-        "topLevelKeys": [
-          "characters",
-          "locations"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/projects/82359bde-da63-4da6-af6b-19c33114f5c3/assets",
-        "status": 200,
-        "topLevelKeys": [
-          "characters",
-          "locations"
-        ],
-        "missingInRust": [],
-        "extraInRust": []
-      }
-    },
-    {
-      "id": "projects-data-by-id",
-      "method": "GET",
-      "path": "/api/projects/82359bde-da63-4da6-af6b-19c33114f5c3/data",
-      "status": "PASS",
-      "failures": [],
-      "compare": {
-        "strictStatus": true,
-        "topLevelKeys": true
-      },
-      "expectedStatus": 200,
-      "legacy": {
-        "url": "http://127.0.0.1:3000/api/projects/82359bde-da63-4da6-af6b-19c33114f5c3/data",
-        "status": 200,
-        "topLevelKeys": [
-          "project"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/projects/82359bde-da63-4da6-af6b-19c33114f5c3/data",
-        "status": 200,
-        "topLevelKeys": [
-          "project"
-        ],
-        "missingInRust": [],
-        "extraInRust": []
       }
     },
     {
       "id": "tasks-list-auth",
       "method": "GET",
       "path": "/api/tasks?limit=5",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "legacy status 401 != expected 200",
+        "status mismatch legacy=401 rust=200",
+        "top-level key mismatch missing=[code, error, message, success] extra=[tasks]"
+      ],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -472,19 +451,29 @@
       "expectedStatus": 200,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/tasks?limit=5",
-        "status": 200,
+        "status": 401,
         "topLevelKeys": [
-          "tasks"
+          "code",
+          "error",
+          "message",
+          "success"
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/tasks?limit=5",
+        "url": "http://185.200.65.233/api/tasks?limit=5",
         "status": 200,
         "topLevelKeys": [
           "tasks"
         ],
-        "missingInRust": [],
-        "extraInRust": []
+        "missingInRust": [
+          "code",
+          "error",
+          "message",
+          "success"
+        ],
+        "extraInRust": [
+          "tasks"
+        ]
       }
     },
     {
@@ -493,7 +482,9 @@
       "path": "/api/tasks/dismiss",
       "status": "FAIL",
       "failures": [
-        "top-level key mismatch missing=[requestId] extra=[]"
+        "legacy status 401 != expected 400",
+        "status mismatch legacy=401 rust=400",
+        "top-level key mismatch missing=[] extra=[requestId]"
       ],
       "compare": {
         "strictStatus": true,
@@ -502,6 +493,16 @@
       "expectedStatus": 400,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/tasks/dismiss",
+        "status": 401,
+        "topLevelKeys": [
+          "code",
+          "error",
+          "message",
+          "success"
+        ]
+      },
+      "rust": {
+        "url": "http://185.200.65.233/api/tasks/dismiss",
         "status": 400,
         "topLevelKeys": [
           "code",
@@ -509,31 +510,19 @@
           "message",
           "requestId",
           "success"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/tasks/dismiss",
-        "status": 400,
-        "topLevelKeys": [
-          "code",
-          "error",
-          "message",
-          "success"
         ],
-        "missingInRust": [
+        "missingInRust": [],
+        "extraInRust": [
           "requestId"
-        ],
-        "extraInRust": []
+        ]
       }
     },
     {
       "id": "task-target-states-invalid",
       "method": "POST",
       "path": "/api/task-target-states",
-      "status": "FAIL",
-      "failures": [
-        "top-level key mismatch missing=[requestId] extra=[]"
-      ],
+      "status": "PASS",
+      "failures": [],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -551,45 +540,14 @@
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/task-target-states",
+        "url": "http://185.200.65.233/api/task-target-states",
         "status": 400,
         "topLevelKeys": [
           "code",
           "error",
           "message",
+          "requestId",
           "success"
-        ],
-        "missingInRust": [
-          "requestId"
-        ],
-        "extraInRust": []
-      }
-    },
-    {
-      "id": "tasks-get-by-id",
-      "method": "GET",
-      "path": "/api/tasks/d3e3b5e5-ed29-4f7a-a86d-0d6febfec7cd?includeEvents=1&eventsLimit=50",
-      "status": "PASS",
-      "failures": [],
-      "compare": {
-        "strictStatus": true,
-        "topLevelKeys": true
-      },
-      "expectedStatus": 200,
-      "legacy": {
-        "url": "http://127.0.0.1:3000/api/tasks/d3e3b5e5-ed29-4f7a-a86d-0d6febfec7cd?includeEvents=1&eventsLimit=50",
-        "status": 200,
-        "topLevelKeys": [
-          "events",
-          "task"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/tasks/d3e3b5e5-ed29-4f7a-a86d-0d6febfec7cd?includeEvents=1&eventsLimit=50",
-        "status": 200,
-        "topLevelKeys": [
-          "events",
-          "task"
         ],
         "missingInRust": [],
         "extraInRust": []
@@ -601,9 +559,9 @@
       "path": "/api/runs?limit=5",
       "status": "FAIL",
       "failures": [
-        "legacy status 500 != expected 200",
-        "status mismatch legacy=500 rust=200",
-        "top-level key mismatch missing=[category, code, error, message, requestId, retryable, success, userMessageKey] extra=[runs]"
+        "legacy status 401 != expected 200",
+        "status mismatch legacy=401 rust=200",
+        "top-level key mismatch missing=[code, error, message, success] extra=[runs]"
       ],
       "compare": {
         "strictStatus": true,
@@ -612,33 +570,25 @@
       "expectedStatus": 200,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/runs?limit=5",
-        "status": 500,
+        "status": 401,
         "topLevelKeys": [
-          "category",
           "code",
           "error",
           "message",
-          "requestId",
-          "retryable",
-          "success",
-          "userMessageKey"
+          "success"
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/runs?limit=5",
+        "url": "http://185.200.65.233/api/runs?limit=5",
         "status": 200,
         "topLevelKeys": [
           "runs"
         ],
         "missingInRust": [
-          "category",
           "code",
           "error",
           "message",
-          "requestId",
-          "retryable",
-          "success",
-          "userMessageKey"
+          "success"
         ],
         "extraInRust": [
           "runs"
@@ -651,7 +601,9 @@
       "path": "/api/runs",
       "status": "FAIL",
       "failures": [
-        "top-level key mismatch missing=[requestId] extra=[]"
+        "legacy status 401 != expected 400",
+        "status mismatch legacy=401 rust=400",
+        "top-level key mismatch missing=[] extra=[requestId]"
       ],
       "compare": {
         "strictStatus": true,
@@ -660,6 +612,16 @@
       "expectedStatus": 400,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/runs",
+        "status": 401,
+        "topLevelKeys": [
+          "code",
+          "error",
+          "message",
+          "success"
+        ]
+      },
+      "rust": {
+        "url": "http://185.200.65.233/api/runs",
         "status": 400,
         "topLevelKeys": [
           "code",
@@ -667,126 +629,10 @@
           "message",
           "requestId",
           "success"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/runs",
-        "status": 400,
-        "topLevelKeys": [
-          "code",
-          "error",
-          "message",
-          "success"
         ],
-        "missingInRust": [
+        "missingInRust": [],
+        "extraInRust": [
           "requestId"
-        ],
-        "extraInRust": []
-      }
-    },
-    {
-      "id": "runs-get-by-id",
-      "method": "GET",
-      "path": "/api/runs/2ed815b9-6a97-42a6-a415-2b7627c80d8c",
-      "status": "FAIL",
-      "failures": [
-        "legacy status 500 != expected 200",
-        "status mismatch legacy=500 rust=200",
-        "top-level key mismatch missing=[category, code, error, message, requestId, retryable, success, userMessageKey] extra=[run, steps]"
-      ],
-      "compare": {
-        "strictStatus": true,
-        "topLevelKeys": true
-      },
-      "expectedStatus": 200,
-      "legacy": {
-        "url": "http://127.0.0.1:3000/api/runs/2ed815b9-6a97-42a6-a415-2b7627c80d8c",
-        "status": 500,
-        "topLevelKeys": [
-          "category",
-          "code",
-          "error",
-          "message",
-          "requestId",
-          "retryable",
-          "success",
-          "userMessageKey"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/runs/2ed815b9-6a97-42a6-a415-2b7627c80d8c",
-        "status": 200,
-        "topLevelKeys": [
-          "run",
-          "steps"
-        ],
-        "missingInRust": [
-          "category",
-          "code",
-          "error",
-          "message",
-          "requestId",
-          "retryable",
-          "success",
-          "userMessageKey"
-        ],
-        "extraInRust": [
-          "run",
-          "steps"
-        ]
-      }
-    },
-    {
-      "id": "runs-events-by-id",
-      "method": "GET",
-      "path": "/api/runs/2ed815b9-6a97-42a6-a415-2b7627c80d8c/events?afterSeq=0&limit=50",
-      "status": "FAIL",
-      "failures": [
-        "legacy status 500 != expected 200",
-        "status mismatch legacy=500 rust=200",
-        "top-level key mismatch missing=[category, code, error, message, requestId, retryable, success, userMessageKey] extra=[afterSeq, events, runId]"
-      ],
-      "compare": {
-        "strictStatus": true,
-        "topLevelKeys": true
-      },
-      "expectedStatus": 200,
-      "legacy": {
-        "url": "http://127.0.0.1:3000/api/runs/2ed815b9-6a97-42a6-a415-2b7627c80d8c/events?afterSeq=0&limit=50",
-        "status": 500,
-        "topLevelKeys": [
-          "category",
-          "code",
-          "error",
-          "message",
-          "requestId",
-          "retryable",
-          "success",
-          "userMessageKey"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/runs/2ed815b9-6a97-42a6-a415-2b7627c80d8c/events?afterSeq=0&limit=50",
-        "status": 200,
-        "topLevelKeys": [
-          "afterSeq",
-          "events",
-          "runId"
-        ],
-        "missingInRust": [
-          "category",
-          "code",
-          "error",
-          "message",
-          "requestId",
-          "retryable",
-          "success",
-          "userMessageKey"
-        ],
-        "extraInRust": [
-          "afterSeq",
-          "events",
-          "runId"
         ]
       }
     },
@@ -794,8 +640,10 @@
       "id": "sse-unauthorized",
       "method": "GET",
       "path": "/api/sse?projectId=global-asset-hub",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "top-level key mismatch missing=[] extra=[requestId]"
+      ],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -812,24 +660,31 @@
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/sse?projectId=global-asset-hub",
+        "url": "http://185.200.65.233/api/sse?projectId=global-asset-hub",
         "status": 401,
         "topLevelKeys": [
           "code",
           "error",
           "message",
+          "requestId",
           "success"
         ],
         "missingInRust": [],
-        "extraInRust": []
+        "extraInRust": [
+          "requestId"
+        ]
       }
     },
     {
       "id": "asset-hub-folders-auth",
       "method": "GET",
       "path": "/api/asset-hub/folders",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "legacy status 401 != expected 200",
+        "status mismatch legacy=401 rust=200",
+        "top-level key mismatch missing=[code, error, message, success] extra=[folders]"
+      ],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -837,27 +692,41 @@
       "expectedStatus": 200,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/asset-hub/folders",
-        "status": 200,
+        "status": 401,
         "topLevelKeys": [
-          "folders"
+          "code",
+          "error",
+          "message",
+          "success"
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/asset-hub/folders",
+        "url": "http://185.200.65.233/api/asset-hub/folders",
         "status": 200,
         "topLevelKeys": [
           "folders"
         ],
-        "missingInRust": [],
-        "extraInRust": []
+        "missingInRust": [
+          "code",
+          "error",
+          "message",
+          "success"
+        ],
+        "extraInRust": [
+          "folders"
+        ]
       }
     },
     {
       "id": "asset-hub-characters-auth",
       "method": "GET",
       "path": "/api/asset-hub/characters",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "legacy status 401 != expected 200",
+        "status mismatch legacy=401 rust=200",
+        "top-level key mismatch missing=[code, error, message, success] extra=[characters]"
+      ],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -865,27 +734,41 @@
       "expectedStatus": 200,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/asset-hub/characters",
-        "status": 200,
+        "status": 401,
         "topLevelKeys": [
-          "characters"
+          "code",
+          "error",
+          "message",
+          "success"
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/asset-hub/characters",
+        "url": "http://185.200.65.233/api/asset-hub/characters",
         "status": 200,
         "topLevelKeys": [
           "characters"
         ],
-        "missingInRust": [],
-        "extraInRust": []
+        "missingInRust": [
+          "code",
+          "error",
+          "message",
+          "success"
+        ],
+        "extraInRust": [
+          "characters"
+        ]
       }
     },
     {
       "id": "asset-hub-picker-auth",
       "method": "GET",
       "path": "/api/asset-hub/picker?type=character",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "legacy status 401 != expected 200",
+        "status mismatch legacy=401 rust=200",
+        "top-level key mismatch missing=[code, error, message, success] extra=[characters]"
+      ],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -893,19 +776,29 @@
       "expectedStatus": 200,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/asset-hub/picker?type=character",
-        "status": 200,
+        "status": 401,
         "topLevelKeys": [
-          "characters"
+          "code",
+          "error",
+          "message",
+          "success"
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/asset-hub/picker?type=character",
+        "url": "http://185.200.65.233/api/asset-hub/picker?type=character",
         "status": 200,
         "topLevelKeys": [
           "characters"
         ],
-        "missingInRust": [],
-        "extraInRust": []
+        "missingInRust": [
+          "code",
+          "error",
+          "message",
+          "success"
+        ],
+        "extraInRust": [
+          "characters"
+        ]
       }
     },
     {
@@ -914,9 +807,10 @@
       "path": "/api/asset-hub/generate-image",
       "status": "FAIL",
       "failures": [
-        "legacy status 400 != expected 200",
-        "status mismatch legacy=400 rust=200",
-        "top-level key mismatch missing=[code, error, field, message, requestId] extra=[async, deduped, status, taskId]"
+        "legacy status 401 != expected 200",
+        "rust status 400 != expected 200",
+        "status mismatch legacy=401 rust=400",
+        "top-level key mismatch missing=[] extra=[requestId]"
       ],
       "compare": {
         "strictStatus": true,
@@ -925,38 +819,27 @@
       "expectedStatus": 200,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/asset-hub/generate-image",
-        "status": 400,
+        "status": 401,
         "topLevelKeys": [
           "code",
           "error",
-          "field",
           "message",
-          "requestId",
           "success"
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/asset-hub/generate-image",
-        "status": 200,
+        "url": "http://185.200.65.233/api/asset-hub/generate-image",
+        "status": 400,
         "topLevelKeys": [
-          "async",
-          "deduped",
-          "status",
-          "success",
-          "taskId"
-        ],
-        "missingInRust": [
           "code",
           "error",
-          "field",
           "message",
-          "requestId"
+          "requestId",
+          "success"
         ],
+        "missingInRust": [],
         "extraInRust": [
-          "async",
-          "deduped",
-          "status",
-          "taskId"
+          "requestId"
         ]
       }
     },
@@ -966,9 +849,10 @@
       "path": "/api/asset-hub/ai-design-character",
       "status": "FAIL",
       "failures": [
-        "legacy status 400 != expected 200",
-        "status mismatch legacy=400 rust=200",
-        "top-level key mismatch missing=[code, error, message, requestId] extra=[async, deduped, status, taskId]"
+        "legacy status 401 != expected 200",
+        "rust status 400 != expected 200",
+        "status mismatch legacy=401 rust=400",
+        "top-level key mismatch missing=[] extra=[requestId]"
       ],
       "compare": {
         "strictStatus": true,
@@ -977,6 +861,16 @@
       "expectedStatus": 200,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/asset-hub/ai-design-character",
+        "status": 401,
+        "topLevelKeys": [
+          "code",
+          "error",
+          "message",
+          "success"
+        ]
+      },
+      "rust": {
+        "url": "http://185.200.65.233/api/asset-hub/ai-design-character",
         "status": 400,
         "topLevelKeys": [
           "code",
@@ -984,29 +878,10 @@
           "message",
           "requestId",
           "success"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/asset-hub/ai-design-character",
-        "status": 200,
-        "topLevelKeys": [
-          "async",
-          "deduped",
-          "status",
-          "success",
-          "taskId"
         ],
-        "missingInRust": [
-          "code",
-          "error",
-          "message",
-          "requestId"
-        ],
+        "missingInRust": [],
         "extraInRust": [
-          "async",
-          "deduped",
-          "status",
-          "taskId"
+          "requestId"
         ]
       }
     },
@@ -1016,9 +891,10 @@
       "path": "/api/asset-hub/voice-design",
       "status": "FAIL",
       "failures": [
-        "legacy status 400 != expected 200",
-        "status mismatch legacy=400 rust=200",
-        "top-level key mismatch missing=[code, error, field, message, requestId] extra=[async, deduped, status, taskId]"
+        "legacy status 401 != expected 200",
+        "rust status 400 != expected 200",
+        "status mismatch legacy=401 rust=400",
+        "top-level key mismatch missing=[] extra=[requestId]"
       ],
       "compare": {
         "strictStatus": true,
@@ -1027,38 +903,27 @@
       "expectedStatus": 200,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/asset-hub/voice-design",
-        "status": 400,
+        "status": 401,
         "topLevelKeys": [
           "code",
           "error",
-          "field",
           "message",
-          "requestId",
           "success"
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/asset-hub/voice-design",
-        "status": 200,
+        "url": "http://185.200.65.233/api/asset-hub/voice-design",
+        "status": 400,
         "topLevelKeys": [
-          "async",
-          "deduped",
-          "status",
-          "success",
-          "taskId"
-        ],
-        "missingInRust": [
           "code",
           "error",
-          "field",
           "message",
-          "requestId"
+          "requestId",
+          "success"
         ],
+        "missingInRust": [],
         "extraInRust": [
-          "async",
-          "deduped",
-          "status",
-          "taskId"
+          "requestId"
         ]
       }
     },
@@ -1066,8 +931,10 @@
       "id": "novel-root-unauthorized",
       "method": "GET",
       "path": "/api/novel-promotion/runtime-compare-project",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "top-level key mismatch missing=[] extra=[requestId]"
+      ],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -1084,186 +951,18 @@
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/novel-promotion/runtime-compare-project",
+        "url": "http://185.200.65.233/api/novel-promotion/runtime-compare-project",
         "status": 401,
         "topLevelKeys": [
           "code",
           "error",
           "message",
-          "success"
-        ],
-        "missingInRust": [],
-        "extraInRust": []
-      }
-    },
-    {
-      "id": "novel-root-by-id",
-      "method": "GET",
-      "path": "/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3",
-      "status": "FAIL",
-      "failures": [
-        "top-level key mismatch missing=[] extra=[project]"
-      ],
-      "compare": {
-        "strictStatus": true,
-        "topLevelKeys": true
-      },
-      "expectedStatus": 200,
-      "legacy": {
-        "url": "http://127.0.0.1:3000/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3",
-        "status": 200,
-        "topLevelKeys": [
-          "capabilityOverrides"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3",
-        "status": 200,
-        "topLevelKeys": [
-          "capabilityOverrides",
-          "project"
-        ],
-        "missingInRust": [],
-        "extraInRust": [
-          "project"
-        ]
-      }
-    },
-    {
-      "id": "novel-assets-by-id",
-      "method": "GET",
-      "path": "/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/assets",
-      "status": "PASS",
-      "failures": [],
-      "compare": {
-        "strictStatus": true,
-        "topLevelKeys": true
-      },
-      "expectedStatus": 200,
-      "legacy": {
-        "url": "http://127.0.0.1:3000/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/assets",
-        "status": 200,
-        "topLevelKeys": [
-          "characters",
-          "locations"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/assets",
-        "status": 200,
-        "topLevelKeys": [
-          "characters",
-          "locations"
-        ],
-        "missingInRust": [],
-        "extraInRust": []
-      }
-    },
-    {
-      "id": "novel-generate-image-submit",
-      "method": "POST",
-      "path": "/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/generate-image",
-      "status": "FAIL",
-      "failures": [
-        "legacy status 400 != expected 200",
-        "status mismatch legacy=400 rust=200",
-        "top-level key mismatch missing=[code, error, field, message, requestId] extra=[async, deduped, status, taskId]"
-      ],
-      "compare": {
-        "strictStatus": true,
-        "topLevelKeys": true
-      },
-      "expectedStatus": 200,
-      "legacy": {
-        "url": "http://127.0.0.1:3000/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/generate-image",
-        "status": 400,
-        "topLevelKeys": [
-          "code",
-          "error",
-          "field",
-          "message",
           "requestId",
           "success"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/generate-image",
-        "status": 200,
-        "topLevelKeys": [
-          "async",
-          "deduped",
-          "status",
-          "success",
-          "taskId"
         ],
-        "missingInRust": [
-          "code",
-          "error",
-          "field",
-          "message",
-          "requestId"
-        ],
+        "missingInRust": [],
         "extraInRust": [
-          "async",
-          "deduped",
-          "status",
-          "taskId"
-        ]
-      }
-    },
-    {
-      "id": "novel-generate-video-submit",
-      "method": "POST",
-      "path": "/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/generate-video",
-      "status": "FAIL",
-      "failures": [
-        "legacy status 400 != expected 200",
-        "status mismatch legacy=400 rust=200",
-        "top-level key mismatch missing=[code, error, field, message, requestId] extra=[async, deduped, status, taskId, tasks, total]"
-      ],
-      "compare": {
-        "strictStatus": true,
-        "topLevelKeys": true
-      },
-      "expectedStatus": 200,
-      "legacy": {
-        "url": "http://127.0.0.1:3000/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/generate-video",
-        "status": 400,
-        "topLevelKeys": [
-          "code",
-          "error",
-          "field",
-          "message",
-          "requestId",
-          "success"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/novel-promotion/82359bde-da63-4da6-af6b-19c33114f5c3/generate-video",
-        "status": 200,
-        "topLevelKeys": [
-          "async",
-          "deduped",
-          "status",
-          "success",
-          "taskId",
-          "tasks",
-          "total"
-        ],
-        "missingInRust": [
-          "code",
-          "error",
-          "field",
-          "message",
           "requestId"
-        ],
-        "extraInRust": [
-          "async",
-          "deduped",
-          "status",
-          "taskId",
-          "tasks",
-          "total"
         ]
       }
     },
@@ -1271,8 +970,12 @@
       "id": "admin-ai-config-unauthorized",
       "method": "GET",
       "path": "/api/admin/ai-config",
-      "status": "PASS",
-      "failures": [],
+      "status": "FAIL",
+      "failures": [
+        "legacy status 404 != expected 401",
+        "status mismatch legacy=404 rust=401",
+        "legacy response is not a JSON object"
+      ],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -1280,21 +983,17 @@
       "expectedStatus": 401,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/admin/ai-config",
-        "status": 401,
-        "topLevelKeys": [
-          "code",
-          "error",
-          "message",
-          "success"
-        ]
+        "status": 404,
+        "topLevelKeys": null
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/admin/ai-config",
+        "url": "http://185.200.65.233/api/admin/ai-config",
         "status": 401,
         "topLevelKeys": [
           "code",
           "error",
           "message",
+          "requestId",
           "success"
         ],
         "missingInRust": [],
@@ -1307,9 +1006,10 @@
       "path": "/api/cos/image?key=runtime-compare.png",
       "status": "FAIL",
       "failures": [
-        "legacy status 404 != expected 401",
-        "status mismatch legacy=404 rust=401",
-        "top-level key mismatch missing=[] extra=[code, message, success]"
+        "legacy status 500 != expected 401",
+        "rust status 404 != expected 401",
+        "status mismatch legacy=500 rust=404",
+        "top-level key mismatch missing=[category, code, message, requestId, retryable, success, userMessageKey] extra=[]"
       ],
       "compare": {
         "strictStatus": true,
@@ -1318,36 +1018,42 @@
       "expectedStatus": 401,
       "legacy": {
         "url": "http://127.0.0.1:3000/api/cos/image?key=runtime-compare.png",
-        "status": 404,
+        "status": 500,
         "topLevelKeys": [
-          "error"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/api/cos/image?key=runtime-compare.png",
-        "status": 401,
-        "topLevelKeys": [
+          "category",
           "code",
           "error",
           "message",
-          "success"
+          "requestId",
+          "retryable",
+          "success",
+          "userMessageKey"
+        ]
+      },
+      "rust": {
+        "url": "http://185.200.65.233/api/cos/image?key=runtime-compare.png",
+        "status": 404,
+        "topLevelKeys": [
+          "error"
         ],
-        "missingInRust": [],
-        "extraInRust": [
+        "missingInRust": [
+          "category",
           "code",
           "message",
-          "success"
-        ]
+          "requestId",
+          "retryable",
+          "success",
+          "userMessageKey"
+        ],
+        "extraInRust": []
       }
     },
     {
       "id": "cos-image-invalid-key-auth",
       "method": "GET",
       "path": "/api/cos/image?key=",
-      "status": "FAIL",
-      "failures": [
-        "top-level key mismatch missing=[requestId] extra=[]"
-      ],
+      "status": "PASS",
+      "failures": [],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -1365,17 +1071,16 @@
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/cos/image?key=",
+        "url": "http://185.200.65.233/api/cos/image?key=",
         "status": 400,
         "topLevelKeys": [
           "code",
           "error",
           "message",
+          "requestId",
           "success"
         ],
-        "missingInRust": [
-          "requestId"
-        ],
+        "missingInRust": [],
         "extraInRust": []
       }
     },
@@ -1383,10 +1088,8 @@
       "id": "files-not-found",
       "method": "GET",
       "path": "/api/files/runtime-compare-not-found.png",
-      "status": "FAIL",
-      "failures": [
-        "top-level key mismatch missing=[] extra=[code, message, success]"
-      ],
+      "status": "PASS",
+      "failures": [],
       "compare": {
         "strictStatus": true,
         "topLevelKeys": true
@@ -1400,20 +1103,13 @@
         ]
       },
       "rust": {
-        "url": "http://127.0.0.1:3001/api/files/runtime-compare-not-found.png",
+        "url": "http://185.200.65.233/api/files/runtime-compare-not-found.png",
         "status": 404,
         "topLevelKeys": [
-          "code",
-          "error",
-          "message",
-          "success"
+          "error"
         ],
         "missingInRust": [],
-        "extraInRust": [
-          "code",
-          "message",
-          "success"
-        ]
+        "extraInRust": []
       }
     },
     {
@@ -1422,7 +1118,9 @@
       "path": "/m/runtime-compare-missing",
       "status": "FAIL",
       "failures": [
-        "top-level key mismatch missing=[] extra=[code, message, success]"
+        "legacy status 500 != expected 404",
+        "status mismatch legacy=500 rust=404",
+        "legacy response is not a JSON object"
       ],
       "compare": {
         "strictStatus": true,
@@ -1431,28 +1129,100 @@
       "expectedStatus": 404,
       "legacy": {
         "url": "http://127.0.0.1:3000/m/runtime-compare-missing",
+        "status": 500,
+        "topLevelKeys": null
+      },
+      "rust": {
+        "url": "http://185.200.65.233/m/runtime-compare-missing",
         "status": 404,
         "topLevelKeys": [
           "error"
-        ]
-      },
-      "rust": {
-        "url": "http://127.0.0.1:3001/m/runtime-compare-missing",
-        "status": 404,
-        "topLevelKeys": [
-          "code",
-          "error",
-          "message",
-          "success"
         ],
         "missingInRust": [],
-        "extraInRust": [
-          "code",
-          "message",
-          "success"
-        ]
+        "extraInRust": []
       }
     }
   ],
-  "skippedCases": []
+  "skippedCases": [
+    {
+      "id": "projects-get-by-id",
+      "method": "GET",
+      "path": "/api/projects/{{WW_PROJECT_ID}}",
+      "missingEnv": [
+        "WW_PROJECT_ID"
+      ]
+    },
+    {
+      "id": "projects-assets-by-id",
+      "method": "GET",
+      "path": "/api/projects/{{WW_PROJECT_ID}}/assets",
+      "missingEnv": [
+        "WW_PROJECT_ID"
+      ]
+    },
+    {
+      "id": "projects-data-by-id",
+      "method": "GET",
+      "path": "/api/projects/{{WW_PROJECT_ID}}/data",
+      "missingEnv": [
+        "WW_PROJECT_ID"
+      ]
+    },
+    {
+      "id": "tasks-get-by-id",
+      "method": "GET",
+      "path": "/api/tasks/{{WW_TASK_ID}}?includeEvents=1&eventsLimit=50",
+      "missingEnv": [
+        "WW_TASK_ID"
+      ]
+    },
+    {
+      "id": "runs-get-by-id",
+      "method": "GET",
+      "path": "/api/runs/{{WW_RUN_ID}}",
+      "missingEnv": [
+        "WW_RUN_ID"
+      ]
+    },
+    {
+      "id": "runs-events-by-id",
+      "method": "GET",
+      "path": "/api/runs/{{WW_RUN_ID}}/events?afterSeq=0&limit=50",
+      "missingEnv": [
+        "WW_RUN_ID"
+      ]
+    },
+    {
+      "id": "novel-root-by-id",
+      "method": "GET",
+      "path": "/api/novel-promotion/{{WW_PROJECT_ID}}",
+      "missingEnv": [
+        "WW_PROJECT_ID"
+      ]
+    },
+    {
+      "id": "novel-assets-by-id",
+      "method": "GET",
+      "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/assets",
+      "missingEnv": [
+        "WW_PROJECT_ID"
+      ]
+    },
+    {
+      "id": "novel-generate-image-submit",
+      "method": "POST",
+      "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/generate-image",
+      "missingEnv": [
+        "WW_PROJECT_ID"
+      ]
+    },
+    {
+      "id": "novel-generate-video-submit",
+      "method": "POST",
+      "path": "/api/novel-promotion/{{WW_PROJECT_ID}}/generate-video",
+      "missingEnv": [
+        "WW_PROJECT_ID"
+      ]
+    }
+  ]
 }

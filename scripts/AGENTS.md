@@ -8,12 +8,13 @@
 |------|------|----------|
 | `api-contract-regression.mjs` | 静态 API 契约扫描（Next.js vs Rust 路由源码对比） | `node scripts/api-contract-regression.mjs` |
 | `api-runtime-compare.mjs` | 运行时 API 行为对比（legacy vs rust 双端） | `node scripts/api-runtime-compare.mjs --legacy-base ... --rust-base ... --token ... --cases ...` |
-| `api-runtime-cases.sample.json` | 运行时对比用例样本（39 条） | 配合 api-runtime-compare.mjs |
+| `api-runtime-cases.sample.json` | 运行时对比用例样本（59 条） | 配合 api-runtime-compare.mjs |
 | `api-performance-benchmark.mjs` | 性能基准测试（延迟/吞吐对比） | `node scripts/api-performance-benchmark.mjs --legacy-base ... --rust-base ...` |
 | `api-performance-cases.sample.json` | 性能测试用例样本 | 配合 benchmark 脚本 |
 | `worker-runtime-smoke.mjs` | Worker 任务烟测（image/text/video/voice） | `node scripts/worker-runtime-smoke.mjs --base ...` |
 | `worker-runtime-cases.sample.json` | Worker 烟测用例 | 配合 worker smoke 脚本 |
 | `sse-reconnect-smoke.mjs` | SSE 断线重连测试 | `node scripts/sse-reconnect-smoke.mjs --base ... --project-id ...` |
+| `e2e-run-all.mjs` | 一键串行 E2E（auth-flow → project-lifecycle → asset-hub-crud → novel-promotion → user-config → admin-billing）并汇总报告 | `node scripts/e2e-run-all.mjs --base ... [--clean]` |
 
 ## 注意
 

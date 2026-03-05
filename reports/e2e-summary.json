@@ -1,0 +1,414 @@
+{
+  "generatedAt": "2026-03-04T10:43:25.720Z",
+  "baseUrl": "http://185.200.65.233/",
+  "cleanRequested": true,
+  "identity": {
+    "username": "e2e-run-all-1772621005720-68acb41c@test.local"
+  },
+  "userId": "dee000ba-64a0-465e-8181-21edd3f34d0a",
+  "projectId": "b07beac8-1fe7-4139-8759-b0ca95329a71",
+  "phases": [
+    {
+      "id": "auth-flow",
+      "status": "PASS",
+      "startedAt": "2026-03-04T10:43:25.721Z",
+      "endedAt": "2026-03-04T10:43:27.461Z",
+      "durationMs": 1740,
+      "steps": [
+        {
+          "id": "register-user",
+          "method": "POST",
+          "path": "/api/auth/register",
+          "result": "PASS",
+          "httpStatus": 201,
+          "durationMs": 759,
+          "note": "userId=dee000ba-64a0-465e-8181-21edd3f34d0a"
+        },
+        {
+          "id": "login-user",
+          "method": "POST",
+          "path": "/api/auth/login",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 723,
+          "note": "role=user"
+        },
+        {
+          "id": "refresh-token",
+          "method": "POST",
+          "path": "/api/auth/refresh",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 258,
+          "note": "token refreshed"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "project-lifecycle",
+      "status": "PASS",
+      "startedAt": "2026-03-04T10:43:27.461Z",
+      "endedAt": "2026-03-04T10:43:28.764Z",
+      "durationMs": 1303,
+      "steps": [
+        {
+          "id": "create-project",
+          "method": "POST",
+          "path": "/api/projects",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 265,
+          "note": "projectId=b07beac8-1fe7-4139-8759-b0ca95329a71"
+        },
+        {
+          "id": "list-projects",
+          "method": "GET",
+          "path": "/api/projects?page=1&pageSize=20",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 258,
+          "note": "listed=1"
+        },
+        {
+          "id": "get-project",
+          "method": "GET",
+          "path": "/api/projects/b07beac8-1fe7-4139-8759-b0ca95329a71",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 259,
+          "note": "name=E2E Run All 1772621005720"
+        },
+        {
+          "id": "get-project-data",
+          "method": "GET",
+          "path": "/api/projects/b07beac8-1fe7-4139-8759-b0ca95329a71/data",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 263,
+          "note": "novelId=868e5a44-2500-46ad-b28b-bb90f80caf1d"
+        },
+        {
+          "id": "get-project-assets",
+          "method": "GET",
+          "path": "/api/projects/b07beac8-1fe7-4139-8759-b0ca95329a71/assets",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 258,
+          "note": "characters=0, locations=0"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "asset-hub-crud",
+      "status": "PASS",
+      "startedAt": "2026-03-04T10:43:28.764Z",
+      "endedAt": "2026-03-04T10:43:30.606Z",
+      "durationMs": 1842,
+      "steps": [
+        {
+          "id": "create-asset-character",
+          "method": "POST",
+          "path": "/api/asset-hub/characters",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 267,
+          "note": "characterId=4157d2d4-da8f-40f2-977d-38314cd6c1e1"
+        },
+        {
+          "id": "update-asset-character",
+          "method": "PATCH",
+          "path": "/api/asset-hub/characters/4157d2d4-da8f-40f2-977d-38314cd6c1e1",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 266,
+          "note": "updated=4157d2d4-da8f-40f2-977d-38314cd6c1e1"
+        },
+        {
+          "id": "create-asset-location",
+          "method": "POST",
+          "path": "/api/asset-hub/locations",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 265,
+          "note": "locationId=cea05a69-24d9-4199-93ec-e93734c47d9b"
+        },
+        {
+          "id": "create-asset-voice",
+          "method": "POST",
+          "path": "/api/asset-hub/voices",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 262,
+          "note": "voiceId=2559876e-415f-42bc-b059-d1d4c633a332"
+        },
+        {
+          "id": "list-asset-locations",
+          "method": "GET",
+          "path": "/api/asset-hub/locations",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 260,
+          "note": "count=1 include-new"
+        },
+        {
+          "id": "list-asset-voices",
+          "method": "GET",
+          "path": "/api/asset-hub/voices",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 259,
+          "note": "count=1 include-new"
+        },
+        {
+          "id": "delete-asset-character",
+          "method": "DELETE",
+          "path": "/api/asset-hub/characters/4157d2d4-da8f-40f2-977d-38314cd6c1e1",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 262,
+          "note": "deleted"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "novel-promotion",
+      "status": "PASS",
+      "startedAt": "2026-03-04T10:43:30.606Z",
+      "endedAt": "2026-03-04T10:43:32.451Z",
+      "durationMs": 1845,
+      "steps": [
+        {
+          "id": "get-novel-root",
+          "method": "GET",
+          "path": "/api/novel-promotion/b07beac8-1fe7-4139-8759-b0ca95329a71",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 262,
+          "note": "episodes=0"
+        },
+        {
+          "id": "get-novel-episodes",
+          "method": "GET",
+          "path": "/api/novel-promotion/b07beac8-1fe7-4139-8759-b0ca95329a71/episodes",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 263,
+          "note": "episodes=0"
+        },
+        {
+          "id": "create-novel-episode",
+          "method": "POST",
+          "path": "/api/novel-promotion/b07beac8-1fe7-4139-8759-b0ca95329a71/episodes",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 268,
+          "note": "episodeId=1541e4ca-c195-4d1a-8f56-c91c3227fbad"
+        },
+        {
+          "id": "get-novel-characters",
+          "method": "GET",
+          "path": "/api/novel-promotion/b07beac8-1fe7-4139-8759-b0ca95329a71/characters",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 259,
+          "note": "characters=0"
+        },
+        {
+          "id": "get-novel-locations",
+          "method": "GET",
+          "path": "/api/novel-promotion/b07beac8-1fe7-4139-8759-b0ca95329a71/locations",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 262,
+          "note": "locations=0"
+        },
+        {
+          "id": "create-novel-character",
+          "method": "POST",
+          "path": "/api/novel-promotion/b07beac8-1fe7-4139-8759-b0ca95329a71/characters",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 269,
+          "note": "characterId=47dc8e9d-b7ca-484f-a8ca-55fd859a818c"
+        },
+        {
+          "id": "get-novel-storyboards",
+          "method": "GET",
+          "path": "/api/novel-promotion/b07beac8-1fe7-4139-8759-b0ca95329a71/storyboards?episodeId=1541e4ca-c195-4d1a-8f56-c91c3227fbad",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 262,
+          "note": "storyboards=0"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "user-config",
+      "status": "PASS",
+      "startedAt": "2026-03-04T10:43:32.451Z",
+      "endedAt": "2026-03-04T10:43:33.764Z",
+      "durationMs": 1313,
+      "steps": [
+        {
+          "id": "get-user-models",
+          "method": "GET",
+          "path": "/api/user/models",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 258,
+          "note": "llm=1"
+        },
+        {
+          "id": "get-user-api-config",
+          "method": "GET",
+          "path": "/api/user/api-config",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 267,
+          "note": "providers=3, models=9"
+        },
+        {
+          "id": "get-user-preference",
+          "method": "GET",
+          "path": "/api/user-preference",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 265,
+          "note": "artStyle=american-comic"
+        },
+        {
+          "id": "patch-user-preference",
+          "method": "PATCH",
+          "path": "/api/user-preference",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 266,
+          "note": "artStyle=american-comic"
+        },
+        {
+          "id": "test-user-api-config-invalid",
+          "method": "POST",
+          "path": "/api/user/api-config/test-connection",
+          "result": "PASS",
+          "httpStatus": 400,
+          "durationMs": 257,
+          "note": "empty payload rejected as expected"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "admin-billing",
+      "status": "PASS",
+      "startedAt": "2026-03-04T10:43:33.764Z",
+      "endedAt": "2026-03-04T10:43:35.063Z",
+      "durationMs": 1299,
+      "steps": [
+        {
+          "id": "admin-ai-config-non-admin",
+          "method": "GET",
+          "path": "/api/admin/ai-config",
+          "result": "PASS",
+          "httpStatus": 403,
+          "durationMs": 256,
+          "note": "non-admin rejected as expected"
+        },
+        {
+          "id": "billing-balance",
+          "method": "GET",
+          "path": "/api/user/balance",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 263,
+          "note": "currency=CNY"
+        },
+        {
+          "id": "billing-costs",
+          "method": "GET",
+          "path": "/api/user/costs",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 262,
+          "note": "projects=0"
+        },
+        {
+          "id": "billing-cost-details",
+          "method": "GET",
+          "path": "/api/user/costs/details?page=1&pageSize=10",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 258,
+          "note": "records=0"
+        },
+        {
+          "id": "billing-transactions",
+          "method": "GET",
+          "path": "/api/user/transactions?page=1&pageSize=10",
+          "result": "PASS",
+          "httpStatus": 200,
+          "durationMs": 259,
+          "note": "transactions=0"
+        }
+      ],
+      "error": null
+    }
+  ],
+  "cleanup": {
+    "requested": true,
+    "startedAt": "2026-03-04T10:43:35.063Z",
+    "endedAt": "2026-03-04T10:43:37.539Z",
+    "steps": [
+      {
+        "id": "delete-novel-character",
+        "method": "DELETE",
+        "path": "/api/novel-promotion/b07beac8-1fe7-4139-8759-b0ca95329a71/characters",
+        "result": "PASS",
+        "httpStatus": 200,
+        "durationMs": 263,
+        "note": "characterId=47dc8e9d-b7ca-484f-a8ca-55fd859a818c"
+      },
+      {
+        "id": "delete-asset-location-cea05a69-24d9-4199-93ec-e93734c47d9b",
+        "method": "DELETE",
+        "path": "/api/asset-hub/locations/cea05a69-24d9-4199-93ec-e93734c47d9b",
+        "result": "PASS",
+        "httpStatus": 200,
+        "durationMs": 261,
+        "note": "done"
+      },
+      {
+        "id": "delete-asset-voice-2559876e-415f-42bc-b059-d1d4c633a332",
+        "method": "DELETE",
+        "path": "/api/asset-hub/voices/2559876e-415f-42bc-b059-d1d4c633a332",
+        "result": "PASS",
+        "httpStatus": 200,
+        "durationMs": 1689,
+        "note": "done"
+      },
+      {
+        "id": "delete-project",
+        "method": "DELETE",
+        "path": "/api/projects/b07beac8-1fe7-4139-8759-b0ca95329a71",
+        "result": "PASS",
+        "httpStatus": 200,
+        "durationMs": 263,
+        "note": "projectId=b07beac8-1fe7-4139-8759-b0ca95329a71"
+      }
+    ]
+  },
+  "summary": {
+    "phaseTotal": 6,
+    "phasePass": 6,
+    "phaseFail": 0,
+    "stepTotal": 32,
+    "stepPass": 32,
+    "stepFail": 0,
+    "cleanupTotal": 4,
+    "cleanupPass": 4,
+    "cleanupFail": 0
+  }
+}

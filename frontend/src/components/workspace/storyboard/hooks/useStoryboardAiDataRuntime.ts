@@ -1,5 +1,3 @@
-'use client'
-
 import { logWarn as _ulogWarn, logError as _ulogError } from '@/lib/logging/core'
 import { useCallback, useMemo } from 'react'
 import type { NovelPromotionStoryboard } from '@/types/project'

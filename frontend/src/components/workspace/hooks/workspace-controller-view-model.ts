@@ -1,5 +1,3 @@
-'use client'
-
 import type { UserModelsPayload } from './useWorkspaceUserModels'
 import type { WorkspaceStageRuntimeValue } from '../WorkspaceStageRuntimeContext'
 import type { TaskPresentationState } from '@/lib/task/presentation'

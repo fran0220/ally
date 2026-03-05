@@ -1,6 +1,4 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { MouseEvent } from 'react'

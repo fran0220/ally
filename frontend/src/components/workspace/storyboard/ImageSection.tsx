@@ -1,4 +1,3 @@
-'use client'
 import { useTranslations } from '@/compat/next-intl'
 import { useState } from 'react'
 import './ImageSection.css'

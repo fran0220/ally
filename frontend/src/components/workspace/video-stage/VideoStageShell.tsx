@@ -1,5 +1,3 @@
-'use client'
-
 import VideoStageLayout, { type VideoStageShellProps } from './VideoStageLayout'
 
 export type { VideoStageShellProps }

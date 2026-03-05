@@ -2,7 +2,7 @@
  * 小说推文模式 - 阶段导航组件
  */
 
-import Link from 'next/link'
+import { Link } from 'react-router-dom'
 import { useTranslations } from 'next-intl'
 import { AppIcon } from '@/components/ui/icons'
 
@@ -54,7 +54,7 @@ export function StageNavigation({
         const isEnabled = stage.enabled && !isDisabled
         const isCurrent = effectiveStage === stage.id
         // 构建 URL，包含 episode 参数以支持新标签页打开时保持当前剧集
-        const href = episodeId
+        const to = episodeId
           ? `/workspace/${projectId}?stage=${stage.id}&episode=${episodeId}`
           : `/workspace/${projectId}?stage=${stage.id}`
 
@@ -69,7 +69,7 @@ export function StageNavigation({
           <div key={stage.id} className="flex items-center space-x-3">
             {isEnabled ? (
               <Link
-                href={href}
+                to={to}
                 onClick={(e) => {
                   // 左键点击时阻止默认行为，使用 onStageClick
                   if (e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
@@ -96,4 +96,3 @@ export function StageNavigation({
     </div>
   )
 }
-

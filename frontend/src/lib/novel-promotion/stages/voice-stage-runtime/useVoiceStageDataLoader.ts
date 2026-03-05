@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useRef, useState } from 'react'
 import { logError as _ulogError } from '@/lib/logging/core'
 import { useFetchProjectVoiceStageData } from '@/lib/query/hooks'

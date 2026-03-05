@@ -1,6 +1,5 @@
-'use client'
-
 import { useState } from 'react'
+import { useToast } from '@/contexts/ToastContext'
 import {
   encodeModelKey,
   PRESET_MODELS,
@@ -214,6 +213,7 @@ export function useProviderCardState({
   const [batchMode, setBatchMode] = useState(false)
   const [editingModelId, setEditingModelId] = useState<string | null>(null)
   const [editModel, setEditModel] = useState<ModelFormState>(EMPTY_MODEL_FORM)
+  const { showToast } = useToast()
 
   const providerKey = getProviderKey(provider.id)
   const isPresetProvider = PRESET_PROVIDERS.some(
@@ -306,7 +306,7 @@ export function useProviderCardState({
 
   const handleSaveModel = (originalModelKey: string) => {
     if (!editModel.name || !editModel.modelId) {
-      alert(t('fillComplete'))
+      showToast(t('fillComplete'), 'warning')
       return
     }
 
@@ -319,7 +319,7 @@ export function useProviderCardState({
     )
 
     if (duplicate) {
-      alert(t('modelIdExists'))
+      showToast(t('modelIdExists'), 'warning')
       return
     }
 
@@ -333,7 +333,7 @@ export function useProviderCardState({
 
   const handleAddModel = (type: ProviderCardModelType) => {
     if (!newModel.name || !newModel.modelId) {
-      alert(t('fillComplete'))
+      showToast(t('fillComplete'), 'warning')
       return
     }
 
@@ -345,7 +345,7 @@ export function useProviderCardState({
 
     const all = allModels || models
     if (all.some((model) => model.modelKey === finalModelKey)) {
-      alert(t('modelIdExists'))
+      showToast(t('modelIdExists'), 'warning')
       return
     }
 
@@ -359,7 +359,7 @@ export function useProviderCardState({
       needsCustomPricing: CUSTOM_PRICING_PROVIDER_KEYS.has(getProviderKey(provider.id)),
     })
     if (!pricingBuildResult.ok) {
-      alert(t('fillPricing'))
+      showToast(t('fillPricing'), 'warning')
       return
     }
     const customPricing = pricingBuildResult.customPricing

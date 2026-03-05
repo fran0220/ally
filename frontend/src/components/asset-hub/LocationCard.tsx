@@ -1,4 +1,3 @@
-'use client'
 import { resolveErrorDisplay } from '@/lib/errors/display'
 
 import { useRef, useState } from 'react'

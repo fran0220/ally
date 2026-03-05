@@ -1,6 +1,4 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/compat/next-intl'
 import PanelEditForm, { PanelEditData } from '../PanelEditForm'
 import ImageSection from './ImageSection'
 import PanelActionButtons from './PanelActionButtons'

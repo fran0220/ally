@@ -1,5 +1,3 @@
-'use client'
-
 import InsertPanelModal from './InsertPanelModal'
 import PanelVariantModal from './PanelVariantModal'
 import type { VariantData, VariantOptions } from './hooks/usePanelVariant'
