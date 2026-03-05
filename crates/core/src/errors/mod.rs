@@ -8,7 +8,7 @@ use thiserror::Error;
 pub use api_error::ApiErrorBody;
 pub use codes::{ErrorCategory, ErrorCode, ErrorSpec};
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, Clone)]
 #[error("{message}")]
 pub struct AppError {
     pub code: ErrorCode,

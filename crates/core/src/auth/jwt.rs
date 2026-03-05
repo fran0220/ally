@@ -83,7 +83,7 @@ mod tests {
             jwt_ttl_seconds: 3600,
             cors_allow_origin: vec![],
             internal_task_token: String::new(),
-            billing_mode: crate::billing::BillingMode::Off,
+            billing_enabled: false,
             ark_api_key: String::new(),
             google_ai_key: String::new(),
             minimax_api_key: String::new(),

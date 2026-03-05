@@ -2,8 +2,6 @@ use anyhow::{Context, Result};
 use config::{Config, Environment, File};
 use serde::{Deserialize, Deserializer};
 
-use crate::billing::BillingMode;
-
 #[derive(Debug, Clone, Deserialize)]
 pub struct AppConfig {
     #[serde(default = "default_host")]
@@ -22,8 +20,8 @@ pub struct AppConfig {
     pub cors_allow_origin: Vec<String>,
     #[serde(default)]
     pub internal_task_token: String,
-    #[serde(default)]
-    pub billing_mode: BillingMode,
+    #[serde(default = "default_billing_enabled")]
+    pub billing_enabled: bool,
     #[serde(default)]
     pub ark_api_key: String,
     #[serde(default)]
@@ -101,6 +99,10 @@ fn default_api_encryption_key() -> String {
     String::new()
 }
 
+fn default_billing_enabled() -> bool {
+    false
+}
+
 fn default_ark_api_base_url() -> String {
     "https://ark.cn-beijing.volces.com/api/v3".to_string()
 }
@@ -171,7 +173,7 @@ mod tests {
         assert_eq!(default_port(), 43001);
         assert_eq!(default_jwt_ttl_seconds(), 604_800);
         assert_eq!(default_api_encryption_key(), "");
-        assert_eq!(BillingMode::default(), BillingMode::Off);
+        assert!(!default_billing_enabled());
         assert_eq!(default_llm_stream_chunk_timeout_ms(), 180_000);
         assert_eq!(default_generator_poll_interval_ms(), 3_000);
         assert_eq!(default_generator_poll_timeout_secs(), 1_200);

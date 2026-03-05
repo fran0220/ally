@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use rust_decimal::Decimal;
+use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::Serialize;
 use serde_json::Value;
 use sqlx::{MySql, MySqlPool, QueryBuilder};
@@ -134,19 +134,15 @@ struct CostAggregateRow {
 #[derive(Debug, sqlx::FromRow)]
 struct UsageCostRow {
     id: String,
-    #[sqlx(rename = "projectId")]
     project_id: String,
-    #[sqlx(rename = "userId")]
     user_id: String,
-    #[sqlx(rename = "apiType")]
     api_type: String,
     model: String,
     action: String,
-    quantity: i32,
+    quantity: Decimal,
     unit: String,
     cost: Decimal,
-    metadata: Option<String>,
-    #[sqlx(rename = "createdAt")]
+    metadata: Option<sqlx::types::Json<Value>>,
     created_at: NaiveDateTime,
 }
 
@@ -158,74 +154,33 @@ struct TotalRow {
 #[derive(Debug, sqlx::FromRow)]
 struct TransactionRow {
     id: String,
-    #[sqlx(rename = "userId")]
     user_id: String,
-    #[sqlx(rename = "type")]
     tx_type: String,
     amount: Decimal,
-    #[sqlx(rename = "balanceAfter")]
     balance_after: Decimal,
     description: Option<String>,
-    #[sqlx(rename = "relatedId")]
     related_id: Option<String>,
-    #[sqlx(rename = "freezeId")]
     freeze_id: Option<String>,
-    #[sqlx(rename = "operatorId")]
     operator_id: Option<String>,
-    #[sqlx(rename = "externalOrderId")]
     external_order_id: Option<String>,
-    #[sqlx(rename = "idempotencyKey")]
     idempotency_key: Option<String>,
-    #[sqlx(rename = "projectId")]
     project_id: Option<String>,
-    #[sqlx(rename = "projectName")]
     project_name: Option<String>,
-    #[sqlx(rename = "episodeId")]
     episode_id: Option<String>,
-    #[sqlx(rename = "episodeNumber")]
     episode_number: Option<i32>,
-    #[sqlx(rename = "episodeName")]
     episode_name: Option<String>,
-    #[sqlx(rename = "taskType")]
-    task_type: Option<String>,
-    #[sqlx(rename = "billingMeta")]
-    billing_meta: Option<String>,
-    #[sqlx(rename = "createdAt")]
+    action: Option<String>,
+    billing_meta: Option<sqlx::types::Json<Value>>,
     created_at: NaiveDateTime,
 }
 
-fn parse_action_from_description(description: Option<&str>) -> Option<String> {
-    let description = description?.trim();
-    if description.is_empty() {
-        return None;
-    }
-
-    let cleaned = description
-        .strip_prefix("[SHADOW]")
-        .map(str::trim)
-        .unwrap_or(description);
-    let action = cleaned.split(" - ").next()?.trim();
-    if action.is_empty() {
-        return None;
-    }
-
-    if action
-        .chars()
-        .all(|ch| ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '_')
-        && action
-            .chars()
-            .next()
-            .is_some_and(|ch| ch.is_ascii_lowercase())
-    {
-        return Some(action.to_string());
-    }
-
-    None
+fn decimal_quantity_to_i32(value: Decimal) -> i32 {
+    value.trunc().to_i32().unwrap_or(0)
 }
 
 pub async fn get_project_total_cost(pool: &MySqlPool, project_id: &str) -> Result<f64, AppError> {
     let total = sqlx::query_as::<_, TotalRow>(
-        "SELECT COALESCE(SUM(cost), 0) AS total FROM usage_costs WHERE projectId = ?",
+        "SELECT COALESCE(SUM(amount), 0) AS total FROM credit_records WHERE project_id = ? AND type = 'consume'",
     )
     .bind(project_id)
     .fetch_one(pool)
@@ -239,21 +194,21 @@ pub async fn get_project_cost_details(
     project_id: &str,
 ) -> Result<ProjectCostDetails, AppError> {
     let by_type_raw = sqlx::query_as::<_, CostAggregateRow>(
-        "SELECT apiType AS `key`, COALESCE(SUM(cost), 0) AS total_cost, COUNT(*) AS record_count FROM usage_costs WHERE projectId = ? GROUP BY apiType",
+        "SELECT api_type AS `key`, COALESCE(SUM(amount), 0) AS total_cost, COUNT(*) AS record_count FROM credit_records WHERE project_id = ? AND type = 'consume' AND api_type IS NOT NULL GROUP BY api_type",
     )
     .bind(project_id)
     .fetch_all(pool)
     .await?;
 
     let by_action_raw = sqlx::query_as::<_, CostAggregateRow>(
-        "SELECT action AS `key`, COALESCE(SUM(cost), 0) AS total_cost, COUNT(*) AS record_count FROM usage_costs WHERE projectId = ? GROUP BY action",
+        "SELECT action AS `key`, COALESCE(SUM(amount), 0) AS total_cost, COUNT(*) AS record_count FROM credit_records WHERE project_id = ? AND type = 'consume' AND action IS NOT NULL GROUP BY action",
     )
     .bind(project_id)
     .fetch_all(pool)
     .await?;
 
     let recent = sqlx::query_as::<_, UsageCostRow>(
-        "SELECT id, projectId, userId, apiType, model, action, quantity, unit, cost, metadata, createdAt FROM usage_costs WHERE projectId = ? ORDER BY createdAt DESC LIMIT 50",
+        "SELECT id, COALESCE(project_id, '') AS project_id, user_id, COALESCE(api_type, '') AS api_type, COALESCE(model, '') AS model, COALESCE(action, '') AS action, COALESCE(quantity, 0) AS quantity, COALESCE(unit, '') AS unit, amount AS cost, metadata, created_at FROM credit_records WHERE project_id = ? AND type = 'consume' ORDER BY created_at DESC LIMIT 50",
     )
     .bind(project_id)
     .fetch_all(pool)
@@ -284,10 +239,10 @@ pub async fn get_project_cost_details(
             api_type: row.api_type,
             model: row.model,
             action: row.action,
-            quantity: row.quantity,
+            quantity: decimal_quantity_to_i32(row.quantity),
             unit: row.unit,
             cost: decimal_to_f64(row.cost),
-            metadata: row.metadata,
+            metadata: row.metadata.map(|value| value.0.to_string()),
             created_at: row.created_at,
         })
         .collect::<Vec<_>>();
@@ -305,14 +260,14 @@ pub async fn get_user_cost_summary(
     user_id: &str,
 ) -> Result<UserCostSummary, AppError> {
     let by_project = sqlx::query_as::<_, CostAggregateRow>(
-        "SELECT projectId AS `key`, COALESCE(SUM(cost), 0) AS total_cost, COUNT(*) AS record_count FROM usage_costs WHERE userId = ? GROUP BY projectId",
+        "SELECT project_id AS `key`, COALESCE(SUM(amount), 0) AS total_cost, COUNT(*) AS record_count FROM credit_records WHERE user_id = ? AND type = 'consume' AND project_id IS NOT NULL GROUP BY project_id",
     )
     .bind(user_id)
     .fetch_all(pool)
     .await?;
 
     let total = sqlx::query_as::<_, TotalRow>(
-        "SELECT COALESCE(SUM(cost), 0) AS total FROM usage_costs WHERE userId = ?",
+        "SELECT COALESCE(SUM(amount), 0) AS total FROM credit_records WHERE user_id = ? AND type = 'consume'",
     )
     .bind(user_id)
     .fetch_one(pool)
@@ -342,7 +297,7 @@ pub async fn get_user_cost_details(
     let offset = (page - 1) * page_size;
 
     let rows = sqlx::query_as::<_, UsageCostRow>(
-        "SELECT id, projectId, userId, apiType, model, action, quantity, unit, cost, metadata, createdAt FROM usage_costs WHERE userId = ? ORDER BY createdAt DESC LIMIT ? OFFSET ?",
+        "SELECT id, COALESCE(project_id, '') AS project_id, user_id, COALESCE(api_type, '') AS api_type, COALESCE(model, '') AS model, COALESCE(action, '') AS action, COALESCE(quantity, 0) AS quantity, COALESCE(unit, '') AS unit, amount AS cost, metadata, created_at FROM credit_records WHERE user_id = ? AND type = 'consume' ORDER BY created_at DESC LIMIT ? OFFSET ?",
     )
     .bind(user_id)
     .bind(page_size)
@@ -350,10 +305,12 @@ pub async fn get_user_cost_details(
     .fetch_all(pool)
     .await?;
 
-    let total = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM usage_costs WHERE userId = ?")
-        .bind(user_id)
-        .fetch_one(pool)
-        .await?;
+    let total = sqlx::query_scalar::<_, i64>(
+        "SELECT COUNT(*) FROM credit_records WHERE user_id = ? AND type = 'consume'",
+    )
+    .bind(user_id)
+    .fetch_one(pool)
+    .await?;
 
     Ok(UserCostDetailsPage {
         records: rows
@@ -365,10 +322,10 @@ pub async fn get_user_cost_details(
                 api_type: row.api_type,
                 model: row.model,
                 action: row.action,
-                quantity: row.quantity,
+                quantity: decimal_quantity_to_i32(row.quantity),
                 unit: row.unit,
                 cost: decimal_to_f64(row.cost),
-                metadata: row.metadata,
+                metadata: row.metadata.map(|value| value.0.to_string()),
                 created_at: row.created_at,
             })
             .collect(),
@@ -386,16 +343,16 @@ fn push_transaction_filters<'a>(qb: &mut QueryBuilder<'a, MySql>, input: &'a Tra
         .map(str::trim)
         .filter(|value| !value.is_empty() && *value != "all")
     {
-        qb.push(" AND bt.type = ");
+        qb.push(" AND cr.type = ");
         qb.push_bind(tx_type);
     }
 
     if let Some(start_at) = input.start_at {
-        qb.push(" AND bt.createdAt >= ");
+        qb.push(" AND cr.created_at >= ");
         qb.push_bind(start_at);
     }
     if let Some(end_at) = input.end_at {
-        qb.push(" AND bt.createdAt <= ");
+        qb.push(" AND cr.created_at <= ");
         qb.push_bind(end_at);
     }
 }
@@ -408,20 +365,19 @@ pub async fn list_user_transactions(
     let page_size = input.page_size.clamp(1, 200);
     let offset = (page - 1) * page_size;
 
-    let mut count_qb: QueryBuilder<'_, MySql> = QueryBuilder::new(
-        "SELECT COUNT(*) AS total FROM balance_transactions bt WHERE bt.userId = ",
-    );
+    let mut count_qb: QueryBuilder<'_, MySql> =
+        QueryBuilder::new("SELECT COUNT(*) AS total FROM credit_records cr WHERE cr.user_id = ");
     count_qb.push_bind(&input.user_id);
     push_transaction_filters(&mut count_qb, input);
 
     let total = count_qb.build_query_scalar::<i64>().fetch_one(pool).await?;
 
     let mut data_qb: QueryBuilder<'_, MySql> = QueryBuilder::new(
-        "SELECT bt.id, bt.userId, bt.type, bt.amount, bt.balanceAfter, bt.description, bt.relatedId, bt.freezeId, bt.operatorId, bt.externalOrderId, bt.idempotencyKey, bt.projectId, p.name AS projectName, bt.episodeId, e.episodeNumber AS episodeNumber, e.name AS episodeName, bt.taskType, bt.billingMeta, bt.createdAt FROM balance_transactions bt LEFT JOIN projects p ON p.id = bt.projectId LEFT JOIN novel_promotion_episodes e ON e.id = bt.episodeId WHERE bt.userId = ",
+        "SELECT cr.id, cr.user_id, cr.type AS tx_type, cr.amount, cr.balance_after, NULL AS description, NULL AS related_id, NULL AS freeze_id, cr.operator_id, cr.external_order_id, cr.idempotency_key, cr.project_id, p.name AS project_name, cr.episode_id, e.episodeNumber AS episode_number, e.name AS episode_name, cr.action, cr.metadata AS billing_meta, cr.created_at FROM credit_records cr LEFT JOIN projects p ON p.id = cr.project_id LEFT JOIN novel_promotion_episodes e ON e.id = cr.episode_id WHERE cr.user_id = ",
     );
     data_qb.push_bind(&input.user_id);
     push_transaction_filters(&mut data_qb, input);
-    data_qb.push(" ORDER BY bt.createdAt DESC LIMIT ");
+    data_qb.push(" ORDER BY cr.created_at DESC LIMIT ");
     data_qb.push_bind(page_size);
     data_qb.push(" OFFSET ");
     data_qb.push_bind(offset);
@@ -433,45 +389,27 @@ pub async fn list_user_transactions(
 
     let transactions = rows
         .into_iter()
-        .map(|row| {
-            let billing_meta = row
-                .billing_meta
-                .as_deref()
-                .and_then(|raw| serde_json::from_str::<Value>(raw).ok());
-
-            UserTransactionRecord {
-                id: row.id,
-                user_id: row.user_id,
-                tx_type: row.tx_type,
-                amount: decimal_to_f64(row.amount),
-                balance_after: decimal_to_f64(row.balance_after),
-                description: row.description.clone(),
-                related_id: row.related_id,
-                freeze_id: row.freeze_id,
-                operator_id: row.operator_id,
-                external_order_id: row.external_order_id,
-                idempotency_key: row.idempotency_key,
-                project_id: row.project_id,
-                project_name: row.project_name,
-                episode_id: row.episode_id,
-                episode_number: row.episode_number,
-                episode_name: row.episode_name,
-                action: row
-                    .task_type
-                    .as_ref()
-                    .and_then(|value| {
-                        let value = value.trim();
-                        if value.is_empty() {
-                            None
-                        } else {
-                            Some(value.to_string())
-                        }
-                    })
-                    .or_else(|| parse_action_from_description(row.description.as_deref())),
-                task_type: row.task_type,
-                billing_meta,
-                created_at: row.created_at,
-            }
+        .map(|row| UserTransactionRecord {
+            id: row.id,
+            user_id: row.user_id,
+            tx_type: row.tx_type,
+            amount: decimal_to_f64(row.amount),
+            balance_after: decimal_to_f64(row.balance_after),
+            description: row.description,
+            related_id: row.related_id,
+            freeze_id: row.freeze_id,
+            operator_id: row.operator_id,
+            external_order_id: row.external_order_id,
+            idempotency_key: row.idempotency_key,
+            project_id: row.project_id,
+            project_name: row.project_name,
+            episode_id: row.episode_id,
+            episode_number: row.episode_number,
+            episode_name: row.episode_name,
+            task_type: row.action.clone(),
+            action: row.action,
+            billing_meta: row.billing_meta.map(|value| value.0),
+            created_at: row.created_at,
         })
         .collect::<Vec<_>>();
 
@@ -483,21 +421,12 @@ pub async fn list_user_transactions(
 
 #[cfg(test)]
 mod tests {
-    use super::parse_action_from_description;
+    use rust_decimal::Decimal;
+
+    use super::decimal_quantity_to_i32;
 
     #[test]
-    fn parse_action_from_description_handles_shadow_prefix() {
-        assert_eq!(
-            parse_action_from_description(Some("[SHADOW] modify_asset_image - model-a - ¥0.96")),
-            Some("modify_asset_image".to_string())
-        );
-    }
-
-    #[test]
-    fn parse_action_from_description_ignores_non_action_format() {
-        assert_eq!(
-            parse_action_from_description(Some("Balance recharge | audit={...}")),
-            None
-        );
+    fn decimal_quantity_is_truncated_for_legacy_response_shape() {
+        assert_eq!(decimal_quantity_to_i32(Decimal::new(59, 1)), 5);
     }
 }

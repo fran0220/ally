@@ -8,13 +8,13 @@ use std::{
 
 use chrono::{SecondsFormat, Utc};
 use deadpool_redis::Pool as RedisPool;
+use rust_decimal::Decimal;
 use serde_json::{Map, Value, json};
 use sqlx::MySqlPool;
 use uuid::Uuid;
 use waoowaoo_core::{
     billing::{
-        BillingStatus, TaskBillingInfo, parse_task_billing_info, rollback_task_billing,
-        serialize_task_billing_info, settle_task_billing,
+        CreditRecord, DeductRequest, deduct_credits, extract_billing_params, is_billable_task_type,
     },
     errors::AppError,
     runtime::{
@@ -154,19 +154,27 @@ pub struct TaskContext {
     mysql: MySqlPool,
     redis: RedisPool,
     queue: Arc<str>,
+    billing_enabled: bool,
     flow: FlowFields,
     #[allow(dead_code)]
     stream_seq: Arc<AtomicU64>,
 }
 
 impl TaskContext {
-    pub fn new(task: WorkerTask, mysql: MySqlPool, redis: RedisPool, queue: &str) -> Self {
+    pub fn new(
+        task: WorkerTask,
+        mysql: MySqlPool,
+        redis: RedisPool,
+        queue: &str,
+        billing_enabled: bool,
+    ) -> Self {
         let flow = FlowFields::from_payload(&task.payload);
         Self {
             task: Arc::new(task),
             mysql,
             redis,
             queue: Arc::<str>::from(queue.trim().to_string()),
+            billing_enabled,
             flow,
             stream_seq: Arc::new(AtomicU64::new(0)),
         }
@@ -179,6 +187,7 @@ impl TaskContext {
             mysql: self.mysql.clone(),
             redis: self.redis.clone(),
             queue: self.queue.clone(),
+            billing_enabled: self.billing_enabled,
             flow,
             stream_seq: self.stream_seq.clone(),
         }
@@ -190,16 +199,6 @@ impl TaskContext {
 
     pub fn queue(&self) -> &str {
         self.queue.as_ref()
-    }
-
-    fn task_billing_info(&self) -> Result<Option<TaskBillingInfo>, AppError> {
-        parse_task_billing_info(self.task.billing_info.clone())
-    }
-
-    fn billing_info_bind(
-        info: Option<&TaskBillingInfo>,
-    ) -> Result<Option<sqlx::types::Json<Value>>, AppError> {
-        Ok(serialize_task_billing_info(info)?.map(sqlx::types::Json))
     }
 
     pub fn should_retry(&self, error: &AppError) -> bool {
@@ -266,34 +265,57 @@ impl TaskContext {
         self.publish_stream_event(Value::Object(payload)).await
     }
 
-    pub async fn mark_completed(&self, result: &Value) -> Result<bool, AppError> {
-        let current_billing = self.task_billing_info()?;
-        let settled_billing = match settle_task_billing(
+    async fn try_deduct_credits(&self) -> Result<Option<CreditRecord>, AppError> {
+        if !self.billing_enabled || !is_billable_task_type(&self.task.task_type) {
+            return Ok(None);
+        }
+
+        let params =
+            extract_billing_params(&self.task.task_type, &self.task.payload).ok_or_else(|| {
+                AppError::invalid_params(format!(
+                    "failed to extract billing params for task type: {}",
+                    self.task.task_type
+                ))
+            })?;
+
+        if params.quantity <= Decimal::ZERO {
+            return Ok(None);
+        }
+
+        let record = deduct_credits(
             &self.mysql,
-            &self.task.task_id,
-            &self.task.user_id,
-            &self.task.project_id,
-            self.task.episode_id.as_deref(),
-            current_billing.as_ref(),
+            &DeductRequest {
+                task_id: self.task.task_id.clone(),
+                user_id: self.task.user_id.clone(),
+                project_id: self.task.project_id.clone(),
+                episode_id: self.task.episode_id.clone(),
+                api_type: params.api_type,
+                model: params.model,
+                action: self.task.task_type.clone(),
+                quantity: params.quantity,
+                unit: params.unit,
+                metadata: params.metadata,
+            },
         )
-        .await
-        {
-            Ok(value) => value,
+        .await?;
+
+        Ok(Some(record))
+    }
+
+    pub async fn mark_completed(&self, result: &Value) -> Result<bool, AppError> {
+        let billed = match self.try_deduct_credits().await {
+            Ok(Some(record)) => record.amount > Decimal::ZERO,
+            Ok(None) => false,
             Err(error) => {
                 let _ = self.mark_failed(&error).await?;
                 return Ok(false);
             }
         };
-        let billed = settled_billing
-            .as_ref()
-            .is_some_and(|info| info.billable && info.status == Some(BillingStatus::Settled));
-        let billing_info = Self::billing_info_bind(settled_billing.as_ref())?;
 
         let updated = sqlx::query(
-            "UPDATE tasks SET status = 'completed', progress = 100, result = ?, errorCode = NULL, errorMessage = NULL, billingInfo = ?, billedAt = CASE WHEN ? THEN COALESCE(billedAt, NOW(3)) ELSE billedAt END, dedupeKey = NULL, finishedAt = NOW(3), heartbeatAt = NULL, updatedAt = NOW(3) WHERE id = ? AND status = 'processing'",
+            "UPDATE tasks SET status = 'completed', progress = 100, result = ?, errorCode = NULL, errorMessage = NULL, billedAt = CASE WHEN ? THEN COALESCE(billedAt, NOW(3)) ELSE billedAt END, dedupeKey = NULL, finishedAt = NOW(3), heartbeatAt = NULL, updatedAt = NOW(3) WHERE id = ? AND status = 'processing'",
         )
         .bind(sqlx::types::Json(result.clone()))
-        .bind(billing_info)
         .bind(billed)
         .bind(&self.task.task_id)
         .execute(&self.mysql)
@@ -315,28 +337,13 @@ impl TaskContext {
 
     pub async fn mark_failed(&self, error: &AppError) -> Result<bool, AppError> {
         let code = error.code.as_str().to_string();
-        let mut message = error.message.clone();
-
-        let current_billing = self.task_billing_info()?;
-        let next_billing = match rollback_task_billing(&self.mysql, current_billing.as_ref()).await
-        {
-            Ok(value) => value,
-            Err(rollback_error) => {
-                message = format!("{}; billing rollback failed: {}", message, rollback_error);
-                current_billing.map(|mut info| {
-                    info.status = Some(BillingStatus::Failed);
-                    info
-                })
-            }
-        };
-        let billing_info = Self::billing_info_bind(next_billing.as_ref())?;
+        let message = error.message.clone();
 
         let updated = sqlx::query(
-            "UPDATE tasks SET status = 'failed', errorCode = ?, errorMessage = ?, billingInfo = ?, dedupeKey = NULL, finishedAt = NOW(3), heartbeatAt = NULL, updatedAt = NOW(3) WHERE id = ? AND status = 'processing'",
+            "UPDATE tasks SET status = 'failed', errorCode = ?, errorMessage = ?, dedupeKey = NULL, finishedAt = NOW(3), heartbeatAt = NULL, updatedAt = NOW(3) WHERE id = ? AND status = 'processing'",
         )
         .bind(&code)
         .bind(&message)
-        .bind(billing_info)
         .bind(&self.task.task_id)
         .execute(&self.mysql)
         .await?;

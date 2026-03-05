@@ -15,7 +15,7 @@ ally/
 ├── deploy/         # 部署配置（灰度发布模板、CI 脚本）
 ├── migrations/     # SQL 迁移文件（SQLx MySQL）
 ├── scripts/        # 测试与验证脚本
-├── standards/      # AI 能力/定价/Prompt 标准数据
+├── standards/      # AI 能力/Prompt 标准数据
 └── messages/       # 消息模板
 ```
 
@@ -76,6 +76,47 @@ cd frontend && npm run build           # Vite 构建
 - `REDIS_URL` — Redis 连接串
 - `JWT_SECRET` — JWT 签名密钥（≥32 字符）
 - `CORS_ALLOW_ORIGIN` — 允许的前端域名（逗号分隔）
+- `BILLING_ENABLED` — 是否启用计费（默认 false）
+
+## 计费系统
+
+极简积分制：**查价 × 用量 = 扣积分**，一个事务完成。
+
+### 核心表
+
+| 表 | 作用 |
+|---|------|
+| `model_pricing` | 单价表：`(api_type, model_id, unit)` → `unit_price` |
+| `user_balances` | 用户余额：`balance` + `totalSpent` |
+| `credit_records` | 所有流水：consume / recharge / refund / admin_adjust |
+
+### 计费流程
+
+```
+任务提交（server）→ 余额预检查（快速失败）→ 入队
+任务完成（worker）→ extract_billing_params → deduct_credits（原子扣减）
+任务失败（worker）→ 无操作（未扣过不用退）
+```
+
+### 关键代码
+
+| 文件 | 职责 |
+|------|------|
+| `crates/core/src/billing/pricing.rs` | DB 查单价 `get_unit_price` |
+| `crates/core/src/billing/task.rs` | 任务注册表 `BILLING_DEFS` + `extract_billing_params` |
+| `crates/core/src/billing/ledger.rs` | `deduct_credits` / `add_credits` / `refund_credits` |
+| `crates/core/src/billing/reporting.rs` | 费用汇总与流水查询 |
+
+### 新增任务类型
+
+只需在 `task.rs` 的 `BILLING_DEFS` 注册表中加一行：
+```rust
+defs.insert("new_task_type", IMAGE_DEF); // 或 VIDEO_DEF / TEXT_DEF / 自定义
+```
+
+### 新增模型定价
+
+在 `model_pricing` 表 INSERT 一行即可，无需改代码。
 
 ## 子目录 AGENTS.md
 

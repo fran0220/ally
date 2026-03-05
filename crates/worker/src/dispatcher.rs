@@ -43,6 +43,7 @@ async fn dispatch_with_heartbeat(
 
 pub async fn run_worker_loop(
     queue: &str,
+    billing_enabled: bool,
     mysql: MySqlPool,
     redis: RedisPool,
 ) -> Result<(), anyhow::Error> {
@@ -60,7 +61,7 @@ pub async fn run_worker_loop(
         let Some(task) = task else {
             continue;
         };
-        let task = TaskContext::new(task, mysql.clone(), redis.clone(), queue);
+        let task = TaskContext::new(task, mysql.clone(), redis.clone(), queue, billing_enabled);
 
         match dispatch_with_heartbeat(&task, queue).await {
             Ok(dispatch_result) => match task.mark_completed(&dispatch_result).await {

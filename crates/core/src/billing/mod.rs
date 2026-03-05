@@ -6,12 +6,11 @@ pub mod task;
 pub mod types;
 
 pub use ledger::{
-    AddBalanceOptions, ConfirmChargeInput, FreezeBalanceOptions, add_balance, check_balance,
-    confirm_charge_with_record, freeze_balance, get_balance, get_freeze_by_idempotency_key,
-    increase_pending_freeze_amount, record_shadow_usage, rollback_freeze,
+    AddCreditsOptions, add_credits, check_balance, deduct_credits, ensure_user_balance_row,
+    get_balance, insufficient_balance_error, refund_credits,
 };
 pub use money::{decimal_from_f64, decimal_to_f64, normalize_money};
-pub use pricing::quote_task_cost;
+pub use pricing::get_unit_price;
 pub use reporting::{
     ProjectCostBreakdown, ProjectCostDetails, ProjectCostRecentRecord, TransactionListInput,
     TransactionListResult, UsageCostDetailRecord, UserCostDetailsPage, UserCostSummary,
@@ -19,12 +18,10 @@ pub use reporting::{
     get_user_cost_summary, list_user_transactions,
 };
 pub use task::{
-    BUILTIN_PRICING_VERSION, build_default_task_billing_info, is_billable_task_type,
-    parse_task_billing_info, prepare_task_billing, rollback_task_billing,
-    serialize_task_billing_info, settle_task_billing,
+    BillingParams, build_deduct_request, extract_billing_params, is_billable_task_type,
 };
 pub use types::{
-    BalanceSnapshot, BillingApiType, BillingMode, BillingStatus, FreezeSnapshot, TaskBillingInfo,
+    BalanceSnapshot, BillingApiType, CreditRecord, CreditRecordType, DeductRequest, ModelPrice,
     UsageUnit,
 };
 

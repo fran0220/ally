@@ -35,12 +35,14 @@ fn spawn_queue_workers(
     joins: &mut JoinSet<Result<()>>,
     queue: &'static str,
     concurrency: usize,
+    billing_enabled: bool,
     mysql: &MySqlPool,
     redis: &RedisPool,
 ) {
     for _ in 0..concurrency {
         joins.spawn(dispatcher::run_worker_loop(
             queue,
+            billing_enabled,
             mysql.clone(),
             redis.clone(),
         ));
@@ -60,17 +62,50 @@ async fn main() -> Result<()> {
     let text_concurrency = read_queue_concurrency("QUEUE_CONCURRENCY_TEXT", 10);
     let video_concurrency = read_queue_concurrency("QUEUE_CONCURRENCY_VIDEO", 4);
     let voice_concurrency = read_queue_concurrency("QUEUE_CONCURRENCY_VOICE", 10);
+    let billing_enabled = config.billing_enabled;
 
     info!(
         image_concurrency,
-        text_concurrency, video_concurrency, voice_concurrency, "starting worker loops"
+        text_concurrency,
+        video_concurrency,
+        voice_concurrency,
+        billing_enabled,
+        "starting worker loops"
     );
 
     let mut joins = JoinSet::new();
-    spawn_queue_workers(&mut joins, "image", image_concurrency, &mysql, &redis);
-    spawn_queue_workers(&mut joins, "text", text_concurrency, &mysql, &redis);
-    spawn_queue_workers(&mut joins, "video", video_concurrency, &mysql, &redis);
-    spawn_queue_workers(&mut joins, "voice", voice_concurrency, &mysql, &redis);
+    spawn_queue_workers(
+        &mut joins,
+        "image",
+        image_concurrency,
+        billing_enabled,
+        &mysql,
+        &redis,
+    );
+    spawn_queue_workers(
+        &mut joins,
+        "text",
+        text_concurrency,
+        billing_enabled,
+        &mysql,
+        &redis,
+    );
+    spawn_queue_workers(
+        &mut joins,
+        "video",
+        video_concurrency,
+        billing_enabled,
+        &mysql,
+        &redis,
+    );
+    spawn_queue_workers(
+        &mut joins,
+        "voice",
+        voice_concurrency,
+        billing_enabled,
+        &mysql,
+        &redis,
+    );
     joins.spawn(heartbeat::run_heartbeat(redis.clone()));
 
     while let Some(result) = joins.join_next().await {

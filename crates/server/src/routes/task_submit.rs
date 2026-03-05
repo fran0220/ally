@@ -1,9 +1,12 @@
 use axum::Json;
+use rust_decimal::Decimal;
 use serde_json::{Value, json};
 use uuid::Uuid;
 use waoowaoo_core::billing::{
-    TaskBillingInfo, prepare_task_billing, rollback_task_billing, serialize_task_billing_info,
+    BILLING_CURRENCY, BillingParams, check_balance, decimal_to_f64, extract_billing_params,
+    get_unit_price, is_billable_task_type,
 };
+use waoowaoo_core::errors::AppError as CoreAppError;
 use waoowaoo_core::runtime::publisher::{
     TaskLifecycleMessageInput, build_task_lifecycle_message, publish_task_message,
 };
@@ -123,6 +126,15 @@ fn normalize_payload_locale(mut payload: Value, accept_language: Option<&str>) -
     payload
 }
 
+fn billing_snapshot_from_params(params: &BillingParams) -> Value {
+    json!({
+        "api_type": params.api_type.clone(),
+        "model": params.model.clone(),
+        "quantity": decimal_to_f64(params.quantity),
+        "unit": params.unit.clone(),
+    })
+}
+
 async fn find_active_task_by_dedupe_key(
     state: &AppState,
     dedupe_key: &str,
@@ -143,14 +155,6 @@ fn is_unique_violation(error: &sqlx::Error) -> bool {
         }
         _ => false,
     }
-}
-
-async fn rollback_prepared_billing(
-    state: &AppState,
-    billing_info: Option<&TaskBillingInfo>,
-) -> Result<(), AppError> {
-    let _ = rollback_task_billing(&state.mysql, billing_info).await?;
-    Ok(())
 }
 
 pub async fn verify_project_access(
@@ -232,17 +236,32 @@ pub async fn submit_task(
 
     let task_id = Uuid::new_v4().to_string();
     let payload = normalize_payload_locale(payload, accept_language);
-    let prepared_billing = prepare_task_billing(
-        &state.mysql,
-        state.config.billing_mode,
-        &task_id,
-        &user.id,
-        project_id,
-        task_type,
-        &payload,
-    )
-    .await?;
-    let billing_info_json = serialize_task_billing_info(prepared_billing.as_ref())?;
+    let mut billing_info_json: Option<Value> = None;
+    if state.config.billing_enabled && is_billable_task_type(task_type) {
+        if let Some(params) = extract_billing_params(task_type, &payload) {
+            // The pre-check is best effort: billing is still finalized in worker when task completes.
+            if let Ok(model_price) =
+                get_unit_price(&state.mysql, &params.api_type, &params.model, &params.unit).await
+            {
+                let required_amount = (model_price.unit_price * params.quantity).round_dp(6);
+                if required_amount > Decimal::ZERO {
+                    let has_balance =
+                        check_balance(&state.mysql, &user.id, decimal_to_f64(required_amount))
+                            .await?;
+                    if !has_balance {
+                        return Err(CoreAppError::insufficient_balance(format!(
+                            "insufficient balance for estimated task cost ({BILLING_CURRENCY} {:.4})",
+                            decimal_to_f64(required_amount),
+                        ))
+                        .into());
+                    }
+                }
+            }
+
+            billing_info_json = Some(billing_snapshot_from_params(&params));
+        }
+    }
+
     let event_payload = payload.clone();
     let normalized_episode_id = normalize_optional_string(episode_id);
 
@@ -273,10 +292,9 @@ pub async fn submit_task(
     .await;
 
     if let Err(error) = insert_result {
+        tx.rollback().await?;
         if is_unique_violation(&error) {
-            tx.rollback().await?;
             if let Some(active_task) = find_active_task_by_dedupe_key(state, &dedupe_key).await? {
-                rollback_prepared_billing(state, prepared_billing.as_ref()).await?;
                 return Ok(Json(json!({
                   "success": true,
                   "async": true,
@@ -286,7 +304,6 @@ pub async fn submit_task(
                 })));
             }
         }
-        rollback_prepared_billing(state, prepared_billing.as_ref()).await?;
         return Err(error.into());
     }
 
@@ -304,7 +321,6 @@ pub async fn submit_task(
         Ok(result) => result,
         Err(error) => {
             tx.rollback().await?;
-            rollback_prepared_billing(state, prepared_billing.as_ref()).await?;
             return Err(error.into());
         }
     };
@@ -339,9 +355,14 @@ pub async fn submit_task(
 
 #[cfg(test)]
 mod tests {
-    use serde_json::json;
+    use rust_decimal::Decimal;
+    use serde_json::{Value, json};
 
-    use super::{build_dedupe_key, normalize_locale_candidate, normalize_payload_locale};
+    use super::{
+        billing_snapshot_from_params, build_dedupe_key, normalize_locale_candidate,
+        normalize_payload_locale,
+    };
+    use waoowaoo_core::billing::BillingParams;
 
     #[test]
     fn build_dedupe_key_uses_expected_format() {
@@ -385,5 +406,33 @@ mod tests {
             .and_then(|value| value.as_str());
 
         assert_eq!(locale, Some("en"));
+    }
+
+    #[test]
+    fn billing_snapshot_from_params_keeps_only_basic_billing_fields() {
+        let params = BillingParams {
+            api_type: "image".to_string(),
+            model: "fal::banana-2".to_string(),
+            quantity: Decimal::new(2, 0),
+            unit: "image:2K".to_string(),
+            metadata: Some(json!({ "resolution": "2K" })),
+        };
+
+        let snapshot = billing_snapshot_from_params(&params);
+
+        assert_eq!(
+            snapshot.get("api_type").and_then(Value::as_str),
+            Some("image")
+        );
+        assert_eq!(
+            snapshot.get("model").and_then(Value::as_str),
+            Some("fal::banana-2")
+        );
+        assert_eq!(snapshot.get("quantity").and_then(Value::as_f64), Some(2.0));
+        assert_eq!(
+            snapshot.get("unit").and_then(Value::as_str),
+            Some("image:2K")
+        );
+        assert_eq!(snapshot.get("metadata"), None);
     }
 }

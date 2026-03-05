@@ -130,7 +130,6 @@ async fn balance(
         "success": true,
         "currency": BILLING_CURRENCY,
         "balance": decimal_to_f64(snapshot.balance),
-        "frozenAmount": decimal_to_f64(snapshot.frozen_amount),
         "totalSpent": decimal_to_f64(snapshot.total_spent),
     })))
 }
