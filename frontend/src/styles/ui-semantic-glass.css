@@ -63,7 +63,7 @@
   background: var(--glass-bg-surface);
   color: var(--glass-text-primary);
   outline: none;
-  transition: border-color 180ms ease-out, box-shadow 200ms cubic-bezier(0.2, 0, 0, 1), background-color 180ms ease-out;
+  transition: border-color var(--glass-duration-normal) ease-out, box-shadow var(--glass-duration-normal) var(--glass-ease-default), background-color var(--glass-duration-normal) ease-out;
 }
 
 .glass-input-base::placeholder,
@@ -110,11 +110,11 @@
   border-radius: var(--glass-radius-sm);
   border: 1px solid transparent;
   transition:
-    transform 200ms cubic-bezier(0.2, 0, 0, 1),
-    background-color 180ms ease-out,
-    border-color 180ms ease-out,
-    box-shadow 200ms cubic-bezier(0.2, 0, 0, 1),
-    color 150ms ease;
+    transform var(--glass-duration-normal) var(--glass-ease-default),
+    background-color var(--glass-duration-normal) ease-out,
+    border-color var(--glass-duration-normal) ease-out,
+    box-shadow var(--glass-duration-normal) var(--glass-ease-default),
+    color var(--glass-duration-fast) ease;
   white-space: nowrap;
 }
 
@@ -140,7 +140,7 @@
 }
 
 .glass-btn-primary:hover:not(:disabled) {
-  background: #d44a32;
+  background: var(--glass-accent-to);
   transform: translateY(-1px);
   box-shadow: 0 12px 24px var(--glass-accent-shadow-strong);
 }
@@ -309,9 +309,9 @@
   border-radius: var(--glass-radius-xs);
   color: var(--glass-text-tertiary);
   transition:
-    transform 180ms cubic-bezier(0.2, 0, 0, 1),
-    background-color 150ms ease,
-    color 150ms ease;
+    transform var(--glass-duration-normal) var(--glass-ease-default),
+    background-color var(--glass-duration-normal) ease,
+    color var(--glass-duration-normal) ease;
 }
 
 .glass-icon-btn-sm:hover {
@@ -330,9 +330,9 @@
   border: 1px solid var(--glass-stroke-base);
   background: var(--glass-bg-surface);
   transition:
-    transform 200ms cubic-bezier(0.2, 0, 0, 1),
-    border-color 180ms ease-out,
-    background-color 180ms ease-out;
+    transform var(--glass-duration-normal) var(--glass-ease-default),
+    border-color var(--glass-duration-normal) ease-out,
+    background-color var(--glass-duration-normal) ease-out;
 }
 
 .glass-list-row:hover {

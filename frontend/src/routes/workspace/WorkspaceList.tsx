@@ -261,19 +261,14 @@ export function WorkspaceList() {
             ))}
       </section>
 
-      {!projectsQuery.isLoading && projects.length === 0 ? (
+      {!projectsQuery.isLoading && projects.length === 0 && search ? (
         <GlassSurface className="mt-6 text-center">
           <p className="text-base font-medium text-[var(--glass-text-primary)]">
-            {search ? t('workspace:noResults') : t('workspace:noProjects')}
+            {t('workspace:noResults')}
           </p>
           <p className="mt-2 text-sm text-[var(--glass-text-secondary)]">
-            {search ? t('workspace:noResultsDesc') : t('workspace:noProjectsDesc')}
+            {t('workspace:noResultsDesc')}
           </p>
-          {!search ? (
-            <GlassButton className="mt-4" variant="primary" onClick={openCreateModal}>
-              {t('workspace:newProject')}
-            </GlassButton>
-          ) : null}
         </GlassSurface>
       ) : null}
 

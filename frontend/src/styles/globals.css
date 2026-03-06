@@ -5,10 +5,14 @@
 
 :root {
   color-scheme: light;
-  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  font-family: var(--glass-font-sans);
   font-weight: 400;
+  font-size: 14px;
+  line-height: 1.6;
   background: var(--glass-bg-canvas);
   min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
@@ -19,7 +23,7 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--glass-text-primary);
-  background: #f8f7f5;
+  background: var(--glass-bg-canvas);
 }
 
 #root {

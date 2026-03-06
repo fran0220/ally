@@ -1,8 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
+import { useAuthSession } from '../hooks/useAuthSession';
+
 export function Landing() {
   const { t } = useTranslation(['landing', 'nav']);
+  const { isAuthenticated } = useAuthSession();
 
   return (
     <main className="page-shell py-12 md:py-16">
@@ -16,15 +19,25 @@ export function Landing() {
           </h1>
           <p className="mt-4 text-base text-[var(--glass-text-secondary)] md:text-lg">{t('landing:subtitle')}</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link className="glass-btn-base glass-btn-primary h-11 w-full justify-center px-6 sm:w-auto" to="/auth/signin">
-              {t('nav:signin')}
-            </Link>
-            <Link className="glass-btn-base glass-btn-secondary h-11 w-full justify-center px-6 sm:w-auto" to="/auth/signup">
-              {t('nav:signup')}
-            </Link>
-            <Link className="glass-btn-base glass-btn-soft h-11 w-full justify-center px-6 sm:w-auto" to="/workspace">
-              {t('landing:enterWorkspace')}
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <p className="flex w-full items-center text-base text-[var(--glass-text-primary)] sm:w-auto">
+                  {t('landing:welcomeBack')}
+                </p>
+                <Link className="glass-btn-base glass-btn-primary h-11 w-full justify-center px-6 sm:w-auto" to="/workspace">
+                  {t('landing:enterWorkspace')}
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link className="glass-btn-base glass-btn-primary h-11 w-full justify-center px-6 sm:w-auto" to="/auth/signin">
+                  {t('nav:signin')}
+                </Link>
+                <Link className="glass-btn-base glass-btn-secondary h-11 w-full justify-center px-6 sm:w-auto" to="/auth/signup">
+                  {t('nav:signup')}
+                </Link>
+              </>
+            )}
           </div>
           <div className="mt-8 grid gap-3 md:grid-cols-3">
             <article className="glass-kpi p-4">

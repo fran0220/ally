@@ -35,20 +35,27 @@ SPA 前端，从 Next.js 迁移而来。
 - 不引入 `lucide-react`，图标使用 `components/ui/icons/custom.tsx`（98 个自定义图标）
 - 数据获取统一用 TanStack Query hooks，不直接在组件中 fetch
 
-## Design Token v2（Glass UI 设计系统）
+## Design Token v2（Glass UI 设计系统 — JAcoworks 统一风格）
 
 所有样式必须使用 CSS 变量，**禁止硬编码** Tailwind 圆角/颜色 class。
 
-### 圆角（锐利风格）
+### 设计基调
+
+暖色奶油基调（Warm Cream），与 JAcoworks 项目视觉统一：
+- 页面背景：`#F5F0EB`（奶油色）
+- 强调色：`#C4724A`（陶土色 Terra Cotta）
+- 文字主色：`#1A1A1A`
+
+### 圆角（柔和风格，对齐 JAcoworks）
 
 | Token | 值 | 用途 |
 |-------|-----|------|
 | `--glass-radius-none` | 0px | 导航栏、工具栏 |
-| `--glass-radius-xs` | 2px | 按钮、Chip、Input |
-| `--glass-radius-sm` | 2px | 表单控件、小组件 |
-| `--glass-radius-md` | 3px | 卡片（`.glass-surface`） |
-| `--glass-radius-lg` | 4px | 面板、侧边栏 |
-| `--glass-radius-xl` | 6px | 弹窗（Modal）— 最大值 |
+| `--glass-radius-xs` | 4px | 图标按钮、小控件 |
+| `--glass-radius-sm` | 6px | 按钮、Chip、Input |
+| `--glass-radius-md` | 8px | 卡片（`.glass-surface`） |
+| `--glass-radius-lg` | 12px | 面板、侧边栏 |
+| `--glass-radius-xl` | 16px | 弹窗（Modal）— 最大值 |
 
 **写法**：`rounded-[var(--glass-radius-md)]`，不要写 `rounded-lg` / `rounded-xl`。
 **例外**：`rounded-full` 可用于圆形元素（头像、状态点、spinner、toggle）。
@@ -57,10 +64,10 @@ SPA 前端，从 Next.js 迁移而来。
 
 | Token | 值 | 用途 |
 |-------|-----|------|
-| `--glass-bg-canvas` | #f8f7f5 | 页面背景 |
-| `--glass-text-primary` | #111111 | 主文本 |
-| `--glass-text-secondary` | #6b6b6b | 次要文本 |
-| `--glass-accent-from` | #e8553a | 强调色（CTA 按钮） |
+| `--glass-bg-canvas` | #F5F0EB | 页面背景 |
+| `--glass-text-primary` | #1A1A1A | 主文本 |
+| `--glass-text-secondary` | #5A5248 | 次要文本 |
+| `--glass-accent-from` | #C4724A | 强调色（CTA 按钮） |
 
 ### 密度（紧凑优先）
 
@@ -97,9 +104,10 @@ SPA 前端，从 Next.js 迁移而来。
 --glass-ease-default: cubic-bezier(0.2, 0, 0, 1);
 --glass-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 --glass-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
---glass-duration-fast: 150ms;
---glass-duration-normal: 200ms;
---glass-duration-slow: 300ms;
+--glass-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+--glass-duration-fast: 120ms;
+--glass-duration-normal: 150ms;
+--glass-duration-slow: 200ms;
 ```
 
 ### ⚠️ 禁止项
