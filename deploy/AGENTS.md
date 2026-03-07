@@ -11,9 +11,7 @@
 ```
 /opt/ally/
 ├── bin/                 # Rust 编译产物
-│   ├── waoowaoo-server  # Axum HTTP API (:3001)
-│   ├── waoowaoo-worker  # Redis Stream 消费者
-│   └── waoowaoo-watchdog # 超时扫描
+│   └── ally             # 单二进制（serve/work/watch 子命令）
 ├── src/                 # 项目源码（rsync 同步）
 ├── frontend/dist/       # Vite SPA 产物
 ├── uploads/             # 用户上传文件
@@ -49,7 +47,7 @@ check job:
 
 deploy job (main only):
   npm run build → rsync src + dist → cargo build --release on server
-  → cp binaries to /opt/ally/bin/ → systemctl restart → health check
+  → cp ally binary to /opt/ally/bin/ → systemctl restart → health check
 ```
 
 ### 手动部署

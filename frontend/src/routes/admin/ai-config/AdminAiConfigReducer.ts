@@ -1,11 +1,28 @@
-import type { AdminAiConfig, AdminModel, AdminProvider, ModelType } from '../../../api/admin';
+import type { CapabilitySelections, CapabilityValue } from '../../../lib/model-config-contract';
+import type {
+  AdminAiConfig,
+  AdminDefaultModels,
+  AdminModel,
+  AdminProvider,
+  ModelType,
+} from '../../../api/admin';
 
 import { validateAdminAiConfig } from './validation';
 
 export const MODEL_TYPES: ModelType[] = ['llm', 'image', 'video', 'audio', 'lipsync'];
 export const PROVIDER_BASE_KEYS = ['openai-compatible', 'gemini-compatible', 'fal', 'qwen'] as const;
+export const DEFAULT_MODEL_FIELDS = [
+  'analysisModel',
+  'characterModel',
+  'locationModel',
+  'storyboardModel',
+  'editModel',
+  'videoModel',
+  'lipSyncModel',
+] as const;
 
 export type ProviderBaseKey = (typeof PROVIDER_BASE_KEYS)[number];
+export type DefaultModelField = (typeof DEFAULT_MODEL_FIELDS)[number];
 
 export interface ProviderPreset {
   label: string;
@@ -64,6 +81,11 @@ export type AdminAiConfigAction =
   | { type: 'MODEL_ADD' }
   | { type: 'MODEL_UPDATE_FIELD'; payload: { index: number } & ModelFieldUpdate }
   | { type: 'MODEL_DELETE'; payload: { index: number } }
+  | { type: 'DEFAULT_MODEL_UPDATE'; payload: { field: DefaultModelField; value: string } }
+  | {
+      type: 'CAPABILITY_DEFAULT_UPDATE';
+      payload: { modelKey: string; field: string; value: CapabilityValue | null };
+    }
   | { type: 'SET_ACTIVE_MODEL_TYPE'; payload: { modelType: ModelType } };
 
 export const adminAiConfigInitialState: AdminAiConfigState = {
@@ -146,6 +168,102 @@ export function updateModelAtIndex(
   return nextModels;
 }
 
+function normalizeAiConfig(payload: AdminAiConfig): AdminAiConfig {
+  return {
+    ...payload,
+    defaultModels: { ...(payload.defaultModels ?? {}) },
+    capabilityDefaults: { ...(payload.capabilityDefaults ?? {}) },
+  };
+}
+
+function remapDefaultModelSelection(
+  defaultModels: AdminDefaultModels | undefined,
+  fromModelKey: string,
+  toModelKey: string,
+): AdminDefaultModels | undefined {
+  if (!defaultModels || fromModelKey === toModelKey) {
+    return defaultModels;
+  }
+
+  let changed = false;
+  const nextDefaultModels: AdminDefaultModels = { ...defaultModels };
+  for (const field of DEFAULT_MODEL_FIELDS) {
+    if ((nextDefaultModels[field] ?? '') === fromModelKey) {
+      nextDefaultModels[field] = toModelKey;
+      changed = true;
+    }
+  }
+
+  return changed ? nextDefaultModels : defaultModels;
+}
+
+function removeModelSelection(
+  defaultModels: AdminDefaultModels | undefined,
+  removedModelKey: string,
+): AdminDefaultModels | undefined {
+  if (!defaultModels) {
+    return defaultModels;
+  }
+
+  let changed = false;
+  const nextDefaultModels: AdminDefaultModels = { ...defaultModels };
+  for (const field of DEFAULT_MODEL_FIELDS) {
+    if ((nextDefaultModels[field] ?? '') === removedModelKey) {
+      delete nextDefaultModels[field];
+      changed = true;
+    }
+  }
+
+  return changed ? nextDefaultModels : defaultModels;
+}
+
+function remapCapabilityDefaultsModelKey(
+  capabilityDefaults: CapabilitySelections | undefined,
+  fromModelKey: string,
+  toModelKey: string,
+): CapabilitySelections | undefined {
+  if (!capabilityDefaults || fromModelKey === toModelKey) {
+    return capabilityDefaults;
+  }
+
+  const currentValues = capabilityDefaults[fromModelKey];
+  if (!currentValues) {
+    return capabilityDefaults;
+  }
+
+  const nextCapabilityDefaults: CapabilitySelections = { ...capabilityDefaults };
+  delete nextCapabilityDefaults[fromModelKey];
+
+  nextCapabilityDefaults[toModelKey] = {
+    ...(nextCapabilityDefaults[toModelKey] ?? {}),
+    ...currentValues,
+  };
+
+  return nextCapabilityDefaults;
+}
+
+function removeCapabilityDefaultsForModels(
+  capabilityDefaults: CapabilitySelections | undefined,
+  removedModelKeys: readonly string[],
+): CapabilitySelections | undefined {
+  if (!capabilityDefaults || removedModelKeys.length === 0) {
+    return capabilityDefaults;
+  }
+
+  const removedSet = new Set(removedModelKeys);
+  let changed = false;
+  const nextCapabilityDefaults: CapabilitySelections = {};
+  for (const [modelKeyValue, values] of Object.entries(capabilityDefaults)) {
+    if (removedSet.has(modelKeyValue)) {
+      changed = true;
+      continue;
+    }
+    nextCapabilityDefaults[modelKeyValue] = values;
+  }
+
+  return changed ? nextCapabilityDefaults : capabilityDefaults;
+}
+
 function withValidation(state: AdminAiConfigState, nextDraft: AdminAiConfig | null): AdminAiConfigState {
   return {
     ...state,
@@ -157,7 +275,7 @@ function withValidation(state: AdminAiConfigState, nextDraft: AdminAiConfig | nu
 export function adminAiConfigReducer(state: AdminAiConfigState, action: AdminAiConfigAction): AdminAiConfigState {
   switch (action.type) {
     case 'LOAD_FROM_SERVER': {
-      const nextDraft = action.payload;
+      const nextDraft = normalizeAiConfig(action.payload);
       return {
         ...state,
         draft: nextDraft,
@@ -214,12 +332,25 @@ export function adminAiConfigReducer(state: AdminAiConfigState, action: AdminAiC
       }
 
       const nextProviders = state.draft.providers.filter((_, index) => index !== action.payload.index);
+      const removedModelKeys = state.draft.models
+        .filter((model) => model.provider === provider.id)
+        .map((model) => model.modelKey);
       const nextModels = state.draft.models.filter((model) => model.provider !== provider.id);
+      const nextDefaultModels = removedModelKeys.reduce<AdminDefaultModels | undefined>(
+        (current, modelKeyValue) => removeModelSelection(current, modelKeyValue),
+        state.draft.defaultModels,
+      );
+      const nextCapabilityDefaults = removeCapabilityDefaultsForModels(
+        state.draft.capabilityDefaults,
+        removedModelKeys,
+      );
 
       return withValidation(state, {
         ...state.draft,
         providers: nextProviders,
         models: nextModels,
+        defaultModels: nextDefaultModels,
+        capabilityDefaults: nextCapabilityDefaults,
       });
     }
 
@@ -283,9 +414,34 @@ export function adminAiConfigReducer(state: AdminAiConfigState, action: AdminAiC
         return state;
       }
 
+      const previousModel = state.draft.models[index];
+      const updatedModel = nextModels[index];
+
+      let nextDefaultModels = state.draft.defaultModels;
+      let nextCapabilityDefaults = state.draft.capabilityDefaults;
+
+      if (previousModel && updatedModel && previousModel.modelKey !== updatedModel.modelKey) {
+        nextDefaultModels = remapDefaultModelSelection(
+          nextDefaultModels,
+          previousModel.modelKey,
+          updatedModel.modelKey,
+        );
+        nextCapabilityDefaults = remapCapabilityDefaultsModelKey(
+          nextCapabilityDefaults,
+          previousModel.modelKey,
+          updatedModel.modelKey,
+        );
+      }
+
+      if (updatedModel && action.payload.field === 'enabled' && !action.payload.value) {
+        nextDefaultModels = removeModelSelection(nextDefaultModels, updatedModel.modelKey);
+      }
+
       return withValidation(state, {
         ...state.draft,
         models: nextModels,
+        defaultModels: nextDefaultModels,
+        capabilityDefaults: nextCapabilityDefaults,
       });
     }
 
@@ -299,9 +455,82 @@ export function adminAiConfigReducer(state: AdminAiConfigState, action: AdminAiC
         return state;
       }
 
+      const nextDefaultModels = removeModelSelection(state.draft.defaultModels, model.modelKey);
+      const nextCapabilityDefaults = removeCapabilityDefaultsForModels(state.draft.capabilityDefaults, [model.modelKey]);
+
       return withValidation(state, {
         ...state.draft,
         models: state.draft.models.filter((_, index) => index !== action.payload.index),
+        defaultModels: nextDefaultModels,
+        capabilityDefaults: nextCapabilityDefaults,
+      });
+    }
+
+    case 'DEFAULT_MODEL_UPDATE': {
+      if (!state.draft) {
+        return state;
+      }
+
+      const { field, value } = action.payload;
+      const currentValue = state.draft.defaultModels?.[field] ?? '';
+      if (currentValue === value) {
+        return state;
+      }
+
+      const nextDefaultModels: AdminDefaultModels = {
+        ...(state.draft.defaultModels ?? {}),
+      };
+
+      if (value.trim()) {
+        nextDefaultModels[field] = value;
+      } else {
+        delete nextDefaultModels[field];
+      }
+
+      return withValidation(state, {
+        ...state.draft,
+        defaultModels: nextDefaultModels,
+      });
+    }
+
+    case 'CAPABILITY_DEFAULT_UPDATE': {
+      if (!state.draft) {
+        return state;
+      }
+
+      const { modelKey: rawModelKey, field, value } = action.payload;
+      const modelKeyValue = rawModelKey.trim();
+      if (!modelKeyValue) {
+        return state;
+      }
+
+      const currentValue = state.draft.capabilityDefaults?.[modelKeyValue]?.[field];
+      if ((value === null && currentValue === undefined) || currentValue === value) {
+        return state;
+      }
+
+      const nextCapabilityDefaults: CapabilitySelections = {
+        ...(state.draft.capabilityDefaults ?? {}),
+      };
+      const nextValues = {
+        ...(nextCapabilityDefaults[modelKeyValue] ?? {}),
+      };
+
+      if (value === null) {
+        delete nextValues[field];
+      } else {
+        nextValues[field] = value;
+      }
+
+      if (Object.keys(nextValues).length === 0) {
+        delete nextCapabilityDefaults[modelKeyValue];
+      } else {
+        nextCapabilityDefaults[modelKeyValue] = nextValues;
+      }
+
+      return withValidation(state, {
+        ...state.draft,
+        capabilityDefaults: nextCapabilityDefaults,
       });
     }
 

@@ -11,7 +11,7 @@ const LEGACY_ROOT = fs.existsSync(path.join(WORKSPACE_ROOT, 'allyvideo'))
   ? path.join(WORKSPACE_ROOT, 'allyvideo')
   : WORKSPACE_ROOT
 const TS_API_ROOT = path.join(LEGACY_ROOT, 'src', 'app', 'api')
-const RUST_ROUTES_ROOT = path.join(WORKSPACE_ROOT, 'crates', 'server', 'src', 'routes')
+const RUST_ROUTES_ROOT = path.join(WORKSPACE_ROOT, 'crates', 'app', 'src', 'routes')
 const REPORT_DIR = fs.existsSync(path.join(LEGACY_ROOT, 'docs'))
   ? path.join(LEGACY_ROOT, 'docs')
   : path.join(WORKSPACE_ROOT, 'docs')
@@ -781,7 +781,7 @@ function extractRustContracts() {
           method: methodEntry.method,
           path: entry.path,
           keys: keys.sort(),
-          source: `waoowaoo-rust/crates/server/src/routes/${fileName}#${methodEntry.handler}`,
+          source: `waoowaoo-rust/crates/app/src/routes/${fileName}#${methodEntry.handler}`,
         })
       }
     }
@@ -794,7 +794,7 @@ function extractRustContracts() {
           method: 'POST',
           path: normalizePath(routePath),
           keys: [...SUBMIT_TASK_KEYS].sort(),
-          source: 'waoowaoo-rust/crates/server/src/routes/novel.rs#handle_task_submission',
+          source: 'waoowaoo-rust/crates/app/src/routes/novel.rs#handle_task_submission',
         })
       }
       const arms = parseNovelDispatchArms(src)
@@ -804,7 +804,7 @@ function extractRustContracts() {
           method: arm.method,
           path: arm.path,
           keys: [...arm.keys].sort(),
-          source: 'waoowaoo-rust/crates/server/src/routes/novel.rs#dispatch',
+          source: 'waoowaoo-rust/crates/app/src/routes/novel.rs#dispatch',
         })
       }
     }

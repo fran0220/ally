@@ -141,9 +141,7 @@ jobs:
             systemctl stop ally-server ally-worker ally-watchdog 2>/dev/null || true
 
             mkdir -p $APP_DIR/bin
-            cp target/release/waoowaoo-server $APP_DIR/bin/
-            cp target/release/waoowaoo-worker $APP_DIR/bin/
-            cp target/release/waoowaoo-watchdog $APP_DIR/bin/
+            cp target/release/ally $APP_DIR/bin/
 
             # Install systemd services
             cp deploy/ally-server.service /etc/systemd/system/

@@ -101,6 +101,35 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
+name = "ally"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "base64",
+ "chrono",
+ "deadpool-redis",
+ "futures",
+ "http 1.4.0",
+ "once_cell",
+ "reqwest",
+ "rust_decimal",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tokio",
+ "tokio-stream",
+ "tower",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "urlencoding",
+ "uuid",
+ "waoowaoo-core",
+ "zip",
+]
+
+[[package]]
 name = "android_system_properties"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4439,68 +4468,6 @@ dependencies = [
  "tracing",
  "urlencoding",
  "uuid",
-]
-
-[[package]]
-name = "waoowaoo-server"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "axum",
- "base64",
- "chrono",
- "deadpool-redis",
- "futures",
- "http 1.4.0",
- "reqwest",
- "rust_decimal",
- "serde",
- "serde_json",
- "sqlx",
- "tokio",
- "tokio-stream",
- "tower",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "urlencoding",
- "uuid",
- "waoowaoo-core",
- "zip",
-]
-
-[[package]]
-name = "waoowaoo-watchdog"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "chrono",
- "deadpool-redis",
- "serde_json",
- "sqlx",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "waoowaoo-core",
-]
-
-[[package]]
-name = "waoowaoo-worker"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "chrono",
- "deadpool-redis",
- "once_cell",
- "rust_decimal",
- "serde",
- "serde_json",
- "sqlx",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "uuid",
- "waoowaoo-core",
 ]
 
 [[package]]

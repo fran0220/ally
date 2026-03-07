@@ -1,7 +1,4 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useToast } from '@/contexts/ToastContext'
-import { GlassModalShell } from '@/components/ui/primitives'
 import { resolveTaskPresentationState } from '@/lib/task/presentation'
 import type { CapabilityValue } from '@/lib/model-config-contract'
 import {
@@ -11,12 +8,10 @@ import {
   useProviders,
 } from '../api-config'
 import { ApiConfigToolbar } from './ApiConfigToolbar'
-import { ApiConfigProviderList } from './ApiConfigProviderList'
 import { useApiConfigFilters } from './hooks/useApiConfigFilters'
 import { ModelCapabilityDropdown } from '@/components/ui/config-modals/ModelCapabilityDropdown'
 import { AppIcon } from '@/components/ui/icons'
 
-type CustomProviderType = 'gemini-compatible' | 'openai-compatible'
 type DefaultModelField =
   | 'analysisModel'
   | 'characterModel'
@@ -93,24 +88,13 @@ function toCapabilityFieldLabel(field: string): string {
 export function ApiConfigTabContainer() {
   const { t, i18n } = useTranslation('apiConfig')
   const { t: tc } = useTranslation('common')
-  const { t: tp } = useTranslation('providerSection')
-  const { showToast } = useToast()
   const locale = i18n.language
   const {
-    providers,
     models,
     defaultModels,
     capabilityDefaults,
     loading,
     saveStatus,
-    updateProviderApiKey,
-    updateProviderBaseUrl,
-    addProvider,
-    deleteProvider,
-    toggleModel,
-    deleteModel,
-    addModel,
-    updateModel,
     updateDefaultModel,
     updateCapabilityDefault,
   } = useProviders()
@@ -126,68 +110,10 @@ export function ApiConfigTabContainer() {
       : null
 
   const {
-    modelProviders,
-    audioProviders,
-    getModelsForProvider,
     getEnabledModelsByType,
   } = useApiConfigFilters({
-    providers,
     models,
   })
-
-  const [showAddGeminiProvider, setShowAddGeminiProvider] = useState(false)
-  const [newGeminiProvider, setNewGeminiProvider] = useState<{
-    name: string
-    baseUrl: string
-    apiKey: string
-    apiType: CustomProviderType
-  }>({
-    name: '',
-    baseUrl: '',
-    apiKey: '',
-    apiType: 'gemini-compatible',
-  })
-
-  const handleAddGeminiProvider = () => {
-    if (!newGeminiProvider.name || !newGeminiProvider.baseUrl) {
-      showToast(tp('fillRequired'), 'warning')
-      return
-    }
-
-    const uuid = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
-      ? crypto.randomUUID()
-      : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
-    const providerId = `${newGeminiProvider.apiType}:${uuid}`
-    const name = newGeminiProvider.name.trim()
-    const baseUrl = newGeminiProvider.baseUrl.trim()
-    const apiKey = newGeminiProvider.apiKey.trim()
-
-    addProvider({
-      id: providerId,
-      name,
-      baseUrl,
-      apiKey,
-      apiMode: newGeminiProvider.apiType === 'openai-compatible' ? 'openai-official' : 'gemini-sdk',
-    })
-
-    setNewGeminiProvider({
-      name: '',
-      baseUrl: '',
-      apiKey: '',
-      apiType: 'gemini-compatible',
-    })
-    setShowAddGeminiProvider(false)
-  }
-
-  const handleCancelAddGeminiProvider = () => {
-    setNewGeminiProvider({
-      name: '',
-      baseUrl: '',
-      apiKey: '',
-      apiType: 'gemini-compatible',
-    })
-    setShowAddGeminiProvider(false)
-  }
 
   if (loading) {
     return (
@@ -342,7 +268,7 @@ export function ApiConfigTabContainer() {
                         {current && card.modelType !== 'lipsync' && (
                           <div className="mt-1.5 flex items-center justify-between px-0.5">
                             <span className="text-[11px] text-[var(--glass-text-tertiary)]">
-                              {current.providerName}
+                              {current.providerName || getProviderDisplayName(current.provider, locale)}
                             </span>
                           </div>
                         )}
@@ -353,135 +279,8 @@ export function ApiConfigTabContainer() {
               })}
             </div>
           </div>
-
-          <ApiConfigProviderList
-            modelProviders={modelProviders}
-            allModels={models}
-            defaultModels={defaultModels}
-            audioProviders={audioProviders}
-            getModelsForProvider={getModelsForProvider}
-            onAddGeminiProvider={() => setShowAddGeminiProvider(true)}
-            onToggleModel={toggleModel}
-            onUpdateApiKey={updateProviderApiKey}
-            onUpdateBaseUrl={updateProviderBaseUrl}
-            onDeleteModel={deleteModel}
-            onUpdateModel={updateModel}
-            onDeleteProvider={deleteProvider}
-            onAddModel={addModel}
-            labels={{
-              providerPool: t('providerPool'),
-              addGeminiProvider: t('addGeminiProvider'),
-              otherProviders: t('otherProviders'),
-              audioCategory: t('audioCategory'),
-              audioApiKey: t('sections.audioApiKey'),
-            }}
-          />
         </div>
       </div>
-
-      <GlassModalShell
-        open={showAddGeminiProvider}
-        onClose={handleCancelAddGeminiProvider}
-        title={t('addGeminiProvider')}
-        description={t('providerPool')}
-        size="md"
-        footer={
-          <div className="flex justify-end gap-2">
-            <button
-              onClick={handleCancelAddGeminiProvider}
-              className="glass-btn-base glass-btn-secondary px-3 py-1.5 text-sm"
-            >
-              {tc('cancel')}
-            </button>
-            <button
-              onClick={handleAddGeminiProvider}
-              className="glass-btn-base glass-btn-primary px-3 py-1.5 text-sm"
-            >
-              {tp('add')}
-            </button>
-          </div>
-        }
-      >
-        <div className="space-y-3">
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-[var(--glass-text-primary)]">
-              {t('apiType')}
-            </label>
-            <div className="relative">
-              <select
-                value={newGeminiProvider.apiType}
-                onChange={(event) =>
-                  setNewGeminiProvider({
-                    ...newGeminiProvider,
-                    apiType: event.target.value as CustomProviderType,
-                  })
-                }
-                className="glass-select-base w-full cursor-pointer appearance-none px-3 py-2.5 pr-8 text-sm"
-              >
-                <option value="gemini-compatible">{t('apiTypeGeminiCompatible')}</option>
-                <option value="openai-compatible">{t('apiTypeOpenAICompatible')}</option>
-              </select>
-              <div className="pointer-events-none absolute right-3 top-3 text-[var(--glass-text-tertiary)]">
-                <Icons.chevronDown />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-[var(--glass-text-primary)]">
-              {tp('name')}
-            </label>
-            <input
-              type="text"
-              value={newGeminiProvider.name}
-              onChange={(event) =>
-                setNewGeminiProvider({
-                  ...newGeminiProvider,
-                  name: event.target.value,
-                })
-              }
-              placeholder={tp('name')}
-              className="glass-input-base w-full px-3 py-2.5 text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-[var(--glass-text-primary)]">
-              {t('baseUrl')}
-            </label>
-            <input
-              type="text"
-              value={newGeminiProvider.baseUrl}
-              onChange={(event) =>
-                setNewGeminiProvider({
-                  ...newGeminiProvider,
-                  baseUrl: event.target.value,
-                })
-              }
-              placeholder={t('baseUrl')}
-              className="glass-input-base w-full px-3 py-2.5 text-sm font-mono"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-[var(--glass-text-primary)]">
-              {t('apiKeyLabel')}
-            </label>
-            <input
-              type="password"
-              value={newGeminiProvider.apiKey}
-              onChange={(event) =>
-                setNewGeminiProvider({
-                  ...newGeminiProvider,
-                  apiKey: event.target.value,
-                })
-              }
-              placeholder={t('apiKeyLabel')}
-              className="glass-input-base w-full px-3 py-2.5 text-sm"
-            />
-          </div>
-        </div>
-      </GlassModalShell>
     </div>
   )
 }

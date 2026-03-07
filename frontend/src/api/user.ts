@@ -111,8 +111,6 @@ export interface UserApiConfigPayload {
 }
 
 export interface UpdateUserApiConfigPayload {
-  models?: UserApiModel[];
-  providers?: UserApiProvider[];
   defaultModels?: UserApiDefaultModels;
   capabilityDefaults?: CapabilitySelections;
 }

@@ -1,8 +1,17 @@
-import type { AdminAiConfig } from '../../../api/admin';
+import type { AdminAiConfig, AdminDefaultModels, ModelType } from '../../../api/admin';
 
 const ALLOWED_PROVIDER_BASE_KEYS = ['fal', 'qwen', 'openai-compatible', 'gemini-compatible'] as const;
 
 type AllowedProviderBaseKey = (typeof ALLOWED_PROVIDER_BASE_KEYS)[number];
+const DEFAULT_MODEL_FIELD_TYPES: Record<keyof AdminDefaultModels, ModelType> = {
+  analysisModel: 'llm',
+  characterModel: 'image',
+  locationModel: 'image',
+  storyboardModel: 'image',
+  editModel: 'image',
+  videoModel: 'video',
+  lipSyncModel: 'lipsync',
+};
 
 function providerBaseKey(value: string): string {
   return value.split(':')[0] ?? value;
@@ -85,6 +94,31 @@ export function validateAdminAiConfig(config: AdminAiConfig | null): Record<stri
 
     if (!Number.isFinite(model.price) || model.price < 0) {
       errors[`models[${index}].price`] = 'Price must be greater than or equal to 0.';
+    }
+  }
+
+  const enabledModelByKey = new Map(
+    config.models
+      .filter((model) => model.enabled)
+      .map((model) => [model.modelKey.trim(), model] as const),
+  );
+
+  for (const [field, expectedType] of Object.entries(DEFAULT_MODEL_FIELD_TYPES) as Array<
+    [keyof AdminDefaultModels, ModelType]
+  >) {
+    const selectedModelKey = config.defaultModels?.[field]?.trim() ?? '';
+    if (!selectedModelKey) {
+      continue;
+    }
+
+    const matchedModel = enabledModelByKey.get(selectedModelKey);
+    if (!matchedModel) {
+      errors[`defaultModels.${field}`] = 'Default model must reference an enabled model.';
+      continue;
+    }
+
+    if (matchedModel.type !== expectedType) {
+      errors[`defaultModels.${field}`] = `Default model type must be ${expectedType}.`;
     }
   }
 

@@ -8,9 +8,7 @@
 ally/
 ├── crates/
 │   ├── core/       # 共享业务基础（config, auth, db, errors, llm, runtime）
-│   ├── server/     # Axum HTTP API 服务（routes, middleware, SSE）
-│   ├── worker/     # Redis Stream 消费者进程（image/text/video/voice handlers）
-│   └── watchdog/   # 超时扫描进程
+│   └── app/        # 单一入口二进制（serve/work/watch 子命令）
 ├── frontend/       # React 19 + Vite 7 + TailwindCSS 4 + TanStack Query
 ├── deploy/         # 部署配置（灰度发布模板、CI 脚本）
 ├── migrations/     # SQL 迁移文件（SQLx MySQL）
@@ -30,7 +28,20 @@ ally/
 | 前端 | React 19 + React Router 7 + Vite 7 + TailwindCSS 4 |
 | 国际化 | i18next |
 | 数据获取 | TanStack Query v5 |
-| 构建 | Cargo workspace (edition 2024) |
+| 构建 | Cargo workspace（core + app，edition 2024） |
+
+## 运行模式
+
+```bash
+# API（默认）
+cargo run -p ally
+
+# Worker
+cargo run -p ally -- work
+
+# Watchdog
+cargo run -p ally -- watch
+```
 
 ## 验证命令（必须在提交前通过）
 
@@ -93,9 +104,9 @@ cd frontend && npm run build           # Vite 构建
 ### 计费流程
 
 ```
-任务提交（server）→ 余额预检查（快速失败）→ 入队
-任务完成（worker）→ extract_billing_params → deduct_credits（原子扣减）
-任务失败（worker）→ 无操作（未扣过不用退）
+任务提交（serve）→ 余额预检查（快速失败）→ 入队
+任务完成（work）→ extract_billing_params → deduct_credits（原子扣减）
+任务失败（work）→ 无操作（未扣过不用退）
 ```
 
 ### 关键代码

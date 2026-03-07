@@ -1,4 +1,5 @@
 import { apiRequest } from './client';
+import type { CapabilitySelections, ModelCapabilities } from '../lib/model-config-contract';
 
 export type ModelType = 'llm' | 'image' | 'video' | 'audio' | 'lipsync';
 
@@ -18,12 +19,25 @@ export interface AdminModel {
   provider: string;
   enabled: boolean;
   price: number;
+  capabilities?: ModelCapabilities;
   customPricing?: Record<string, unknown>;
+}
+
+export interface AdminDefaultModels {
+  analysisModel?: string;
+  characterModel?: string;
+  locationModel?: string;
+  storyboardModel?: string;
+  editModel?: string;
+  videoModel?: string;
+  lipSyncModel?: string;
 }
 
 export interface AdminAiConfig {
   providers: AdminProvider[];
   models: AdminModel[];
+  defaultModels?: AdminDefaultModels;
+  capabilityDefaults?: CapabilitySelections;
 }
 
 export function getAdminAiConfig() {

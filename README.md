@@ -160,14 +160,14 @@ mysql -u root -p waoowaoo < migrations/0002_run_runtime.sql
 
 ### 3. 启动后端三进程
 ```bash
-# API
-cargo run -p waoowaoo-server
+# API（默认 serve）
+cargo run -p ally
 
 # Worker（新终端）
-cargo run -p waoowaoo-worker
+cargo run -p ally -- work
 
 # Watchdog（新终端）
-cargo run -p waoowaoo-watchdog
+cargo run -p ally -- watch
 ```
 
 ### 4. 启动前端
