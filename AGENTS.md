@@ -74,11 +74,45 @@ cd frontend && npm run build           # Vite 构建
 - 样式：TailwindCSS 4（@tailwindcss/vite 插件）
 - 文件命名：PascalCase 组件文件，camelCase 工具文件
 
+## AI 模型接入
+
+通过 CLIProxyAPI 中转站 + jimeng-gateway 统一接入，6 种 Provider：
+
+| Provider Key | 协议 | Base URL | 用途 |
+|---|---|---|---|
+| `openai-compatible` | OpenAI `/v1/chat/completions` | LLM Proxy `/v1` | LLM (GPT/Grok/GLM) + 图片 (gemini-flash-image-preview via chat) |
+| `gemini-compatible` | Gemini `generateContent` | LLM Proxy | LLM (Gemini text) + 图片 (Gemini native) |
+| `anthropic` | Anthropic `/v1/messages` | LLM Proxy | LLM (Claude sonnet/opus) |
+| `fal` | FAL queue API | fal.ai 原生 | 视频 (kling/veo) + 唇形同步 + 语音克隆 |
+| `qwen` | 阿里 DashScope | dashscope.aliyuncs.com | 语音设计 (TTS 定制) |
+| `jimeng` | 异步任务 (POST + 轮询) | jpdata:5100 | 视频 (seedance-2.0) |
+
+### 生成能力 → Provider 映射
+
+| 能力 | 入口函数 | 支持的 Provider |
+|---|---|---|
+| 图片生成 | `generators::generate_image` | fal, openai-compatible, gemini-compatible |
+| 视频生成 | `generators::generate_video` | fal (kling/veo), openai-compatible, jimeng (seedance) |
+| 唇形同步 | `generators::generate_lip_sync` | fal |
+| 语音克隆 | `generators::generate_voice_clone` | fal |
+| 语音设计 | `generators::create_voice_design` | qwen |
+| LLM 流式 | `llm::stream_chat` | openai-compatible, gemini-compatible, anthropic |
+
+### 管理员 Provider 白名单
+
+后端 `admin.rs` + 前端 `validation.ts` 同步维护：
+`["fal", "qwen", "openai-compatible", "gemini-compatible", "anthropic", "jimeng"]`
+
+### model_key 格式
+
+`provider_id::model_id`，例如 `openai-compatible::gpt-5.4`、`jimeng::seedance-2.0`
+
 ## 部署目标
 
 - 服务器：`jpdata`（185.200.65.233），SSH root 用户
-- 基础设施：Docker (MySQL 8.0 + Redis 7) + PM2 (Node.js) + Nginx 反代
+- 基础设施：Docker (MySQL 8.0 + Redis 7) + Nginx 反代
 - 部署模式：rsync + SSH 远程重启
+- jpdata 上的 jimeng-gateway：systemd 服务，端口 5100，上游 jimeng-free-api Docker :8000
 
 ## 环境变量（必须）
 
