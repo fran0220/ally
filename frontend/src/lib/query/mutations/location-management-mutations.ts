@@ -14,6 +14,7 @@ import {
     invalidateQueryTemplates,
     requestJsonWithError,
     requestTaskResponseWithError,
+    tMutationError,
     requestVoidWithError,
 } from './mutation-shared'
 
@@ -265,7 +266,7 @@ export function useConfirmProjectLocationSelection(projectId: string) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ locationId }),
                 },
-                '确认选择失败',
+                tMutationError('confirmSelectionFailed'),
             ),
         onSettled: invalidateProjectAssets,
     })

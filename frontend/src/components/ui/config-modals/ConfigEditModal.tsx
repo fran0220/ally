@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  ART_STYLES,
+  resolveArtStyleOptions,
   VIDEO_RATIOS,
 } from '../../../lib/constants';
 import type {
@@ -136,7 +136,12 @@ export function SettingsModal({
   onTTSRateChange,
 }: SettingsModalProps) {
   const { t } = useTranslation('configModal');
+  const { t: tCommon } = useTranslation('common');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saved'>('idle');
+  const artStyleOptions = useMemo(
+    () => resolveArtStyleOptions((key) => tCommon(key)),
+    [tCommon],
+  );
   const userModels = useMemo<UserModels>(() => ({
     llm: Array.isArray(availableModels?.llm) ? availableModels.llm : [],
     image: Array.isArray(availableModels?.image) ? availableModels.image : [],
@@ -330,7 +335,7 @@ export function SettingsModal({
               <StyleSelector
                 value={artStyle}
                 onChange={(value) => handleChange(onArtStyleChange)(value)}
-                options={ART_STYLES}
+                options={artStyleOptions}
               />
             </div>
           </div>

@@ -35,6 +35,7 @@ fn parse_reference_images(payload: &Value) -> Vec<String> {
 pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     let mysql = runtime::mysql()?;
     let payload = &task.payload;
+    let locale = shared::resolve_prompt_locale(payload);
     let is_asset_hub = task.task_type == "asset_hub_reference_to_character";
     let references = parse_reference_images(payload);
     if references.is_empty() {
@@ -87,8 +88,9 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         .ok_or_else(|| AppError::invalid_params("character image model is not configured"))?;
 
     let custom_description = shared::read_string(payload, "customDescription");
-    let character_name = shared::read_string(payload, "characterName")
-        .unwrap_or_else(|| "新角色 - 初始形象".to_string());
+    let character_name = shared::read_string(payload, "characterName").unwrap_or_else(|| {
+        shared::l(locale, "新角色 - 初始形象", "New Character - Initial Look").to_string()
+    });
     let art_style = shared::read_string(payload, "artStyle");
     let mut prompt = if let Some(description) = custom_description.clone() {
         description
@@ -99,9 +101,9 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
             &PromptVariables::new(),
         )?
     };
-    prompt = shared::add_character_prompt_suffix(&prompt);
+    prompt = shared::add_character_prompt_suffix_for_locale(&prompt, locale);
     if let Some(style) = art_style {
-        prompt = format!("{prompt}，{style}");
+        prompt = format!("{prompt}{}{style}", shared::l(locale, "，", ", "));
     }
 
     let _ = task

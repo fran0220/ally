@@ -3,6 +3,7 @@ import { resolveTaskResponse } from '@/lib/task/client'
 import {
   requestJsonWithError,
   requestTaskResponseWithError,
+  tMutationError,
 } from './mutation-shared'
 import {
   invalidateGlobalCharacters,
@@ -41,7 +42,7 @@ export function useCreateAssetHubLocation() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-      }, '创建失败')
+      }, tMutationError('createFailed'))
     },
     onSuccess: invalidateLocations,
   })
@@ -57,7 +58,7 @@ export function useUploadAssetHubTempMedia() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         },
-        '上传失败',
+        tMutationError('uploadFailed'),
       ),
   })
 }
@@ -117,7 +118,7 @@ export function useCreateAssetHubCharacter() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-      }, '创建角色失败'),
+      }, tMutationError('createCharacterFailed')),
     onSuccess: invalidateCharacters,
   })
 }

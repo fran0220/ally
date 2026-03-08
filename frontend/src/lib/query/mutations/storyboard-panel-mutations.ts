@@ -12,6 +12,7 @@ import {
     invalidateQueryTemplates,
     requestJsonWithError,
     requestTaskResponseWithError,
+    tMutationError,
 } from './mutation-shared'
 
 export function useRegenerateProjectPanelImage(projectId: string) {
@@ -25,15 +26,15 @@ export function useRegenerateProjectPanelImage(projectId: string) {
             })
             if (!res.ok) {
                 const error = await res.json().catch(() => ({}))
-                if (res.status === 402) throw new Error('余额不足，请充值后继续使用')
+                if (res.status === 402) throw new Error(tMutationError('insufficientBalance'))
                 if (res.status === 400 && String(error?.error || '').includes('敏感')) {
-                    throw new Error(resolveTaskErrorMessage(error, '提示词包含敏感内容'))
+                    throw new Error(resolveTaskErrorMessage(error, tMutationError('sensitivePrompt')))
                 }
                 if (res.status === 429 || error?.code === 'RATE_LIMIT') {
                     const retryAfter = error?.retryAfter || 60
-                    throw new Error(`API 配额超限，请等待 ${retryAfter} 秒后重试`)
+                    throw new Error(tMutationError('apiQuotaExceeded', { retryAfter }))
                 }
-                throw new Error(resolveTaskErrorMessage(error, '重新生成失败'))
+                throw new Error(resolveTaskErrorMessage(error, tMutationError('regenerateFailed')))
             }
             return res.json()
         },
@@ -83,7 +84,7 @@ export function useModifyProjectStoryboardImage(projectId: string) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
-            }, '修改失败')
+            }, tMutationError('modifyFailed'))
         },
         onSettled: () => {
             invalidateQueryTemplates(queryClient, [queryKeys.projectAssets.all(projectId)])
@@ -103,7 +104,7 @@ export function useDownloadProjectImages(projectId: string) {
             })
             if (!response.ok) {
                 const error = await response.json().catch(() => ({}))
-                throw new Error(resolveTaskErrorMessage(error, '下载失败'))
+                throw new Error(resolveTaskErrorMessage(error, tMutationError('downloadFailed')))
             }
             return response.blob()
         },
@@ -126,7 +127,7 @@ export function useUpdateProjectPanel(projectId: string) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
                 },
-                '保存失败',
+                tMutationError('saveFailed'),
             ),
         onSettled: () => {
             invalidateQueryTemplates(queryClient, [queryKeys.projectAssets.all(projectId)])
@@ -146,7 +147,7 @@ export function useCreateProjectPanel(projectId: string) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
-            }, '添加失败')
+            }, tMutationError('addFailed'))
         },
         onSettled: () => {
             invalidateQueryTemplates(queryClient, [queryKeys.projectAssets.all(projectId)])
@@ -164,7 +165,7 @@ export function useDeleteProjectPanel(projectId: string) {
         mutationFn: async ({ panelId }: { panelId: string }) => {
             return await requestJsonWithError(`/api/novel-promotion/${projectId}/panel?panelId=${panelId}`, {
                 method: 'DELETE',
-            }, '删除失败')
+            }, tMutationError('deleteFailed'))
         },
         onSettled: () => {
             invalidateQueryTemplates(queryClient, [queryKeys.projectAssets.all(projectId)])
@@ -183,7 +184,7 @@ export function useDeleteProjectStoryboardGroup(projectId: string) {
             return await requestJsonWithError(
                 `/api/novel-promotion/${projectId}/storyboard-group?storyboardId=${storyboardId}`,
                 { method: 'DELETE' },
-                '删除失败',
+                tMutationError('deleteFailed'),
             )
         },
         onSettled: () => {
@@ -225,7 +226,7 @@ export function useCreateProjectStoryboardGroup(projectId: string) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
-            }, '添加失败')
+            }, tMutationError('addFailed'))
         },
         onSettled: () => {
             invalidateQueryTemplates(queryClient, [queryKeys.projectAssets.all(projectId)])
@@ -245,7 +246,7 @@ export function useMoveProjectStoryboardGroup(projectId: string) {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
-            }, '移动失败')
+            }, tMutationError('moveFailed'))
         },
         onSettled: () => {
             invalidateQueryTemplates(queryClient, [queryKeys.projectAssets.all(projectId)])
@@ -265,7 +266,7 @@ export function useInsertProjectPanel(projectId: string) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
-            }, '插入分镜失败')
+            }, tMutationError('insertPanelFailed'))
         },
         onSettled: () => {
             invalidateQueryTemplates(queryClient, [queryKeys.projectAssets.all(projectId)])
@@ -298,7 +299,7 @@ export function useCreateProjectPanelVariant(projectId: string) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
-            }, '生成变体失败')
+            }, tMutationError('createVariantFailed'))
         },
         onSettled: () => {
             invalidateQueryTemplates(queryClient, [queryKeys.projectAssets.all(projectId)])
@@ -320,7 +321,7 @@ export function useClearProjectStoryboardError(projectId: string) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ storyboardId }),
                 },
-                '清除分镜错误失败',
+                tMutationError('clearStoryboardErrorFailed'),
             ),
         onSettled: () => {
             invalidateQueryTemplates(queryClient, [queryKeys.projectAssets.all(projectId)])

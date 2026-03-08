@@ -8,6 +8,7 @@ use super::shared;
 
 pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     let payload = &task.payload;
+    let locale = shared::resolve_prompt_locale(payload);
     let modify_instruction = shared::read_string(payload, "modifyInstruction")
         .ok_or_else(|| AppError::invalid_params("modifyInstruction is required"))?;
     let current_description = shared::read_string(payload, "currentDescription")
@@ -22,8 +23,8 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         "asset_hub_ai_modify_location" => {
             let target_id = shared::read_string(payload, "locationId")
                 .ok_or_else(|| AppError::invalid_params("locationId is required"))?;
-            let location_name =
-                shared::read_string(payload, "locationName").unwrap_or_else(|| "场景".to_string());
+            let location_name = shared::read_string(payload, "locationName")
+                .unwrap_or_else(|| shared::l(locale, "场景", "Scene").to_string());
 
             let mut prompt_variables = PromptVariables::new();
             prompt_variables.insert("location_name".to_string(), location_name);

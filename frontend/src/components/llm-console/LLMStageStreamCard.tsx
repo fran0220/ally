@@ -35,8 +35,8 @@ export type LLMStageStreamCardProps = {
 };
 
 const PROGRESS_KEY_PREFIX = 'progress.';
-const REASONING_HEADER = '【思考过程】';
-const FINAL_HEADER = '【最终结果】';
+const REASONING_MARKERS = ['【思考过程】', '【Reasoning】'];
+const FINAL_MARKERS = ['【最终结果】', '【Final Output】'];
 
 function statusClass(status: LLMStageViewStatus): string {
   if (status === 'completed') return 'glass-chip glass-chip-success';
@@ -51,6 +51,28 @@ function clampProgress(value: number): number {
   return Math.max(0, Math.min(100, value));
 }
 
+function findLeadingMarker(input: string, markers: readonly string[]): string | null {
+  for (const marker of markers) {
+    if (input.startsWith(marker)) return marker;
+  }
+  return null;
+}
+
+function findFirstMarker(input: string, markers: readonly string[], fromIndex = 0): {
+  marker: string;
+  index: number;
+} | null {
+  let matched: { marker: string; index: number } | null = null;
+  for (const marker of markers) {
+    const index = input.indexOf(marker, fromIndex);
+    if (index < 0) continue;
+    if (!matched || index < matched.index) {
+      matched = { marker, index };
+    }
+  }
+  return matched;
+}
+
 function splitStructuredOutput(raw: string): {
   hasStructured: boolean;
   showReasoning: boolean;
@@ -59,7 +81,10 @@ function splitStructuredOutput(raw: string): {
   finalText: string;
 } {
   const normalized = typeof raw === 'string' ? raw : '';
-  if (!normalized.startsWith(REASONING_HEADER) && !normalized.startsWith(FINAL_HEADER)) {
+  const leadingReasoningMarker = findLeadingMarker(normalized, REASONING_MARKERS);
+  const leadingFinalMarker = findLeadingMarker(normalized, FINAL_MARKERS);
+
+  if (!leadingReasoningMarker && !leadingFinalMarker) {
     return {
       hasStructured: false,
       showReasoning: false,
@@ -69,35 +94,36 @@ function splitStructuredOutput(raw: string): {
     };
   }
 
-  const finalIndex = normalized.indexOf(FINAL_HEADER);
-  if (normalized.startsWith(REASONING_HEADER) && finalIndex >= 0) {
-    const reasoning = normalized.slice(REASONING_HEADER.length, finalIndex).trim();
-    const finalText = normalized.slice(finalIndex + FINAL_HEADER.length).trim();
-    return {
-      hasStructured: true,
-      showReasoning: true,
-      showFinal: true,
-      reasoning,
-      finalText,
-    };
-  }
+  if (leadingReasoningMarker) {
+    const finalMarker = findFirstMarker(normalized, FINAL_MARKERS, leadingReasoningMarker.length);
+    if (finalMarker) {
+      const reasoning = normalized.slice(leadingReasoningMarker.length, finalMarker.index).trim();
+      const finalText = normalized.slice(finalMarker.index + finalMarker.marker.length).trim();
+      return {
+        hasStructured: true,
+        showReasoning: true,
+        showFinal: true,
+        reasoning,
+        finalText,
+      };
+    }
 
-  if (normalized.startsWith(REASONING_HEADER)) {
     return {
       hasStructured: true,
       showReasoning: true,
       showFinal: true,
-      reasoning: normalized.slice(REASONING_HEADER.length).trim(),
+      reasoning: normalized.slice(leadingReasoningMarker.length).trim(),
       finalText: '',
     };
   }
 
+  const finalMarker = leadingFinalMarker ?? '【最终结果】';
   return {
     hasStructured: true,
     showReasoning: true,
     showFinal: true,
     reasoning: '',
-    finalText: normalized.slice(FINAL_HEADER.length).trim(),
+    finalText: normalized.slice(finalMarker.length).trim(),
   };
 }
 
@@ -143,6 +169,8 @@ export default function LLMStageStreamCard({
   );
 
   const resolvedPlaceholderText = resolveProgressText(placeholderText, 'stageCard.waitingModelOutput');
+  const reasoningHeader = t('common:llmOutputHeaders.reasoning');
+  const finalHeader = t('common:llmOutputHeaders.final');
 
   const outputStageId = selectedStageId || activeStageId;
   const outputRef = useRef<HTMLDivElement | null>(null);
@@ -356,7 +384,7 @@ export default function LLMStageStreamCard({
                 {structuredOutput.showReasoning ? (
                   <div className="rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface)]">
                     <div className="border-b border-[var(--glass-stroke-base)] px-3 py-2 text-xs font-semibold text-[var(--glass-text-primary)]">
-                      {REASONING_HEADER}
+                      {reasoningHeader}
                     </div>
                     <pre className="min-h-[110px] whitespace-pre-wrap break-words px-3 py-3 font-mono text-[14px] leading-7 text-[var(--glass-text-secondary)]">
                       {structuredOutput.reasoning ||
@@ -372,7 +400,7 @@ export default function LLMStageStreamCard({
                 {structuredOutput.showFinal ? (
                   <div className="rounded-[var(--glass-radius-md)] border border-[var(--glass-stroke-base)] bg-[var(--glass-bg-surface)]">
                     <div className="border-b border-[var(--glass-stroke-base)] px-3 py-2 text-xs font-semibold text-[var(--glass-text-primary)]">
-                      {FINAL_HEADER}
+                      {finalHeader}
                     </div>
                     <pre className="min-h-[110px] whitespace-pre-wrap break-words px-3 py-3 font-mono text-[14px] leading-7 text-[var(--glass-text-secondary)]">
                       {structuredOutput.finalText || t('stageCard.waitingModelOutput')}

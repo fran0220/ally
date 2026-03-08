@@ -15,7 +15,7 @@
     "recommended": "Recommended"
   },
   "markerDetection": {
-    "enable": "Use Markers (Episode X / 第X集)",
+    "enable": "Use Markers (Episode X)",
     "tooltip": "Auto-detect [Episode X], [Chapter X], [第X集/章] markers, free & fast"
   },
   "smartImportDesc": "Upload your novel or script, AI engine automatically identifies chapter structure for one-click smart episode splitting.",

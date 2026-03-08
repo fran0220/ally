@@ -6,7 +6,7 @@
 import { useTranslations } from '@/compat/next-intl'
 import { useState, useRef, useEffect } from 'react'
 import '@/styles/animations.css'
-import { ART_STYLES, VIDEO_RATIOS } from '@/lib/constants'
+import { resolveArtStyleOptions, VIDEO_RATIOS } from '@/lib/constants'
 import { TaskStatusInline } from '@/components/task/TaskStatusInline'
 import { resolveTaskPresentationState } from '@/lib/task/presentation'
 import { AppIcon, RatioPreviewIcon } from '@/components/ui/icons'
@@ -196,6 +196,8 @@ export default function NovelInputStage({
   onArtStyleChange
 }: NovelInputStageProps) {
   const t = useTranslations('novelPromotion')
+  const tc = useTranslations('common')
+  const artStyleOptions = resolveArtStyleOptions(tc)
   const hasContent = novelText.trim().length > 0
   const stageSwitchingState = isSwitchingStage
     ? resolveTaskPresentationState({
@@ -282,7 +284,7 @@ AI 将根据您的文本智能分析：
             <StyleSelector
               value={artStyle}
               onChange={(value) => onArtStyleChange?.(value)}
-              options={ART_STYLES}
+              options={artStyleOptions}
             />
           </div>
         </div>

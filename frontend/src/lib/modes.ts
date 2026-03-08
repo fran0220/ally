@@ -4,8 +4,8 @@ export type { ProjectMode };
 
 export interface ModeConfig {
   id: ProjectMode;
-  name: string;
-  description: string;
+  nameKey: string;
+  descriptionKey: string;
   icon: string;
   color: string;
   available: boolean;
@@ -13,8 +13,8 @@ export interface ModeConfig {
 
 export const PROJECT_MODE: ModeConfig = {
   id: 'novel-promotion',
-  name: '小说推文',
-  description: '从小说生成推广短视频',
+  nameKey: 'modes.novelPromotion.name',
+  descriptionKey: 'modes.novelPromotion.description',
   icon: 'N',
   color: 'purple',
   available: true,

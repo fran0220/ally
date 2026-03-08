@@ -35,6 +35,9 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     shared::ensure_novel_project(task).await?;
     let mysql = runtime::mysql()?;
     let payload = &task.payload;
+    let locale = shared::resolve_prompt_locale(payload);
+    let list_separator = shared::l(locale, "、", ", ");
+    let none_text = shared::l(locale, "无", "None");
 
     let episode_id = shared::read_episode_id(task)
         .ok_or_else(|| AppError::invalid_params("episodeId is required"))?;
@@ -83,17 +86,18 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         .iter()
         .map(|item| item.name.as_str())
         .collect::<Vec<_>>()
-        .join("、");
+        .join(list_separator);
     let locations_lib_name = location_rows
         .iter()
         .map(|item| item.name.as_str())
         .collect::<Vec<_>>()
-        .join("、");
+        .join(list_separator);
     let characters_introduction = shared::build_characters_introduction(
         &character_rows
             .iter()
             .map(|item| (item.name.clone(), item.introduction.clone()))
             .collect::<Vec<_>>(),
+        locale,
     );
 
     let _ = task
@@ -124,7 +128,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         prompt_variables.insert(
             "locations_lib_name".to_string(),
             if locations_lib_name.is_empty() {
-                "无".to_string()
+                none_text.to_string()
             } else {
                 locations_lib_name.clone()
             },
@@ -132,7 +136,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         prompt_variables.insert(
             "characters_lib_name".to_string(),
             if characters_lib_name.is_empty() {
-                "无".to_string()
+                none_text.to_string()
             } else {
                 characters_lib_name.clone()
             },
@@ -153,7 +157,12 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
             run_id: Some(run_id.clone()),
             stream_run_id: Some(run_id.clone()),
             step_id: Some(format!("screenplay_clip_{}", clip.id)),
-            step_title: Some(format!("片段剧本转换 {}/{}", index + 1, total)),
+            step_title: Some(format!(
+                "{} {}/{}",
+                shared::l(locale, "片段剧本转换", "Screenplay Conversion"),
+                index + 1,
+                total
+            )),
             step_attempt: Some(1),
             step_index: Some(i32::try_from(index + 1).unwrap_or(1)),
             step_total: Some(i32::try_from(total).unwrap_or(1)),

@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use axum::{
     Json, Router,
     extract::{Path, Query, State},
+    http::{HeaderMap, header},
     routing::get,
 };
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
@@ -67,6 +68,23 @@ fn normalize_page(page: i64) -> i64 {
 
 fn normalize_page_size(page_size: i64) -> i64 {
     page_size.clamp(1, 200)
+}
+
+fn request_locale(headers: &HeaderMap) -> &'static str {
+    let is_english = headers
+        .get(header::ACCEPT_LANGUAGE)
+        .and_then(|raw| raw.to_str().ok())
+        .and_then(|raw| raw.split(',').next())
+        .and_then(|raw| raw.split(';').next())
+        .map(str::trim)
+        .map(|raw| raw.to_ascii_lowercase())
+        .filter(|raw| !raw.is_empty())
+        .is_some_and(|raw| raw == "en" || raw.starts_with("en-"));
+    if is_english { "en" } else { "zh" }
+}
+
+fn localized_msg<'a>(locale: &str, zh: &'a str, en: &'a str) -> &'a str {
+    if locale == "en" { en } else { zh }
 }
 
 fn parse_start_datetime(raw: &str) -> Result<NaiveDateTime, AppError> {
@@ -137,7 +155,9 @@ async fn balance(
 async fn costs(
     State(state): State<AppState>,
     user: AuthUser,
+    headers: HeaderMap,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    let locale = request_locale(&headers);
     let summary = get_user_cost_summary(&state.mysql, &user.id).await?;
 
     let project_ids = summary
@@ -156,7 +176,9 @@ async fn costs(
                 "projectName": project_name_map
                     .get(&item.project_id)
                     .cloned()
-                    .unwrap_or_else(|| "未知项目".to_string()),
+                    .unwrap_or_else(|| {
+                        localized_msg(locale, "未知项目", "Unknown Project").to_string()
+                    }),
                 "totalCost": item.total_cost,
                 "recordCount": item.record_count,
             })

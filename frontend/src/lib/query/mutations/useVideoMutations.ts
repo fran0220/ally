@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '../keys'
-import { invalidateQueryTemplates, requestJsonWithError } from './mutation-shared'
+import { invalidateQueryTemplates, requestJsonWithError, tMutationError } from './mutation-shared'
 
 /**
  * 获取剧集可下载视频列表（项目）
@@ -18,7 +18,7 @@ export function useListProjectEpisodeVideoUrls(projectId: string) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         },
-        '获取视频列表失败',
+        tMutationError('fetchVideoListFailed'),
       ),
   })
 }
@@ -40,7 +40,7 @@ export function useUpdateProjectPanelLink(projectId: string) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         },
-        '保存链接状态失败',
+        tMutationError('saveLinkStatusFailed'),
       ),
   })
 }

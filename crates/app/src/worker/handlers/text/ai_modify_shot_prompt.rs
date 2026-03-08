@@ -1,12 +1,12 @@
 use serde_json::{Value, json};
 use waoowaoo_core::errors::AppError;
-use waoowaoo_core::prompt_i18n::{PromptIds, PromptVariables};
+use waoowaoo_core::prompt_i18n::{PromptIds, PromptLocale, PromptVariables};
 
 use crate::task_context::TaskContext;
 
 use super::shared;
 
-fn collect_asset_descriptions(payload: &Value) -> Option<String> {
+fn collect_asset_descriptions(payload: &Value, locale: PromptLocale) -> Option<String> {
     let assets = payload.get("referencedAssets")?.as_array()?;
     let descriptions = assets
         .iter()
@@ -36,12 +36,13 @@ fn collect_asset_descriptions(payload: &Value) -> Option<String> {
     if descriptions.is_empty() {
         None
     } else {
-        Some(descriptions.join("，"))
+        Some(descriptions.join(shared::l(locale, "，", ", ")))
     }
 }
 
 pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     let payload = &task.payload;
+    let locale = shared::resolve_prompt_locale(payload);
     let current_prompt = shared::read_string(payload, "currentPrompt")
         .ok_or_else(|| AppError::invalid_params("currentPrompt is required"))?;
     let current_video_prompt =
@@ -59,9 +60,12 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         .report_progress(22, Some("ai_modify_shot_prompt_prepare"))
         .await?;
 
-    let user_input = match collect_asset_descriptions(payload) {
+    let user_input = match collect_asset_descriptions(payload, locale) {
         Some(asset_descriptions) => {
-            format!("{modify_instruction}\n\n引用的资产描述：{asset_descriptions}")
+            format!(
+                "{modify_instruction}\n\n{} {asset_descriptions}",
+                shared::l(locale, "引用的资产描述：", "Referenced asset descriptions:")
+            )
         }
         None => modify_instruction,
     };
@@ -71,7 +75,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     prompt_variables.insert(
         "video_prompt_input".to_string(),
         if current_video_prompt.is_empty() {
-            "无".to_string()
+            shared::l(locale, "无", "None").to_string()
         } else {
             current_video_prompt
         },

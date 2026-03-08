@@ -7,6 +7,7 @@ import {
   requestBlobWithError,
   requestJsonWithError,
   requestTaskResponseWithError,
+  tMutationError,
 } from './mutation-shared'
 
 /**
@@ -22,7 +23,7 @@ export function useListProjectEpisodes(projectId: string) {
           description?: string
           novelText?: string
         }>
-      }>(`/api/novel-promotion/${projectId}/episodes`, { method: 'GET' }, '获取剧集失败'),
+      }>(`/api/novel-promotion/${projectId}/episodes`, { method: 'GET' }, tMutationError('fetchEpisodesFailed')),
   })
 }
 
@@ -39,7 +40,7 @@ export function useSplitProjectEpisodes(projectId: string) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         },
-        '分割失败',
+        tMutationError('splitFailed'),
       )
       return resolveTaskResponse<{
         episodes: Array<{
@@ -75,7 +76,7 @@ export function useSplitProjectEpisodesByMarkers(projectId: string) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         },
-        '分割失败',
+        tMutationError('splitFailed'),
       ),
   })
 }
@@ -102,7 +103,7 @@ export function useSaveProjectEpisodesBatch(projectId: string) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         },
-        '保存剧集失败',
+        tMutationError('saveEpisodesFailed'),
       ),
   })
 }
@@ -251,7 +252,7 @@ export function useDownloadRemoteBlob() {
       await requestBlobWithError(
         url,
         { method: 'GET' },
-        '下载失败',
+        tMutationError('downloadFailed'),
       ),
   })
 }

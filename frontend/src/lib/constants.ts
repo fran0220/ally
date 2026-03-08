@@ -22,33 +22,54 @@ export const VIDEO_RATIOS = Object.entries(ASPECT_RATIO_CONFIGS).map(([value, co
   label: config.label,
 }));
 
-export const ART_STYLES = [
+export type ArtStyleConfig = {
+  value: string;
+  labelKey: string;
+  previewKey: string;
+  promptZh: string;
+  promptEn: string;
+};
+
+export type ArtStyleOption = ArtStyleConfig & {
+  label: string;
+  preview: string;
+};
+
+export const ART_STYLES: ArtStyleConfig[] = [
   {
     value: 'american-comic',
-    label: '漫画风',
-    preview: '漫',
+    labelKey: 'artStyles.americanComic.label',
+    previewKey: 'artStyles.americanComic.preview',
     promptZh: '日式动漫风格',
     promptEn: 'Japanese anime style',
   },
   {
     value: 'chinese-comic',
-    label: '精致国漫',
-    preview: '国',
+    labelKey: 'artStyles.chineseComic.label',
+    previewKey: 'artStyles.chineseComic.preview',
     promptZh: '现代高质量漫画风格，动漫风格，细节丰富精致，线条锐利干净，质感饱满，超清，干净的画面风格，2D风格，动漫风格。',
     promptEn: 'Modern premium Chinese comic style, rich details, clean sharp line art, full texture, ultra-clear 2D anime aesthetics.',
   },
   {
     value: 'japanese-anime',
-    label: '日系动漫风',
-    preview: '日',
+    labelKey: 'artStyles.japaneseAnime.label',
+    previewKey: 'artStyles.japaneseAnime.preview',
     promptZh: '现代日系动漫风格，赛璐璐上色，清晰干净的线条，视觉小说CG感。高质量2D风格',
     promptEn: 'Modern Japanese anime style, cel shading, clean line art, visual-novel CG look, high-quality 2D style.',
   },
   {
     value: 'realistic',
-    label: '真人风格',
-    preview: '实',
+    labelKey: 'artStyles.realistic.label',
+    previewKey: 'artStyles.realistic.preview',
     promptZh: '真实电影级画面质感，真实现实场景，色彩饱满通透，画面干净精致，真实感',
     promptEn: 'Realistic cinematic look, real-world scene fidelity, rich transparent colors, clean and refined image quality.',
   },
 ];
+
+export function resolveArtStyleOptions(resolve: (key: string) => string): ArtStyleOption[] {
+  return ART_STYLES.map((style) => ({
+    ...style,
+    label: resolve(style.labelKey),
+    preview: resolve(style.previewKey),
+  }));
+}

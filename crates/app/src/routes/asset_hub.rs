@@ -629,11 +629,19 @@ fn image_mime_type_by_extension(ext: &str) -> &'static str {
     }
 }
 
-fn build_character_image_label(character_name: &str, change_reason: Option<&str>) -> String {
+fn localized_msg<'a>(locale: &str, zh: &'a str, en: &'a str) -> &'a str {
+    if locale == "en" { en } else { zh }
+}
+
+fn build_character_image_label(
+    character_name: &str,
+    change_reason: Option<&str>,
+    locale: &str,
+) -> String {
     let reason = change_reason
         .map(str::trim)
         .filter(|value| !value.is_empty())
-        .unwrap_or("形象");
+        .unwrap_or(localized_msg(locale, "形象", "Appearance"));
     format!("{} - {}", character_name.trim(), reason)
 }
 
@@ -2102,8 +2110,10 @@ async fn select_image(
 async fn undo_image(
     State(state): State<AppState>,
     user: AuthUser,
+    headers: HeaderMap,
     Json(body): Json<UndoImageBody>,
 ) -> Result<Json<Value>, AppError> {
+    let locale = read_task_locale_from_headers(&headers).unwrap_or("zh");
     let asset_type = body.asset_type.trim().to_lowercase();
 
     if asset_type == "character" {
@@ -2161,9 +2171,14 @@ async fn undo_image(
         .execute(&state.mysql)
         .await?;
 
-        return Ok(Json(
-            json!({ "success": true, "message": "已撤回到上一版本（图片和描述词）" }),
-        ));
+        return Ok(Json(json!({
+            "success": true,
+            "message": localized_msg(
+                locale,
+                "已撤回到上一版本（图片和描述词）",
+                "Reverted to the previous version (image and prompt)"
+            )
+        })));
     }
 
     if asset_type == "location" {
@@ -2197,9 +2212,14 @@ async fn undo_image(
         }
         tx.commit().await?;
 
-        return Ok(Json(
-            json!({ "success": true, "message": "已撤回到上一版本（图片和描述词）" }),
-        ));
+        return Ok(Json(json!({
+            "success": true,
+            "message": localized_msg(
+                locale,
+                "已撤回到上一版本（图片和描述词）",
+                "Reverted to the previous version (image and prompt)"
+            )
+        })));
     }
 
     Err(AppError::invalid_params("unsupported type for undo-image"))
@@ -2208,8 +2228,10 @@ async fn undo_image(
 async fn update_asset_label(
     State(state): State<AppState>,
     user: AuthUser,
+    headers: HeaderMap,
     Json(body): Json<UpdateAssetLabelBody>,
 ) -> Result<Json<Value>, AppError> {
+    let locale = read_task_locale_from_headers(&headers).unwrap_or("zh");
     let new_name = normalize_optional_string(body.new_name)
         .ok_or_else(|| AppError::invalid_params("newName is required"))?;
 
@@ -2245,7 +2267,8 @@ async fn update_asset_label(
                 continue;
             }
 
-            let label_text = build_character_image_label(&new_name, row.change_reason.as_deref());
+            let label_text =
+                build_character_image_label(&new_name, row.change_reason.as_deref(), locale);
             let mut updated_urls = Vec::with_capacity(image_urls.len());
             for image_url in image_urls {
                 let updated = update_image_label(

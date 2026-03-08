@@ -49,6 +49,34 @@
     "episodeNamePlaceholder": "输入剧集名称...",
     "cancelSelection": "取消选择",
     "referenceImage": "参考图",
+    "modes": {
+        "novelPromotion": {
+            "name": "小说推文",
+            "description": "从小说生成推广短视频"
+        }
+    },
+    "artStyles": {
+        "americanComic": {
+            "label": "漫画风",
+            "preview": "漫"
+        },
+        "chineseComic": {
+            "label": "精致国漫",
+            "preview": "国"
+        },
+        "japaneseAnime": {
+            "label": "日系动漫风",
+            "preview": "日"
+        },
+        "realistic": {
+            "label": "真人风格",
+            "preview": "实"
+        }
+    },
+    "llmOutputHeaders": {
+        "reasoning": "思考过程",
+        "final": "最终结果"
+    },
     "previewLarge": "预览大图",
     "viewOriginal": "查看原图",
     "schemeN": "方案 {n}",
@@ -57,6 +85,7 @@
     "operationFailed": "操作失败",
     "pleaseRetry": "请重试",
     "recommended": "推荐",
+    "comingSoon": "即将推出",
     "language": {
         "select": "选择语言",
         "zh": "中文",

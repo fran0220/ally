@@ -13,8 +13,20 @@ use crate::{
 };
 
 const MAX_LLM_STREAM_CHUNK_CHARS: usize = 128;
-const INVALID_LOCATION_KEYWORDS: [&str; 6] =
-    ["幻想", "抽象", "无明确", "空间锚点", "未说明", "不明确"];
+const INVALID_LOCATION_KEYWORDS: [&str; 12] = [
+    "幻想",
+    "抽象",
+    "无明确",
+    "空间锚点",
+    "未说明",
+    "不明确",
+    "fantasy",
+    "abstract",
+    "no clear",
+    "spatial anchor",
+    "unspecified",
+    "unclear",
+];
 
 #[derive(Debug, FromRow)]
 pub struct NovelProjectRow {
@@ -50,8 +62,24 @@ struct NormalizedContent {
 
 // Keep prompt suffix handling aligned with the TypeScript worker so user-facing
 // prompts never leak system-level generation instructions.
-pub const CHARACTER_PROMPT_SUFFIX: &str = "角色设定图，画面分为左右两个区域：【左侧区域】占约1/3宽度，是角色的正面特写（如果是人类则展示完整正脸，如果是动物/生物则展示最具辨识度的正面形态）；【右侧区域】占约2/3宽度，是角色三视图横向排列（从左到右依次为：正面全身、侧面全身、背面全身），三视图高度一致。纯白色背景，无其他元素。";
+pub const CHARACTER_PROMPT_SUFFIX_ZH: &str = "角色设定图，画面分为左右两个区域：【左侧区域】占约1/3宽度，是角色的正面特写（如果是人类则展示完整正脸，如果是动物/生物则展示最具辨识度的正面形态）；【右侧区域】占约2/3宽度，是角色三视图横向排列（从左到右依次为：正面全身、侧面全身、背面全身），三视图高度一致。纯白色背景，无其他元素。";
+pub const CHARACTER_PROMPT_SUFFIX_EN: &str = "Character design sheet. Split the frame into two areas: [Left Area] takes about 1/3 width and shows a front close-up of the character (for humans, show the full frontal face; for animals/creatures, show the most recognizable front form). [Right Area] takes about 2/3 width and shows a horizontal three-view layout (left to right: full-body front view, full-body side view, full-body back view), with matched heights across all three views. Pure white background, no extra elements.";
 pub const LOCATION_PROMPT_SUFFIX: &str = "";
+
+pub fn l<'a>(locale: PromptLocale, zh: &'a str, en: &'a str) -> &'a str {
+    match locale {
+        PromptLocale::Zh => zh,
+        PromptLocale::En => en,
+    }
+}
+
+pub fn character_prompt_suffix(locale: PromptLocale) -> &'static str {
+    l(
+        locale,
+        CHARACTER_PROMPT_SUFFIX_ZH,
+        CHARACTER_PROMPT_SUFFIX_EN,
+    )
+}
 
 pub fn create_stream_run_id(task: &WorkerTask, label: &str) -> String {
     let timestamp = SystemTime::now()
@@ -94,7 +122,10 @@ pub fn parse_aliases(raw: Option<&str>) -> Vec<String> {
     read_string_array(Some(&value))
 }
 
-pub fn build_characters_introduction(characters: &[(String, Option<String>)]) -> String {
+pub fn build_characters_introduction(
+    characters: &[(String, Option<String>)],
+    locale: PromptLocale,
+) -> String {
     let introductions = characters
         .iter()
         .filter_map(|(name, introduction)| {
@@ -102,20 +133,29 @@ pub fn build_characters_introduction(characters: &[(String, Option<String>)]) ->
             if intro.is_empty() {
                 return None;
             }
-            Some(format!("- {name}：{intro}"))
+            Some(format!(
+                "- {name}{separator}{intro}",
+                separator = l(locale, "：", ": ")
+            ))
         })
         .collect::<Vec<_>>();
 
     if introductions.is_empty() {
-        return "暂无角色介绍".to_string();
+        return l(locale, "暂无角色介绍", "No character introductions yet").to_string();
     }
     introductions.join("\n")
 }
 
 pub fn is_invalid_location(name: &str, summary_or_description: &str) -> bool {
-    INVALID_LOCATION_KEYWORDS
-        .iter()
-        .any(|keyword| name.contains(keyword) || summary_or_description.contains(keyword))
+    let normalized_name = name.trim().to_ascii_lowercase();
+    let normalized_summary = summary_or_description.trim().to_ascii_lowercase();
+    INVALID_LOCATION_KEYWORDS.iter().any(|keyword| {
+        if keyword.is_ascii() {
+            normalized_name.contains(keyword) || normalized_summary.contains(keyword)
+        } else {
+            name.contains(keyword) || summary_or_description.contains(keyword)
+        }
+    })
 }
 
 pub fn resolve_art_style_prompt(art_style: Option<&str>, locale: PromptLocale) -> String {
@@ -125,19 +165,19 @@ pub fn resolve_art_style_prompt(art_style: Option<&str>, locale: PromptLocale) -
 
     match (art_style, locale) {
         ("american-comic", PromptLocale::En) => "Japanese anime style".to_string(),
-        ("american-comic", _) => "日式动漫风格".to_string(),
+        ("american-comic", PromptLocale::Zh) => "日式动漫风格".to_string(),
         ("chinese-comic", PromptLocale::En) => {
             "Modern premium Chinese comic style, rich details, clean sharp line art, full texture, ultra-clear 2D anime aesthetics.".to_string()
         }
-        ("chinese-comic", _) => "现代高质量漫画风格，动漫风格，细节丰富精致，线条锐利干净，质感饱满，超清，干净的画面风格，2D风格，动漫风格。".to_string(),
+        ("chinese-comic", PromptLocale::Zh) => "现代高质量漫画风格，动漫风格，细节丰富精致，线条锐利干净，质感饱满，超清，干净的画面风格，2D风格，动漫风格。".to_string(),
         ("japanese-anime", PromptLocale::En) => {
             "Modern Japanese anime style, cel shading, clean line art, visual-novel CG look, high-quality 2D style.".to_string()
         }
-        ("japanese-anime", _) => "现代日系动漫风格，赛璐璐上色，清晰干净的线条，视觉小说CG感。高质量2D风格".to_string(),
+        ("japanese-anime", PromptLocale::Zh) => "现代日系动漫风格，赛璐璐上色，清晰干净的线条，视觉小说CG感。高质量2D风格".to_string(),
         ("realistic", PromptLocale::En) => {
             "Realistic cinematic look, real-world scene fidelity, rich transparent colors, clean and refined image quality.".to_string()
         }
-        ("realistic", _) => {
+        ("realistic", PromptLocale::Zh) => {
             "真实电影级画面质感，真实现实场景，色彩饱满通透，画面干净精致，真实感"
                 .to_string()
         }
@@ -216,22 +256,27 @@ pub fn read_i32(payload: &Value, key: &str) -> Option<i32> {
 
 pub fn remove_character_prompt_suffix(prompt: &str) -> String {
     prompt
-        .replace(CHARACTER_PROMPT_SUFFIX, "")
+        .replace(CHARACTER_PROMPT_SUFFIX_ZH, "")
+        .replace(CHARACTER_PROMPT_SUFFIX_EN, "")
         .trim()
         .to_string()
 }
 
-pub fn add_character_prompt_suffix(prompt: &str) -> String {
+pub fn add_character_prompt_suffix_for_locale(prompt: &str, locale: PromptLocale) -> String {
     if prompt.trim().is_empty() {
-        return CHARACTER_PROMPT_SUFFIX.to_string();
+        return character_prompt_suffix(locale).to_string();
     }
 
     let cleaned = remove_character_prompt_suffix(prompt);
     format!(
         "{}{separator}{suffix}",
         cleaned,
-        separator = if cleaned.is_empty() { "" } else { "，" },
-        suffix = CHARACTER_PROMPT_SUFFIX,
+        separator = if cleaned.is_empty() {
+            ""
+        } else {
+            l(locale, "，", ", ")
+        },
+        suffix = character_prompt_suffix(locale),
     )
 }
 
@@ -242,7 +287,12 @@ pub fn remove_location_prompt_suffix(prompt: &str) -> String {
         prompt.replace(LOCATION_PROMPT_SUFFIX, "")
     };
 
-    without_suffix.trim_end_matches('，').trim().to_string()
+    let trimmed = without_suffix.trim();
+    trimmed
+        .trim_end_matches('，')
+        .trim_end_matches(',')
+        .trim()
+        .to_string()
 }
 
 fn read_prompt_locale(payload: &Value) -> Option<String> {
@@ -902,9 +952,10 @@ mod tests {
     use waoowaoo_core::prompt_i18n::PromptLocale;
 
     use super::{
-        build_characters_introduction, count_words_like_word, match_text_boundary,
-        parse_json_array_response, parse_json_object_response, read_reasoning_effort,
-        read_reasoning_enabled, resolve_art_style_prompt,
+        add_character_prompt_suffix_for_locale, build_characters_introduction,
+        count_words_like_word, match_text_boundary, parse_json_array_response,
+        parse_json_object_response, read_reasoning_effort, read_reasoning_enabled,
+        remove_character_prompt_suffix, resolve_art_style_prompt,
     };
 
     #[test]
@@ -940,11 +991,33 @@ mod tests {
 
     #[test]
     fn build_characters_introduction_skips_empty_rows() {
-        let intro = build_characters_introduction(&[
-            ("林墨".to_string(), Some("男主".to_string())),
-            ("路人".to_string(), Some("   ".to_string())),
-        ]);
+        let intro = build_characters_introduction(
+            &[
+                ("林墨".to_string(), Some("男主".to_string())),
+                ("路人".to_string(), Some("   ".to_string())),
+            ],
+            PromptLocale::Zh,
+        );
         assert_eq!(intro, "- 林墨：男主");
+    }
+
+    #[test]
+    fn build_characters_introduction_uses_english_locale() {
+        let intro = build_characters_introduction(
+            &[("Lin Mo".to_string(), Some("The protagonist".to_string()))],
+            PromptLocale::En,
+        );
+        assert_eq!(intro, "- Lin Mo: The protagonist");
+
+        let fallback = build_characters_introduction(&[], PromptLocale::En);
+        assert_eq!(fallback, "No character introductions yet");
+    }
+
+    #[test]
+    fn character_prompt_suffix_is_locale_aware() {
+        let en_prompt = add_character_prompt_suffix_for_locale("Character base", PromptLocale::En);
+        assert!(en_prompt.contains(", Character design sheet."));
+        assert_eq!(remove_character_prompt_suffix(&en_prompt), "Character base");
     }
 
     #[test]

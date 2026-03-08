@@ -5,6 +5,7 @@ import {
   invalidateQueryTemplates,
   requestJsonWithError,
   requestTaskResponseWithError,
+  tMutationError,
 } from './mutation-shared'
 
 export function useUpdateProjectCharacterIntroduction(projectId: string) {
@@ -101,7 +102,7 @@ export function useUploadProjectTempMedia() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
                 },
-                '上传失败',
+                tMutationError('uploadFailed'),
             )
         },
     })
@@ -207,7 +208,7 @@ export function useConfirmProjectCharacterSelection(projectId: string) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ characterId, appearanceId }),
                 },
-                '确认选择失败',
+                tMutationError('confirmSelectionFailed'),
             ),
         onSettled: invalidateProjectAssets,
     })
@@ -234,7 +235,7 @@ export function useConfirmProjectCharacterProfile(projectId: string) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
                 },
-                '确认失败',
+                tMutationError('confirmFailed'),
             )
             return await resolveTaskResponse<{
                 success?: boolean
@@ -266,7 +267,7 @@ export function useBatchConfirmProjectCharacterProfiles(projectId: string) {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                 },
-                '批量确认失败',
+                tMutationError('batchConfirmFailed'),
             )
             return await resolveTaskResponse<{
                 success?: boolean

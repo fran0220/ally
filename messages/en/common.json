@@ -49,6 +49,34 @@
     "episodeNamePlaceholder": "Enter episode name...",
     "cancelSelection": "Cancel selection",
     "referenceImage": "Reference image",
+    "modes": {
+        "novelPromotion": {
+            "name": "Novel Promotion",
+            "description": "Generate promotional short videos from novels"
+        }
+    },
+    "artStyles": {
+        "americanComic": {
+            "label": "Comic Style",
+            "preview": "C"
+        },
+        "chineseComic": {
+            "label": "Chinese Comic",
+            "preview": "CN"
+        },
+        "japaneseAnime": {
+            "label": "Japanese Anime",
+            "preview": "JP"
+        },
+        "realistic": {
+            "label": "Realistic",
+            "preview": "R"
+        }
+    },
+    "llmOutputHeaders": {
+        "reasoning": "Reasoning",
+        "final": "Final Output"
+    },
     "previewLarge": "Preview large",
     "viewOriginal": "View original",
     "schemeN": "Scheme {n}",
@@ -57,6 +85,7 @@
     "operationFailed": "Operation failed",
     "pleaseRetry": "Please retry",
     "recommended": "Recommended",
+    "comingSoon": "Coming Soon",
     "language": {
         "select": "Select language",
         "zh": "Chinese",

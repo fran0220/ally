@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { apiRequest } from '../../../api/client';
 import { queryKeys } from '../../../lib/query-keys';
-import { ART_STYLES } from '../../../lib/constants';
+import { resolveArtStyleOptions } from '../../../lib/constants';
 import { shouldShowError } from '../../../lib/error-utils';
 import { resolveTaskPresentationState } from '../../../lib/task/presentation';
 import { TaskStatusInline } from '../../task/TaskStatusInline';
@@ -36,6 +36,7 @@ export function LocationCreationModal({
 }: LocationCreationModalProps) {
   const { t } = useTranslation('common');
   const queryClient = useQueryClient();
+  const artStyleOptions = resolveArtStyleOptions((key) => t(key));
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -184,7 +185,7 @@ export function LocationCreationModal({
                 {t('assetModal.artStyle.title')}
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {ART_STYLES.map((style) => (
+                {artStyleOptions.map((style) => (
                   <button
                     key={style.value}
                     type="button"

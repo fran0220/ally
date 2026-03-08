@@ -44,7 +44,7 @@ export default function CharacterCreationPreview({
               <div key={index} className="relative aspect-square">
                 <MediaImageWithLoading
                   src={base64}
-                  alt={`参考图 ${index + 1}`}
+                  alt={`${t('referenceImage')} ${index + 1}`}
                   containerClassName="w-full h-full rounded"
                   className="w-full h-full object-cover rounded"
                 />

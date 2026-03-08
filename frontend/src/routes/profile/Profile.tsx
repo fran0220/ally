@@ -20,24 +20,23 @@ function tabClass(isActive: boolean): string {
 }
 
 export function Profile() {
-  const { t, i18n } = useTranslation('profile');
-  const isZh = i18n.language.toLowerCase().startsWith('zh');
+  const { t } = useTranslation('profile');
 
   const tabs: ProfileTab[] = [
     {
       to: 'account',
       icon: 'userCircle',
-      label: isZh ? '账户' : 'Account',
+      label: t('account'),
     },
     {
       to: 'api-config',
       icon: 'settingsHex',
-      label: t('apiConfig', { defaultValue: isZh ? 'API 配置' : 'API Configuration' }),
+      label: t('profile:apiConfig'),
     },
     {
       to: 'preferences',
       icon: 'settingsHexMinor',
-      label: isZh ? '偏好设置' : 'Preferences',
+      label: t('preferences'),
     },
   ];
 
@@ -45,11 +44,7 @@ export function Profile() {
     <main className="page-shell py-10">
       <header className="mb-4 space-y-1">
         <h1 className="glass-page-title">{t('personalAccount')}</h1>
-        <p className="glass-page-subtitle">
-          {isZh
-            ? '管理账户资料、API 配置与偏好设置。'
-            : 'Manage account details, API configuration, and preferences.'}
-        </p>
+        <p className="glass-page-subtitle">{t('subtitle')}</p>
       </header>
 
       <GlassSurface className="mb-4" padded={false}>

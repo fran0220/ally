@@ -1,0 +1,9 @@
+{
+    "title": "管理员设置",
+    "subtitle": "集中管理 AI 配置、用户和系统能力。",
+    "userManagement": "用户管理",
+    "userManagementDesc": "该模块将用于查看用户列表、权限分配与账号状态管理。",
+    "systemMonitor": "系统监控",
+    "systemMonitorDesc": "后续会提供服务健康状态、任务吞吐和异常告警等运维视图。",
+    "comingSoon": "即将推出"
+}

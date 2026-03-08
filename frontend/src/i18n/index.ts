@@ -2,12 +2,14 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import enApiConfig from '../../../messages/en/apiConfig.json';
+import enAdmin from '../../../messages/en/admin.json';
 import enAssetModal from '../../../messages/en/assetModal.json';
 import enAssetHub from '../../../messages/en/assetHub.json';
 import enAssetPicker from '../../../messages/en/assetPicker.json';
 import enAssets from '../../../messages/en/assets.json';
 import enAuth from '../../../messages/en/auth.json';
 import enCommon from '../../../messages/en/common.json';
+import enErrors from '../../../messages/en/errors.json';
 import enLanding from '../../../messages/en/landing.json';
 import enNav from '../../../messages/en/nav.json';
 import enProviderSection from '../../../messages/en/providerSection.json';
@@ -18,12 +20,14 @@ import enVoice from '../../../messages/en/voice.json';
 import enWorkspace from '../../../messages/en/workspace.json';
 import enWorkspaceDetail from '../../../messages/en/workspaceDetail.json';
 import zhApiConfig from '../../../messages/zh/apiConfig.json';
+import zhAdmin from '../../../messages/zh/admin.json';
 import zhAssetModal from '../../../messages/zh/assetModal.json';
 import zhAssetHub from '../../../messages/zh/assetHub.json';
 import zhAssetPicker from '../../../messages/zh/assetPicker.json';
 import zhAssets from '../../../messages/zh/assets.json';
 import zhAuth from '../../../messages/zh/auth.json';
 import zhCommon from '../../../messages/zh/common.json';
+import zhErrors from '../../../messages/zh/errors.json';
 import zhLanding from '../../../messages/zh/landing.json';
 import zhNav from '../../../messages/zh/nav.json';
 import zhProviderSection from '../../../messages/zh/providerSection.json';
@@ -62,7 +66,9 @@ const resources = {
     stages: zhStages,
     voice: zhVoice,
     apiConfig: zhApiConfig,
+    admin: zhAdmin,
     profile: zhProfile,
+    errors: zhErrors,
   },
   en: {
     common: enCommonMerged,
@@ -77,7 +83,9 @@ const resources = {
     stages: enStages,
     voice: enVoice,
     apiConfig: enApiConfig,
+    admin: enAdmin,
     profile: enProfile,
+    errors: enErrors,
   },
 } as const;
 
@@ -94,7 +102,9 @@ const namespaces = [
   'stages',
   'voice',
   'apiConfig',
+  'admin',
   'profile',
+  'errors',
 ];
 
 i18n.use(initReactI18next).init({

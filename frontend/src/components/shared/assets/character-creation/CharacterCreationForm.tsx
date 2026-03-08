@@ -1,7 +1,7 @@
 import type { DragEvent, RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ART_STYLES } from '../../../../lib/constants';
+import { resolveArtStyleOptions } from '../../../../lib/constants';
 import { AppIcon } from '../../../ui/icons';
 import CharacterCreationPreview from './CharacterCreationPreview';
 
@@ -83,6 +83,7 @@ export default function CharacterCreationForm({
   isExtracting,
 }: CharacterCreationFormProps) {
   const { t } = useTranslation('common');
+  const artStyleOptions = resolveArtStyleOptions((key) => t(key));
 
   return (
     <div className="space-y-5">
@@ -193,7 +194,7 @@ export default function CharacterCreationForm({
             {t('assetModal.artStyle.title')}
           </label>
           <div className="grid grid-cols-2 gap-2">
-            {ART_STYLES.map((style) => (
+            {artStyleOptions.map((style) => (
               <button
                 key={style.value}
                 type="button"

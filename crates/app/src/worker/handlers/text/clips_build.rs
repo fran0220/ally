@@ -126,6 +126,9 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     shared::ensure_novel_project(task).await?;
     let mysql = runtime::mysql()?;
     let payload = &task.payload;
+    let locale = shared::resolve_prompt_locale(payload);
+    let list_separator = shared::l(locale, "、", ", ");
+    let none_text = shared::l(locale, "无", "None");
 
     let episode_id = shared::read_episode_id(task)
         .ok_or_else(|| AppError::invalid_params("episodeId is required"))?;
@@ -167,28 +170,29 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     .await?;
 
     let locations_lib_name = if locations.is_empty() {
-        "无".to_string()
+        none_text.to_string()
     } else {
         locations
             .iter()
             .map(|item| item.name.as_str())
             .collect::<Vec<_>>()
-            .join("、")
+            .join(list_separator)
     };
     let characters_lib_name = if characters.is_empty() {
-        "无".to_string()
+        none_text.to_string()
     } else {
         characters
             .iter()
             .map(|item| item.name.as_str())
             .collect::<Vec<_>>()
-            .join("、")
+            .join(list_separator)
     };
     let characters_introduction = shared::build_characters_introduction(
         &characters
             .iter()
             .map(|item| (item.name.clone(), item.introduction.clone()))
             .collect::<Vec<_>>(),
+        locale,
     );
 
     let mut prompt_variables = PromptVariables::new();
@@ -220,7 +224,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
             } else {
                 format!("split_clips_retry_{attempt}")
             }),
-            step_title: Some("片段切分".to_string()),
+            step_title: Some(shared::l(locale, "片段切分", "Clip Segmentation").to_string()),
             step_attempt: Some(attempt as i32),
             step_index: Some(1),
             step_total: Some(1),

@@ -585,12 +585,38 @@ fn normalize_location_description(input: &str) -> String {
     input.trim().trim_end_matches('，').trim().to_string()
 }
 
-fn map_art_style_prompt(style: &str) -> Option<&'static str> {
+fn localized_msg<'a>(locale: &str, zh: &'a str, en: &'a str) -> &'a str {
+    if locale == "en" { en } else { zh }
+}
+
+fn request_locale(body: Option<&Value>, headers: Option<&HeaderMap>) -> &'static str {
+    body.and_then(read_task_locale_from_body)
+        .or_else(|| headers.and_then(read_task_locale_from_headers))
+        .unwrap_or("zh")
+}
+
+fn map_art_style_prompt(style: &str, locale: &str) -> Option<&'static str> {
     match style.trim() {
-        "american-comic" => Some("美式漫画风格"),
-        "chinese-comic" => Some("精致国漫风格"),
-        "anime" => Some("日系动漫风格"),
-        "realistic" => Some("真人照片写实风格"),
+        "american-comic" => Some(localized_msg(
+            locale,
+            "美式漫画风格",
+            "American comic style",
+        )),
+        "chinese-comic" => Some(localized_msg(
+            locale,
+            "精致国漫风格",
+            "Premium Chinese comic style",
+        )),
+        "anime" => Some(localized_msg(
+            locale,
+            "日系动漫风格",
+            "Japanese anime style",
+        )),
+        "realistic" => Some(localized_msg(
+            locale,
+            "真人照片写实风格",
+            "Photorealistic style",
+        )),
         _ => None,
     }
 }
@@ -2056,6 +2082,7 @@ async fn handle_character_route(
 
     match method {
         "POST" => {
+            let locale = request_locale(Some(&body), Some(headers));
             let name = body_string(&body, "name")
                 .ok_or_else(|| AppError::invalid_params("name is required"))?;
             let introduction = body_string(&body, "introduction");
@@ -2089,7 +2116,7 @@ async fn handle_character_route(
             )
             .bind(&appearance_id)
             .bind(&character_id)
-            .bind("初始形象")
+            .bind(localized_msg(locale, "初始形象", "Default Appearance"))
             .bind(description)
             .bind(normalize_optional_json(Some(descriptions)))
             .bind(initial_image_url)
@@ -2101,12 +2128,6 @@ async fn handle_character_route(
             let accept_language = headers
                 .get(header::ACCEPT_LANGUAGE)
                 .and_then(|raw| raw.to_str().ok());
-            let mut locale = read_task_locale_from_body(&body)
-                .or_else(|| read_task_locale_from_headers(headers))
-                .map(str::to_string);
-            if locale.is_none() {
-                locale = Some("zh".to_string());
-            }
 
             let mut background_meta = body
                 .get("meta")
@@ -2115,9 +2136,9 @@ async fn handle_character_route(
             if !background_meta.is_object() {
                 background_meta = json!({ "source": "character-post" });
             }
-            if let (Some(meta), Some(locale)) = (background_meta.as_object_mut(), locale.clone()) {
+            if let Some(meta) = background_meta.as_object_mut() {
                 meta.entry("locale".to_string())
-                    .or_insert_with(|| Value::String(locale));
+                    .or_insert_with(|| Value::String(locale.to_string()));
             }
 
             let mut reference_image_urls = body_string_array(&body, "referenceImageUrls", 5);
@@ -2138,10 +2159,8 @@ async fn handle_character_route(
                   "isBackgroundJob": true,
                   "meta": background_meta.clone(),
                 });
-                if let Some(locale) = locale.clone()
-                    && let Some(object) = payload.as_object_mut()
-                {
-                    object.insert("locale".to_string(), Value::String(locale));
+                if let Some(object) = payload.as_object_mut() {
+                    object.insert("locale".to_string(), Value::String(locale.to_string()));
                 }
                 if let Some(art_style) = body_string(&body, "artStyle")
                     && let Some(object) = payload.as_object_mut()
@@ -2191,10 +2210,8 @@ async fn handle_character_route(
                   "id": character_id,
                   "meta": background_meta,
                 });
-                if let Some(locale) = locale
-                    && let Some(object) = payload.as_object_mut()
-                {
-                    object.insert("locale".to_string(), Value::String(locale));
+                if let Some(object) = payload.as_object_mut() {
+                    object.insert("locale".to_string(), Value::String(locale.to_string()));
                 }
                 if let Some(art_style) = body_string(&body, "artStyle")
                     && let Some(object) = payload.as_object_mut()
@@ -2315,6 +2332,7 @@ async fn handle_location_route(
 
     match method {
         "POST" => {
+            let locale = request_locale(Some(&body), Some(headers));
             let name = body_string(&body, "name")
                 .ok_or_else(|| AppError::invalid_params("name is required"))?;
             let description = body_string(&body, "description")
@@ -2323,7 +2341,7 @@ async fn handle_location_route(
             let initial_image_id = Uuid::new_v4().to_string();
 
             if let Some(art_style) = body_string(&body, "artStyle")
-                && let Some(prompt) = map_art_style_prompt(&art_style)
+                && let Some(prompt) = map_art_style_prompt(&art_style, locale)
             {
                 sqlx::query(
                     "UPDATE novel_promotion_projects SET artStylePrompt = ?, updatedAt = NOW(3) WHERE id = ?",
@@ -3605,6 +3623,7 @@ async fn handle_storyboard_group(
     project_id: &str,
     method: &str,
     query: &HashMap<String, String>,
+    headers: &HeaderMap,
     body: Value,
 ) -> Result<Json<Value>, AppError> {
     verify_project_owner(state, project_id, &user.id).await?;
@@ -3612,6 +3631,7 @@ async fn handle_storyboard_group(
 
     match method {
         "POST" => {
+            let locale = request_locale(Some(&body), Some(headers));
             let episode_id = body_string(&body, "episodeId")
                 .ok_or_else(|| AppError::invalid_params("episodeId is required"))?;
             let episode_exists: Option<(String,)> = sqlx::query_as(
@@ -3671,7 +3691,14 @@ async fn handle_storyboard_group(
             .bind(&episode_id)
             .bind(
                 body_string(&body, "summary")
-                    .unwrap_or_else(|| "手动添加的分镜组".to_string()),
+                    .unwrap_or_else(|| {
+                        localized_msg(
+                            locale,
+                            "手动添加的分镜组",
+                            "Manually added storyboard group",
+                        )
+                        .to_string()
+                    }),
             )
             .bind(body_string(&body, "content").unwrap_or_default())
             .bind(created_at)
@@ -3692,9 +3719,9 @@ async fn handle_storyboard_group(
             )
             .bind(&panel_id)
             .bind(&storyboard_id)
-            .bind("中景")
-            .bind("固定")
-            .bind("新镜头描述")
+            .bind(localized_msg(locale, "中景", "Medium shot"))
+            .bind(localized_msg(locale, "固定", "Static"))
+            .bind(localized_msg(locale, "新镜头描述", "New shot description"))
             .bind(normalize_optional_json(Some(json!([]))))
             .execute(&mut *tx)
             .await?;
@@ -4079,9 +4106,11 @@ async fn handle_video_urls(
     state: &AppState,
     user: &AuthUser,
     project_id: &str,
+    headers: &HeaderMap,
     body: Value,
 ) -> Result<Json<Value>, AppError> {
     verify_project_owner(state, project_id, &user.id).await?;
+    let locale = request_locale(Some(&body), Some(headers));
     let episode_id = body_string(&body, "episodeId");
     let panel_preferences = body
         .get("panelPreferences")
@@ -4141,9 +4170,11 @@ async fn handle_video_urls(
             .description
             .as_deref()
             .filter(|item| !item.trim().is_empty())
-            .unwrap_or("镜头");
-        let safe_desc =
-            sanitize_filename_segment(&description.chars().take(50).collect::<String>(), "镜头");
+            .unwrap_or(localized_msg(locale, "镜头", "Shot"));
+        let safe_desc = sanitize_filename_segment(
+            &description.chars().take(50).collect::<String>(),
+            localized_msg(locale, "镜头", "Shot"),
+        );
         let index = videos.len() + 1;
         let file_name = format!("{index:03}_{safe_desc}.mp4");
         let proxy_url = format!(
@@ -4211,9 +4242,10 @@ async fn route_video_urls(
     State(state): State<AppState>,
     user: AuthUser,
     Path(project_id): Path<String>,
+    headers: HeaderMap,
     Json(body): Json<Value>,
 ) -> Result<Json<Value>, AppError> {
-    handle_video_urls(&state, &user, &project_id, body).await
+    handle_video_urls(&state, &user, &project_id, &headers, body).await
 }
 
 #[derive(Debug, Deserialize)]
@@ -4239,9 +4271,11 @@ async fn route_download_images(
     State(state): State<AppState>,
     user: AuthUser,
     Path(project_id): Path<String>,
+    headers: HeaderMap,
     Query(query): Query<DownloadQuery>,
 ) -> Result<Response, AppError> {
     verify_project_owner(&state, &project_id, &user.id).await?;
+    let locale = request_locale(None, Some(&headers));
     let novel_id = get_novel_id(&state, &project_id).await?;
     let episode_id = query
         .episode_id
@@ -4287,9 +4321,11 @@ async fn route_download_images(
             .description
             .as_deref()
             .filter(|item| !item.trim().is_empty())
-            .unwrap_or("镜头");
-        let safe_desc =
-            sanitize_filename_segment(&desc.chars().take(50).collect::<String>(), "镜头");
+            .unwrap_or(localized_msg(locale, "镜头", "Shot"));
+        let safe_desc = sanitize_filename_segment(
+            &desc.chars().take(50).collect::<String>(),
+            localized_msg(locale, "镜头", "Shot"),
+        );
         let fallback_ext = infer_extension_from_source(image_url, "png");
         let download_result = download_binary_from_media_source(&state, image_url).await;
         let (bytes, content_type) = match download_result {
@@ -4332,9 +4368,11 @@ async fn route_download_videos(
     State(state): State<AppState>,
     user: AuthUser,
     Path(project_id): Path<String>,
+    headers: HeaderMap,
     Json(body): Json<DownloadVideosBody>,
 ) -> Result<Response, AppError> {
     verify_project_owner(&state, &project_id, &user.id).await?;
+    let locale = request_locale(None, Some(&headers));
     let novel_id = get_novel_id(&state, &project_id).await?;
     let episode_id = body
         .episode_id
@@ -4393,9 +4431,11 @@ async fn route_download_videos(
             .description
             .as_deref()
             .filter(|item| !item.trim().is_empty())
-            .unwrap_or("镜头");
-        let safe_desc =
-            sanitize_filename_segment(&desc.chars().take(50).collect::<String>(), "镜头");
+            .unwrap_or(localized_msg(locale, "镜头", "Shot"));
+        let safe_desc = sanitize_filename_segment(
+            &desc.chars().take(50).collect::<String>(),
+            localized_msg(locale, "镜头", "Shot"),
+        );
         let download_result = download_binary_from_media_source(&state, video_url).await;
         let (bytes, content_type) = match download_result {
             Ok(value) => value,
@@ -5162,7 +5202,16 @@ pub async fn dispatch(
         (method, ["storyboard-group"])
             if method == "POST" || method == "PUT" || method == "DELETE" =>
         {
-            handle_storyboard_group(&state, &user, &project_id, method, &query, body_json).await
+            handle_storyboard_group(
+                &state,
+                &user,
+                &project_id,
+                method,
+                &query,
+                &headers,
+                body_json,
+            )
+            .await
         }
         ("POST", ["clips"]) => {
             handle_clips(&state, &user, &project_id, "POST", None, body_json).await
@@ -5181,7 +5230,9 @@ pub async fn dispatch(
         (method, ["speaker-voice"]) if method == "GET" || method == "PATCH" => {
             handle_speaker_voice(&state, &user, &project_id, method, &query, body_json).await
         }
-        ("POST", ["video-urls"]) => handle_video_urls(&state, &user, &project_id, body_json).await,
+        ("POST", ["video-urls"]) => {
+            handle_video_urls(&state, &user, &project_id, &headers, body_json).await
+        }
         ("POST", ["copy-from-global"]) => {
             handle_copy_from_global(&state, &user, &project_id, body_json).await
         }

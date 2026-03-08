@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -21,37 +20,31 @@ function navItemClass(isActive: boolean): string {
 }
 
 export function AdminLayout() {
-  const { t, i18n } = useTranslation(['apiConfig', 'common']);
-  const isZh = i18n.language.toLowerCase().startsWith('zh');
+  const { t } = useTranslation(['admin', 'apiConfig']);
 
-  const navItems = useMemo<AdminNavItem[]>(
-    () => [
-      {
-        to: 'ai-config',
-        icon: 'settingsHex',
-        label: t('apiConfig:title', { defaultValue: isZh ? 'AI 配置' : 'AI Config' }),
-      },
-      {
-        to: 'users',
-        icon: 'userCircle',
-        label: isZh ? '用户管理' : 'User Management',
-      },
-      {
-        to: 'system',
-        icon: 'monitor',
-        label: isZh ? '系统监控' : 'System Monitor',
-      },
-    ],
-    [isZh, t],
-  );
+  const navItems: AdminNavItem[] = [
+    {
+      to: 'ai-config',
+      icon: 'settingsHex',
+      label: t('apiConfig:title'),
+    },
+    {
+      to: 'users',
+      icon: 'userCircle',
+      label: t('admin:userManagement'),
+    },
+    {
+      to: 'system',
+      icon: 'monitor',
+      label: t('admin:systemMonitor'),
+    },
+  ];
 
   return (
     <div className="page-shell py-8 md:py-10">
       <header className="mb-4 space-y-1">
-        <h1 className="glass-page-title">{isZh ? '管理员设置' : 'Admin Settings'}</h1>
-        <p className="glass-page-subtitle">
-          {isZh ? '集中管理 AI 配置、用户和系统能力。' : 'Manage AI config, users, and system capabilities in one place.'}
-        </p>
+        <h1 className="glass-page-title">{t('admin:title')}</h1>
+        <p className="glass-page-subtitle">{t('admin:subtitle')}</p>
       </header>
 
       <div className="mb-4 md:hidden">

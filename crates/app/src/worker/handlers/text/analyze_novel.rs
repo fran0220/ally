@@ -90,6 +90,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     shared::ensure_novel_project(task).await?;
     let mysql = runtime::mysql()?;
     let payload = &task.payload;
+    let locale = shared::resolve_prompt_locale(payload);
 
     let novel_project = shared::get_novel_project(task).await?;
     let analysis_model = shared::resolve_analysis_model(task, payload).await?;
@@ -175,7 +176,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         run_id: Some(run_id.clone()),
         stream_run_id: Some(run_id.clone()),
         step_id: Some("analyze_characters".to_string()),
-        step_title: Some("角色分析".to_string()),
+        step_title: Some(shared::l(locale, "角色分析", "Character Analysis").to_string()),
         step_attempt: Some(1),
         step_index: Some(1),
         step_total: Some(2),
@@ -184,7 +185,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         run_id: Some(run_id.clone()),
         stream_run_id: Some(run_id),
         step_id: Some("analyze_locations".to_string()),
-        step_title: Some("场景分析".to_string()),
+        step_title: Some(shared::l(locale, "场景分析", "Location Analysis").to_string()),
         step_attempt: Some(1),
         step_index: Some(2),
         step_total: Some(2),

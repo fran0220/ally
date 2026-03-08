@@ -2,7 +2,7 @@ use serde_json::{Value, json};
 use sqlx::FromRow;
 use waoowaoo_core::errors::AppError;
 use waoowaoo_core::media;
-use waoowaoo_core::prompt_i18n::{PromptIds, PromptVariables};
+use waoowaoo_core::prompt_i18n::{PromptIds, PromptLocale, PromptVariables};
 
 use crate::{runtime, task_context::TaskContext};
 
@@ -24,16 +24,16 @@ struct PanelVariantAnalysisRow {
     image_url: Option<String>,
 }
 
-fn parse_panel_characters(raw: Option<&str>) -> String {
+fn parse_panel_characters(raw: Option<&str>, locale: PromptLocale) -> String {
     let Some(raw) = raw.map(str::trim).filter(|item| !item.is_empty()) else {
-        return "无".to_string();
+        return shared::l(locale, "无", "None").to_string();
     };
 
     let Ok(parsed) = serde_json::from_str::<Value>(raw) else {
-        return "无".to_string();
+        return shared::l(locale, "无", "None").to_string();
     };
     let Some(items) = parsed.as_array() else {
-        return "无".to_string();
+        return shared::l(locale, "无", "None").to_string();
     };
 
     let names = items
@@ -60,7 +60,10 @@ fn parse_panel_characters(raw: Option<&str>) -> String {
                 .filter(|value| !value.is_empty());
 
             if let Some(appearance) = appearance {
-                Some(format!("{name}（{appearance}）"))
+                Some(match locale {
+                    PromptLocale::Zh => format!("{name}（{appearance}）"),
+                    PromptLocale::En => format!("{name} ({appearance})"),
+                })
             } else {
                 Some(name.to_string())
             }
@@ -68,15 +71,17 @@ fn parse_panel_characters(raw: Option<&str>) -> String {
         .collect::<Vec<_>>();
 
     if names.is_empty() {
-        "无".to_string()
+        shared::l(locale, "无", "None").to_string()
     } else {
-        names.join("、")
+        names.join(shared::l(locale, "、", ", "))
     }
 }
 
 pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     let mysql = runtime::mysql()?;
     let payload = &task.payload;
+    let locale = shared::resolve_prompt_locale(payload);
+    let none_text = shared::l(locale, "无", "None");
     let panel_id = shared::read_string(payload, "panelId")
         .ok_or_else(|| AppError::invalid_params("panelId is required"))?;
 
@@ -102,29 +107,32 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         panel
             .description
             .clone()
-            .unwrap_or_else(|| "无".to_string()),
+            .unwrap_or_else(|| none_text.to_string()),
     );
     prompt_variables.insert(
         "shot_type".to_string(),
         panel
             .shot_type
             .clone()
-            .unwrap_or_else(|| "中景".to_string()),
+            .unwrap_or_else(|| shared::l(locale, "中景", "Medium shot").to_string()),
     );
     prompt_variables.insert(
         "camera_move".to_string(),
         panel
             .camera_move
             .clone()
-            .unwrap_or_else(|| "固定".to_string()),
+            .unwrap_or_else(|| shared::l(locale, "固定", "Static").to_string()),
     );
     prompt_variables.insert(
         "location".to_string(),
-        panel.location.clone().unwrap_or_else(|| "未知".to_string()),
+        panel
+            .location
+            .clone()
+            .unwrap_or_else(|| shared::l(locale, "未知", "Unknown").to_string()),
     );
     prompt_variables.insert(
         "characters_info".to_string(),
-        parse_panel_characters(panel.characters.as_deref()),
+        parse_panel_characters(panel.characters.as_deref(), locale),
     );
 
     let prompt = shared::render_prompt_template(

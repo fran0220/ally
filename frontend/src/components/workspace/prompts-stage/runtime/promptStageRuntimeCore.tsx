@@ -1,6 +1,6 @@
 import { useTranslations } from '@/compat/next-intl'
 import { useCallback, useMemo, useState } from 'react'
-import { ART_STYLES } from '@/lib/constants'
+import { resolveArtStyleOptions } from '@/lib/constants'
 import { resolveTaskPresentationState } from '@/lib/task/presentation'
 import { useAiModifyProjectShotPrompt } from '@/lib/query/hooks'
 import type { NovelPromotionShot } from '@/types/project'
@@ -34,13 +34,15 @@ export function usePromptStageActions({
   onAppendContent,
 }: PromptsStageShellProps) {
   const t = useTranslations('storyboard')
+  const tCommon = useTranslations('common')
   const aiModifyShotPrompt = useAiModifyProjectShotPrompt(projectId)
+  const artStyleOptions = useMemo(() => resolveArtStyleOptions(tCommon), [tCommon])
 
   const isShotTaskRunning = useCallback((shot: NovelPromotionShot) => {
     return Boolean((shot as NovelPromotionShot & { imageTaskRunning?: boolean }).imageTaskRunning)
   }, [])
 
-  const styleLabel = ART_STYLES.find((style) => style.value === artStyle)?.label || t('prompts.customStyle')
+  const styleLabel = artStyleOptions.find((style) => style.value === artStyle)?.label || t('prompts.customStyle')
   const runningCount = shots.filter((shot) => isShotTaskRunning(shot)).length
   const [previewImage, setPreviewImage] = useState<string | null>(null)
 

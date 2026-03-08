@@ -76,6 +76,7 @@ async fn confirm_character(
 ) -> Result<Value, AppError> {
     let mysql = runtime::mysql()?;
     let payload = &task.payload;
+    let locale = shared::resolve_prompt_locale(payload);
     let novel_project = shared::get_novel_project(task).await?;
     let analysis_model = shared::resolve_analysis_model(task, payload).await?;
 
@@ -142,7 +143,7 @@ async fn confirm_character(
             .and_then(Value::as_str)
             .map(|value| value.trim().to_string())
             .filter(|value| !value.is_empty())
-            .unwrap_or_else(|| "初始形象".to_string());
+            .unwrap_or_else(|| shared::l(locale, "初始形象", "Initial appearance").to_string());
         let descriptions = appearance
             .get("descriptions")
             .and_then(Value::as_array)
@@ -199,6 +200,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     shared::ensure_novel_project(task).await?;
     let mysql = runtime::mysql()?;
     let payload = &task.payload;
+    let locale = shared::resolve_prompt_locale(payload);
     let novel_project = shared::get_novel_project(task).await?;
 
     match task.task_type.as_str() {
@@ -214,7 +216,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
                 return Ok(json!({
                     "success": true,
                     "count": 0,
-                    "message": "没有待确认的角色",
+                    "message": shared::l(locale, "没有待确认的角色", "No characters pending confirmation"),
                 }));
             }
 

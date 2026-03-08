@@ -1,8 +1,8 @@
 use std::{collections::HashMap, time::Duration};
 
-use axum::{Json, extract::State};
+use axum::{Json, extract::State, http::HeaderMap as AxumHeaderMap};
 use chrono::{NaiveDateTime, Utc};
-use reqwest::header::{AUTHORIZATION, HeaderMap, HeaderValue};
+use reqwest::header::{AUTHORIZATION, HeaderMap as ReqwestHeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sqlx::{MySql, QueryBuilder};
@@ -238,6 +238,23 @@ fn normalize_provider(input: Option<String>, base_url: Option<&str>) -> Result<S
     }
 }
 
+fn request_locale(headers: &AxumHeaderMap) -> &'static str {
+    let is_english = headers
+        .get(axum::http::header::ACCEPT_LANGUAGE)
+        .and_then(|raw| raw.to_str().ok())
+        .and_then(|raw| raw.split(',').next())
+        .and_then(|raw| raw.split(';').next())
+        .map(str::trim)
+        .map(|raw| raw.to_ascii_lowercase())
+        .filter(|raw| !raw.is_empty())
+        .is_some_and(|raw| raw == "en" || raw.starts_with("en-"));
+    if is_english { "en" } else { "zh" }
+}
+
+fn localized_msg<'a>(locale: &str, zh: &'a str, en: &'a str) -> &'a str {
+    if locale == "en" { en } else { zh }
+}
+
 fn normalize_openai_base_url(provider: &str, base_url: Option<String>) -> Result<String, AppError> {
     match provider {
         "openrouter" => Ok("https://openrouter.ai/api/v1".to_string()),
@@ -266,13 +283,14 @@ async fn test_openai_compatible(
     provider: &str,
     api_key: &str,
     base_url: String,
+    locale: &str,
 ) -> Result<Value, AppError> {
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(30))
         .build()
         .map_err(|err| AppError::internal(format!("failed to build http client: {err}")))?;
 
-    let mut headers = HeaderMap::new();
+    let mut headers = ReqwestHeaderMap::new();
     let bearer = format!("Bearer {api_key}");
     headers.insert(
         AUTHORIZATION,
@@ -303,11 +321,14 @@ async fn test_openai_compatible(
 
     Ok(json!({
         "provider": provider,
-        "message": format!("{provider} 连接成功"),
+        "message": format!(
+            "{provider} {}",
+            localized_msg(locale, "连接成功", "Connection successful")
+        ),
     }))
 }
 
-async fn test_google(api_key: &str) -> Result<Value, AppError> {
+async fn test_google(api_key: &str, locale: &str) -> Result<Value, AppError> {
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(30))
         .build()
@@ -333,14 +354,19 @@ async fn test_google(api_key: &str) -> Result<Value, AppError> {
 
     Ok(json!({
         "provider": "google",
-        "message": "google 连接成功",
+        "message": format!(
+            "google {}",
+            localized_msg(locale, "连接成功", "Connection successful")
+        ),
     }))
 }
 
 pub async fn test_connection(
     _user: AuthUser,
+    headers: AxumHeaderMap,
     Json(payload): Json<TestConnectionRequest>,
 ) -> Result<Json<Value>, AppError> {
+    let locale = request_locale(&headers);
     let api_key = payload
         .api_key
         .as_deref()
@@ -355,10 +381,10 @@ pub async fn test_connection(
     let started_at = Utc::now();
 
     let result = match provider.as_str() {
-        "google" => test_google(&api_key).await?,
+        "google" => test_google(&api_key, locale).await?,
         "openrouter" | "openai" | "anthropic" | "custom" => {
             let base_url = normalize_openai_base_url(&provider, payload.base_url)?;
-            test_openai_compatible(&provider, &api_key, base_url).await?
+            test_openai_compatible(&provider, &api_key, base_url, locale).await?
         }
         _ => return Err(AppError::invalid_params("unsupported provider")),
     };
@@ -370,7 +396,9 @@ pub async fn test_connection(
         "latencyMs": latency_ms,
         "model": payload.model,
         "provider": result.get("provider").cloned().unwrap_or(Value::String(provider)),
-        "message": result.get("message").cloned().unwrap_or(Value::String("连接成功".to_string())),
+        "message": result.get("message").cloned().unwrap_or_else(|| {
+            Value::String(localized_msg(locale, "连接成功", "Connection successful").to_string())
+        }),
     })))
 }
 

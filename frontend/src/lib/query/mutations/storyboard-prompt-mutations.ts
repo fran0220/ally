@@ -5,6 +5,7 @@ import {
   invalidateQueryTemplates,
   requestJsonWithError,
   requestTaskResponseWithError,
+  tMutationError,
 } from './mutation-shared'
 
 export function useAiModifyProjectShotPrompt(projectId: string) {
@@ -57,7 +58,7 @@ export function useAnalyzeProjectShotVariants(projectId: string) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
                 },
-                '分析失败',
+                tMutationError('analyzeFailed'),
             )
             return await resolveTaskResponse<{
                 success: boolean
@@ -97,7 +98,7 @@ export function useUpdateProjectPhotographyPlan(projectId: string) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
                 },
-                '保存摄影规则失败',
+                tMutationError('savePhotographyPlanFailed'),
             ),
     })
 }
@@ -120,7 +121,7 @@ export function useUpdateProjectPanelActingNotes(projectId: string) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
                 },
-                '保存演技指导失败',
+                tMutationError('saveActingNotesFailed'),
             ),
     })
 }

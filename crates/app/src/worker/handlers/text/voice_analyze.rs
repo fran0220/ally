@@ -111,6 +111,9 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     shared::ensure_novel_project(task).await?;
     let mysql = runtime::mysql()?;
     let payload = &task.payload;
+    let locale = shared::resolve_prompt_locale(payload);
+    let list_separator = shared::l(locale, "、", ", ");
+    let none_text = shared::l(locale, "无", "None");
 
     let episode_id = shared::read_episode_id(task)
         .ok_or_else(|| AppError::invalid_params("episodeId is required"))?;
@@ -198,12 +201,13 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         .iter()
         .map(|item| item.name.as_str())
         .collect::<Vec<_>>()
-        .join("、");
+        .join(list_separator);
     let characters_introduction = shared::build_characters_introduction(
         &character_rows
             .iter()
             .map(|item| (item.name.clone(), item.introduction.clone()))
             .collect::<Vec<_>>(),
+        locale,
     );
 
     let mut prompt_variables = PromptVariables::new();
@@ -211,7 +215,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     prompt_variables.insert(
         "characters_lib_name".to_string(),
         if characters_lib_name.is_empty() {
-            "无".to_string()
+            none_text.to_string()
         } else {
             characters_lib_name
         },
@@ -245,7 +249,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
             } else {
                 format!("voice_analyze_retry_{attempt}")
             }),
-            step_title: Some("台词分析".to_string()),
+            step_title: Some(shared::l(locale, "台词分析", "Voice Analysis").to_string()),
             step_attempt: Some(attempt as i32),
             step_index: Some(1),
             step_total: Some(1),

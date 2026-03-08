@@ -4,6 +4,7 @@ import {
     requestBlobWithError,
     requestJsonWithError,
     requestTaskResponseWithError,
+    tMutationError,
     requestVoidWithError,
 } from './mutation-shared'
 
@@ -80,17 +81,17 @@ export function useFetchProjectVoiceStageData(projectId: string) {
                 requestJsonWithError<{ voiceLines?: ProjectVoiceLine[] }>(
                     `/api/novel-promotion/${projectId}/voice-lines?episodeId=${episodeId}`,
                     { method: 'GET' },
-                    '获取台词失败',
+                    tMutationError('fetchLinesFailed'),
                 ),
                 requestJsonWithError<{ speakerVoices?: Record<string, SpeakerVoiceConfig> }>(
                     `/api/novel-promotion/${projectId}/speaker-voice?episodeId=${episodeId}`,
                     { method: 'GET' },
-                    '获取角色音色失败',
+                    tMutationError('fetchCharacterVoicesFailed'),
                 ),
                 requestJsonWithError<{ speakers?: string[] }>(
                     `/api/novel-promotion/${projectId}/voice-lines?speakersOnly=1`,
                     { method: 'GET' },
-                    '获取说话人失败',
+                    tMutationError('fetchSpeakersFailed'),
                 ),
             ])
 

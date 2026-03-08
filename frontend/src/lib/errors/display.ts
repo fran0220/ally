@@ -5,6 +5,7 @@ import { normalizeAnyError } from './normalize'
 export function resolveErrorDisplay(input?: {
   code?: string | null
   message?: string | null
+  locale?: string | null
 } | null) {
   if (!input) return null
   // code 和 message 都为空时，表示没有错误，直接返回 null
@@ -15,7 +16,7 @@ export function resolveErrorDisplay(input?: {
   if (code && code !== 'INTERNAL_ERROR') {
     return {
       code,
-      message: getUserMessageByCode(code),
+      message: getUserMessageByCode(code, input.locale),
     }
   }
 
@@ -28,7 +29,7 @@ export function resolveErrorDisplay(input?: {
   if (normalized?.code) {
     return {
       code: normalized.code,
-      message: getUserMessageByCode(normalized.code),
+      message: getUserMessageByCode(normalized.code, input.locale),
     }
   }
 

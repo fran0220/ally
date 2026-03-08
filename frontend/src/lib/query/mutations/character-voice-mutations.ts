@@ -3,6 +3,7 @@ import { queryKeys } from '../keys'
 import {
   invalidateQueryTemplates,
   requestJsonWithError,
+  tMutationError,
 } from './mutation-shared'
 
 export function useUploadProjectCharacterVoice(projectId: string) {
@@ -45,7 +46,7 @@ export function useUpdateProjectCharacterVoiceSettings(projectId: string) {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ characterId, voiceType, voiceId, customVoiceUrl }),
-            }, '更新音色失败')
+            }, tMutationError('updateVoiceFailed'))
         },
         onSettled: invalidateProjectAssets,
     })
@@ -77,7 +78,7 @@ export function useSaveProjectDesignedVoice(projectId: string) {
                     characterId,
                     voiceDesign: { voiceId, audioBase64 },
                 }),
-            }, '保存失败')
+            }, tMutationError('saveFailed'))
         },
         onSuccess: invalidateProjectAssets,
     })

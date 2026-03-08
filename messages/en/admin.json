@@ -1,0 +1,9 @@
+{
+  "title": "Admin Settings",
+  "subtitle": "Manage AI config, users, and system capabilities in one place.",
+  "userManagement": "User Management",
+  "userManagementDesc": "This module will provide user list, role assignment, and account state management.",
+  "systemMonitor": "System Monitor",
+  "systemMonitorDesc": "Service health, task throughput, and alert panels will be available here soon.",
+  "comingSoon": "Coming Soon"
+}

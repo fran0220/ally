@@ -55,6 +55,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     shared::ensure_novel_project(task).await?;
     let mysql = runtime::mysql()?;
     let payload = &task.payload;
+    let locale = shared::resolve_prompt_locale(payload);
 
     let task_with_episode = task.with_task(with_episode_payload(task));
     let episode_id = shared::read_episode_id(&task_with_episode)
@@ -136,6 +137,12 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
         let mut panels = Vec::new();
         let mut step_error: Option<AppError> = None;
         for attempt in 1..=MAX_STORYBOARD_ATTEMPTS {
+            let step_title = format!(
+                "{} {}/{}",
+                shared::l(locale, "分镜生成", "Storyboard Generation"),
+                clip_index + 1,
+                clips.len()
+            );
             let meta = shared::LlmStepMeta {
                 run_id: Some(run_id.clone()),
                 stream_run_id: Some(run_id.clone()),
@@ -144,7 +151,7 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
                 } else {
                     format!("storyboard_clip_{}_retry_{}", clip.id, attempt)
                 }),
-                step_title: Some(format!("分镜生成 {}/{}", clip_index + 1, clips.len())),
+                step_title: Some(step_title),
                 step_attempt: Some(attempt as i32),
                 step_index: Some((clip_index + 1) as i32),
                 step_total: Some(clips.len() as i32),

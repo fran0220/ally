@@ -2,7 +2,7 @@ import { logError as _ulogError } from '@/lib/logging/core'
 
 import { useState } from 'react'
 import { useTranslations } from '@/compat/next-intl'
-import { ART_STYLES } from '@/lib/constants'
+import { resolveArtStyleOptions } from '@/lib/constants'
 import { shouldShowError } from '@/lib/error-utils'
 import { useAiCreateProjectLocation, useCreateProjectLocation } from '@/lib/query/hooks'
 import TaskStatusInline from '@/components/task/TaskStatusInline'
@@ -48,6 +48,7 @@ export default function AddLocationModal({
 }: AddLocationModalProps) {
   const t = useTranslations('assets')
   const tc = useTranslations('common')
+  const artStyleOptions = resolveArtStyleOptions(tc)
   const aiCreateLocationMutation = useAiCreateProjectLocation(projectId)
   const createLocationMutation = useCreateProjectLocation(projectId)
 
@@ -161,7 +162,7 @@ export default function AddLocationModal({
                 {t('modal.artStyle')}
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {ART_STYLES.map((style) => (
+                {artStyleOptions.map((style) => (
                   <button
                     key={style.value}
                     type="button"

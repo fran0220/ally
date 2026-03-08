@@ -137,6 +137,7 @@ fn resolve_episode_chunks(content: &str, episodes: &[Value]) -> Result<Vec<Value
 
 pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
     let payload = &task.payload;
+    let locale = shared::resolve_prompt_locale(payload);
     let content = shared::read_string(payload, "content")
         .ok_or_else(|| AppError::invalid_params("content is required"))?;
     if content.chars().count() < 100 {
@@ -169,7 +170,9 @@ pub async fn handle(task: &TaskContext) -> Result<Value, AppError> {
             } else {
                 format!("episode_split_retry_{attempt}")
             }),
-            step_title: Some("智能分集".to_string()),
+            step_title: Some(
+                shared::l(locale, "智能分集", "Intelligent Episode Split").to_string(),
+            ),
             step_attempt: Some(attempt as i32),
             step_index: Some(1),
             step_total: Some(1),

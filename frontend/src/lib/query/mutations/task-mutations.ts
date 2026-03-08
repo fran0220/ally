@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '../keys'
-import { requestJsonWithError } from './mutation-shared'
+import { requestJsonWithError, tMutationError } from './mutation-shared'
 
 export function useDismissFailedTasks(projectId: string) {
     const queryClient = useQueryClient()
@@ -14,7 +14,7 @@ export function useDismissFailedTasks(projectId: string) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ taskIds }),
                 },
-                '关闭错误失败',
+                tMutationError('dismissFailedTasksFailed'),
             )
         },
         onSuccess: () => {

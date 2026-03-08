@@ -3,6 +3,7 @@ import { resolveTaskResponse } from '@/lib/task/client'
 import {
   requestJsonWithError,
   requestTaskResponseWithError,
+  tMutationError,
   requestVoidWithError,
 } from './mutation-shared'
 import { invalidateGlobalVoices } from './asset-hub-mutations-shared'
@@ -71,7 +72,7 @@ export function useSaveDesignedAssetHubVoice() {
           type: 'audio/wav',
           extension: 'wav',
         }),
-      }, '上传音频失败')
+      }, tMutationError('uploadAudioFailed'))
       const res = await requestJsonWithError('/api/asset-hub/voices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -86,7 +87,7 @@ export function useSaveDesignedAssetHubVoice() {
           gender: null,
           language: 'zh',
         }),
-      }, '保存失败')
+      }, tMutationError('saveFailed'))
       return res
     },
     onSuccess: invalidateVoices,
@@ -112,7 +113,7 @@ export function useUploadAssetHubVoice() {
       return await requestJsonWithError('/api/asset-hub/voices/upload', {
         method: 'POST',
         body: formData,
-      }, '上传失败')
+      }, tMutationError('uploadFailed'))
     },
     onSuccess: invalidateVoices,
   })

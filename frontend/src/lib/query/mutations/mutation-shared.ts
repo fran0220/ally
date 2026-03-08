@@ -1,4 +1,5 @@
 import { fetchWithAuth } from '@/api/client'
+import i18n from '@/i18n'
 import type { QueryClient, QueryKey } from '@tanstack/react-query'
 import { resolveTaskErrorMessage } from '@/lib/task/error-message'
 export { getPageLocale } from '@/api/client'
@@ -76,6 +77,13 @@ export async function requestBlobWithError(
 
   const data = await parseJsonSafe(response)
   throw createRequestError(response.status, data, fallbackMessage)
+}
+
+export function tMutationError(
+  key: string,
+  options?: Record<string, unknown>,
+): string {
+  return i18n.t(`errors:mutation.${key}`, options) as string
 }
 
 export async function invalidateQueryTemplates(

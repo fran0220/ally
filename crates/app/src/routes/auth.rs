@@ -52,6 +52,23 @@ const AUTH_COOKIE_PATH: &str = "/";
 const AUTH_COOKIE_SAME_SITE: &str = "Lax";
 const AUTH_COOKIE_EXPIRES_AT_EPOCH: &str = "Thu, 01 Jan 1970 00:00:00 GMT";
 
+fn request_locale(headers: &HeaderMap) -> &'static str {
+    let is_english = headers
+        .get(header::ACCEPT_LANGUAGE)
+        .and_then(|raw| raw.to_str().ok())
+        .and_then(|raw| raw.split(',').next())
+        .and_then(|raw| raw.split(';').next())
+        .map(str::trim)
+        .map(|raw| raw.to_ascii_lowercase())
+        .filter(|raw| !raw.is_empty())
+        .is_some_and(|raw| raw == "en" || raw.starts_with("en-"));
+    if is_english { "en" } else { "zh" }
+}
+
+fn localized_msg<'a>(locale: &str, zh: &'a str, en: &'a str) -> &'a str {
+    if locale == "en" { en } else { zh }
+}
+
 fn insert_set_cookie(headers: &mut HeaderMap, cookie: &str) -> Result<(), AppError> {
     let value = header::HeaderValue::from_str(cookie)
         .map_err(|err| AppError::internal(format!("failed to build auth cookie: {err}")))?;
@@ -81,8 +98,10 @@ fn clear_token_cookie(headers: &mut HeaderMap) -> Result<(), AppError> {
 
 pub async fn register(
     State(state): State<AppState>,
+    request_headers: HeaderMap,
     Json(payload): Json<RegisterRequest>,
 ) -> Result<impl IntoResponse, AppError> {
+    let locale = request_locale(&request_headers);
     let name = payload.name.trim();
     if name.is_empty() {
         return Err(AppError::invalid_params("name is required"));
@@ -119,7 +138,7 @@ pub async fn register(
     set_token_cookie(&mut headers, &token)?;
 
     let response = Json(json!({
-        "message": "注册成功",
+        "message": localized_msg(locale, "注册成功", "Registration successful"),
         "token": token,
         "user": {
             "id": user_id,
