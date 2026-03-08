@@ -22,6 +22,8 @@ const DEFAULT_HTTP_TIMEOUT_SECS: u64 = 120;
 const DEFAULT_STREAM_CHUNK_TIMEOUT_MS: u64 = 180_000;
 const MAX_SSE_BUFFER_BYTES: usize = 4 * 1024 * 1024;
 const MAX_ERROR_BODY_CHARS: usize = 1_024;
+const ANTHROPIC_MAX_TOKENS: u64 = 8_192;
+const ANTHROPIC_THINKING_BUDGET_TOKENS: u64 = 10_000;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChatMessage {
@@ -690,176 +692,70 @@ fn extract_gemini_usage(chunk: &Value) -> Option<ChatStreamUsage> {
     })
 }
 
-fn collect_ark_text(node: &Value, acc: &mut String) {
-    match node {
-        Value::Null => {}
-        Value::String(text) => acc.push_str(text),
-        Value::Array(items) => {
-            for item in items {
-                collect_ark_text(item, acc);
-            }
-        }
-        Value::Object(obj) => {
-            let kind = obj
-                .get("type")
-                .and_then(Value::as_str)
-                .map(|value| value.to_ascii_lowercase())
-                .unwrap_or_default();
-            if kind == "reasoning" || kind == "reasoning_content" || kind == "function_call" {
-                return;
-            }
-
-            if let Some(text) = obj.get("output_text").and_then(Value::as_str) {
-                acc.push_str(text);
-            }
-            if let Some(text) = obj.get("text").and_then(Value::as_str)
-                && !kind.contains("reason")
-                && !kind.contains("think")
-            {
-                acc.push_str(text);
-            }
-            if let Some(content) = obj.get("content") {
-                collect_ark_text(content, acc);
-            }
-            if let Some(message) = obj.get("message") {
-                collect_ark_text(message, acc);
-            }
-        }
-        _ => {}
-    }
-}
-
-fn collect_ark_reasoning(node: &Value, acc: &mut String) {
-    match node {
-        Value::Null | Value::String(_) => {}
-        Value::Array(items) => {
-            for item in items {
-                collect_ark_reasoning(item, acc);
-            }
-        }
-        Value::Object(obj) => {
-            let kind = obj
-                .get("type")
-                .and_then(Value::as_str)
-                .map(|value| value.to_ascii_lowercase())
-                .unwrap_or_default();
-            let is_reasoning =
-                kind == "reasoning" || kind == "reasoning_content" || kind.contains("thinking");
-
-            if is_reasoning {
-                if let Some(text) = obj.get("text").and_then(Value::as_str) {
-                    acc.push_str(text);
-                }
-                if let Some(content) = obj.get("content") {
-                    collect_ark_text(content, acc);
-                }
-            }
-
-            if let Some(reasoning) = obj.get("reasoning") {
-                collect_ark_reasoning(reasoning, acc);
-            }
-            if let Some(reasoning_content) = obj.get("reasoning_content") {
-                collect_ark_reasoning(reasoning_content, acc);
-            }
-            if let Some(thinking) = obj.get("thinking") {
-                collect_ark_reasoning(thinking, acc);
-            }
-        }
-        _ => {}
-    }
-}
-
-fn extract_ark_text(value: &Value) -> String {
-    if let Some(output_text) = value.get("output_text") {
-        let direct = collect_text_value(output_text);
-        if !direct.is_empty() {
-            return direct;
-        }
-    }
-
-    let source = value
-        .get("output")
-        .or_else(|| value.get("outputs"))
-        .or_else(|| value.get("response").and_then(|item| item.get("output")))
-        .unwrap_or(value);
-    let mut text = String::new();
-    collect_ark_text(source, &mut text);
-    text
-}
-
-fn extract_ark_reasoning(value: &Value) -> String {
-    let source = value
-        .get("output")
-        .or_else(|| value.get("outputs"))
-        .or_else(|| value.get("response").and_then(|item| item.get("output")))
-        .unwrap_or(value);
-    let mut reasoning = String::new();
-    collect_ark_reasoning(source, &mut reasoning);
-    reasoning
-}
-
-fn extract_ark_usage(chunk: &Value) -> Option<ChatStreamUsage> {
-    let usage = chunk
-        .get("usage")
-        .or_else(|| chunk.get("response").and_then(|item| item.get("usage")))?;
-
-    let prompt_tokens = value_to_u64(
-        usage
-            .get("input_tokens")
-            .or_else(|| usage.get("prompt_tokens"))
-            .or_else(|| usage.get("promptTokenCount")),
-    );
-    let completion_tokens = value_to_u64(
-        usage
-            .get("output_tokens")
-            .or_else(|| usage.get("completion_tokens"))
-            .or_else(|| usage.get("completionTokenCount")),
-    );
-
-    if prompt_tokens.is_none() && completion_tokens.is_none() {
-        return None;
-    }
-
-    Some(ChatStreamUsage {
-        prompt_tokens: prompt_tokens.unwrap_or(0),
-        completion_tokens: completion_tokens.unwrap_or(0),
-    })
-}
-
-fn extract_ark_stream_parts(value: &Value) -> (String, String) {
-    let event_type = value
+fn extract_anthropic_stream_parts(chunk: &Value) -> (String, String) {
+    let event_type = chunk
         .get("type")
         .and_then(Value::as_str)
-        .map(|item| item.to_ascii_lowercase())
+        .unwrap_or_default();
+    let source = match event_type {
+        "content_block_start" => chunk.get("content_block").unwrap_or(&Value::Null),
+        "content_block_delta" => chunk.get("delta").unwrap_or(&Value::Null),
+        _ => return (String::new(), String::new()),
+    };
+
+    let source_type = source
+        .get("type")
+        .and_then(Value::as_str)
+        .map(|value| value.to_ascii_lowercase())
         .unwrap_or_default();
 
-    if event_type.contains("output_text.delta") {
-        return (
-            value
-                .get("delta")
-                .map(collect_text_value)
-                .unwrap_or_default(),
-            String::new(),
-        );
+    let text_value = source
+        .get("text")
+        .or_else(|| source.get("delta"))
+        .map(collect_text_value)
+        .unwrap_or_default();
+    let thinking_value = source
+        .get("thinking")
+        .or_else(|| source.get("reasoning"))
+        .map(collect_text_value)
+        .unwrap_or_default();
+
+    if source_type.contains("think") || source_type.contains("reason") {
+        return if !thinking_value.is_empty() {
+            (String::new(), thinking_value)
+        } else {
+            (String::new(), text_value)
+        };
     }
 
-    if event_type.contains("reasoning.delta") || event_type.contains("thinking.delta") {
-        return (
-            String::new(),
-            value
-                .get("delta")
-                .map(collect_text_value)
-                .unwrap_or_default(),
-        );
+    if source_type.contains("text") {
+        return (text_value, String::new());
     }
 
-    let (openai_text, openai_reasoning) = extract_openai_delta_parts(value);
-    if !openai_text.is_empty() || !openai_reasoning.is_empty() {
-        return (openai_text, openai_reasoning);
+    if !thinking_value.is_empty() {
+        (String::new(), thinking_value)
+    } else {
+        (text_value, String::new())
     }
+}
 
-    let response = value.get("response").unwrap_or(value);
-    (extract_ark_text(response), extract_ark_reasoning(response))
+fn extract_anthropic_usage_tokens(chunk: &Value) -> (Option<u64>, Option<u64>) {
+    let prompt_tokens = value_to_u64(
+        chunk
+            .pointer("/message/usage/input_tokens")
+            .or_else(|| chunk.pointer("/usage/input_tokens"))
+            .or_else(|| chunk.pointer("/message/usage/prompt_tokens"))
+            .or_else(|| chunk.pointer("/usage/prompt_tokens")),
+    );
+    let completion_tokens = value_to_u64(
+        chunk
+            .pointer("/usage/output_tokens")
+            .or_else(|| chunk.pointer("/message/usage/output_tokens"))
+            .or_else(|| chunk.pointer("/usage/completion_tokens"))
+            .or_else(|| chunk.pointer("/message/usage/completion_tokens")),
+    );
+
+    (prompt_tokens, completion_tokens)
 }
 
 fn merge_stream_piece(target: &mut String, incoming: &str) -> String {
@@ -942,32 +838,15 @@ fn gemini_generate_content_endpoint(base_url: &str, model_id: &str, stream: bool
     }
 }
 
-fn ark_responses_endpoint(base_url: Option<&str>) -> String {
-    let base = base_url
-        .map(str::trim)
-        .filter(|value| !value.is_empty())
-        .unwrap_or("https://ark.cn-beijing.volces.com/api/v3");
-    let trimmed = base.trim_end_matches('/');
-    if trimmed.ends_with("/responses") {
+fn anthropic_messages_endpoint(base_url: &str) -> String {
+    let trimmed = base_url.trim_end_matches('/');
+    if trimmed.ends_with("/v1/messages") {
         trimmed.to_string()
+    } else if trimmed.ends_with("/v1") {
+        format!("{trimmed}/messages")
     } else {
-        format!("{trimmed}/responses")
+        format!("{trimmed}/v1/messages")
     }
-}
-
-fn ark_input_messages(messages: &[ChatMessage]) -> Vec<Value> {
-    messages
-        .iter()
-        .map(|message| {
-            json!({
-                "role": message.role,
-                "content": [{
-                    "type": "input_text",
-                    "text": message.content,
-                }]
-            })
-        })
-        .collect::<Vec<_>>()
 }
 
 async fn stream_with_openai_compatible<F, Fut>(
@@ -1217,17 +1096,8 @@ where
     })
 }
 
-fn is_ark_error_event(value: &Value) -> bool {
-    let Some(event_type) = value.get("type").and_then(Value::as_str) else {
-        return false;
-    };
-
-    let normalized = event_type.to_ascii_lowercase();
-    normalized == "error" || normalized.ends_with(".error")
-}
-
-async fn stream_with_ark_responses<F, Fut>(
-    base_url: Option<&str>,
+async fn stream_with_anthropic<F, Fut>(
+    base_url: &str,
     api_key: &str,
     model_id: &str,
     messages: &[ChatMessage],
@@ -1239,42 +1109,67 @@ where
     F: FnMut(ChatStreamChunk) -> Fut,
     Fut: Future<Output = Result<(), AppError>>,
 {
-    let effort = normalize_reasoning_effort(options.reasoning_effort.as_deref());
+    let system_prompt = messages
+        .iter()
+        .filter(|item| item.role == "system")
+        .map(|item| item.content.clone())
+        .collect::<Vec<_>>()
+        .join("\n");
+    let anthropic_messages = messages
+        .iter()
+        .filter(|item| item.role != "system")
+        .map(|item| {
+            json!({
+                "role": if item.role == "assistant" { "assistant" } else { "user" },
+                "content": item.content,
+            })
+        })
+        .collect::<Vec<_>>();
+
+    if anthropic_messages.is_empty() {
+        return Err(AppError::invalid_params(
+            "anthropic stream requires at least one non-system message",
+        ));
+    }
+
     let mut payload = Map::new();
     payload.insert("model".to_string(), Value::String(model_id.to_string()));
     payload.insert(
-        "input".to_string(),
-        Value::Array(ark_input_messages(messages)),
+        "max_tokens".to_string(),
+        Value::Number(ANTHROPIC_MAX_TOKENS.into()),
     );
-    payload.insert("stream".to_string(), Value::Bool(true));
     payload.insert(
         "temperature".to_string(),
         json!(options.temperature.unwrap_or(0.7)),
     );
-    payload.insert(
-        "thinking".to_string(),
-        if reasoning_enabled {
+    payload.insert("stream".to_string(), Value::Bool(true));
+    payload.insert("messages".to_string(), Value::Array(anthropic_messages));
+    if !system_prompt.trim().is_empty() {
+        payload.insert("system".to_string(), Value::String(system_prompt));
+    }
+    if reasoning_enabled {
+        payload.insert(
+            "thinking".to_string(),
             json!({
                 "type": "enabled",
-                "reasoning_effort": effort,
-            })
-        } else {
-            json!({ "type": "disabled" })
-        },
-    );
+                "budget_tokens": ANTHROPIC_THINKING_BUDGET_TOKENS,
+            }),
+        );
+    }
 
     let mut response = http_client()
-        .post(ark_responses_endpoint(base_url))
-        .bearer_auth(api_key)
+        .post(anthropic_messages_endpoint(base_url))
+        .header("x-api-key", api_key)
+        .header("anthropic-version", "2023-06-01")
         .json(&Value::Object(payload))
         .send()
         .await
-        .map_err(|error| normalize_network_error("ark responses request failed", error))?;
+        .map_err(|error| normalize_network_error("anthropic request failed", error))?;
 
     if !response.status().is_success() {
         let status = response.status();
         let body = response.text().await.unwrap_or_default();
-        return Err(normalize_provider_http_error("ark", status, &body));
+        return Err(normalize_provider_http_error("anthropic", status, &body));
     }
 
     let mut text = String::new();
@@ -1283,6 +1178,7 @@ where
     let chunk_timeout = resolve_stream_chunk_timeout(options);
     let mut sse_buffer = String::new();
     let mut done = false;
+
     while !done {
         let Some(payloads) =
             read_next_sse_payload_batch(&mut response, chunk_timeout, &mut sse_buffer).await?
@@ -1299,15 +1195,15 @@ where
             let value: Value = serde_json::from_str(&payload).map_err(|error| {
                 AppError::new(
                     ErrorCode::ExternalError,
-                    format!("ark stream payload is invalid json: {error}"),
+                    format!("anthropic stream payload is invalid json: {error}"),
                 )
             })?;
 
-            if is_ark_error_event(&value) || value.get("error").is_some() {
-                return Err(normalize_provider_stream_error(
-                    "ark",
-                    value.get("error").unwrap_or(&value),
-                ));
+            if let Some(error) = value.get("error") {
+                return Err(normalize_provider_stream_error("anthropic", error));
+            }
+            if value.get("type").and_then(Value::as_str) == Some("error") {
+                return Err(normalize_provider_stream_error("anthropic", &value));
             }
             if is_sensitive_content_json(&value) {
                 return Err(AppError::new(
@@ -1316,11 +1212,15 @@ where
                 ));
             }
 
-            if let Some(stream_usage) = extract_ark_usage(&value) {
-                usage = stream_usage;
+            let (prompt_tokens, completion_tokens) = extract_anthropic_usage_tokens(&value);
+            if let Some(tokens) = prompt_tokens {
+                usage.prompt_tokens = tokens;
+            }
+            if let Some(tokens) = completion_tokens {
+                usage.completion_tokens = tokens;
             }
 
-            let (text_piece, reasoning_piece) = extract_ark_stream_parts(&value);
+            let (text_piece, reasoning_piece) = extract_anthropic_stream_parts(&value);
             emit_stream_piece(
                 &mut reasoning,
                 reasoning_piece,
@@ -1329,6 +1229,11 @@ where
             )
             .await?;
             emit_stream_piece(&mut text, text_piece, ChatStreamChunkKind::Text, on_chunk).await?;
+
+            if value.get("type").and_then(Value::as_str) == Some("message_stop") {
+                done = true;
+                break;
+            }
         }
     }
 
@@ -1384,9 +1289,12 @@ where
             )
             .await
         }
-        "ark" => {
-            stream_with_ark_responses(
-                provider_base_url,
+        "anthropic" => {
+            let base_url = provider_base_url.ok_or_else(|| {
+                AppError::invalid_params("anthropic provider baseUrl is required")
+            })?;
+            stream_with_anthropic(
+                base_url,
                 provider_api_key,
                 model_id,
                 messages,
@@ -1652,8 +1560,9 @@ mod tests {
     use serde_json::json;
 
     use super::{
-        extract_ark_stream_parts, extract_openai_delta_parts, extract_sse_data,
-        is_reasoning_unsupported_message, is_sensitive_content_json, merge_stream_piece,
+        extract_anthropic_stream_parts, extract_anthropic_usage_tokens, extract_openai_delta_parts,
+        extract_sse_data, is_reasoning_unsupported_message, is_sensitive_content_json,
+        merge_stream_piece,
     };
 
     #[test]
@@ -1682,15 +1591,55 @@ mod tests {
     }
 
     #[test]
-    fn extract_ark_stream_parts_reads_delta_event() {
-        let event = json!({
-            "type": "response.output_text.delta",
-            "delta": "hello"
+    fn extract_anthropic_stream_parts_reads_text_and_thinking() {
+        let text_chunk = json!({
+            "type": "content_block_delta",
+            "delta": {
+                "type": "text_delta",
+                "text": "hello"
+            }
+        });
+        let thinking_chunk = json!({
+            "type": "content_block_delta",
+            "delta": {
+                "type": "thinking_delta",
+                "thinking": "let me think"
+            }
         });
 
-        let (text, reasoning) = extract_ark_stream_parts(&event);
+        let (text, reasoning) = extract_anthropic_stream_parts(&text_chunk);
         assert_eq!(text, "hello");
-        assert!(reasoning.is_empty());
+        assert_eq!(reasoning, "");
+
+        let (text, reasoning) = extract_anthropic_stream_parts(&thinking_chunk);
+        assert_eq!(text, "");
+        assert_eq!(reasoning, "let me think");
+    }
+
+    #[test]
+    fn extract_anthropic_usage_tokens_reads_input_and_output() {
+        let message_start = json!({
+            "type": "message_start",
+            "message": {
+                "usage": {
+                    "input_tokens": 123
+                }
+            }
+        });
+        let message_delta = json!({
+            "type": "message_delta",
+            "usage": {
+                "output_tokens": 45
+            }
+        });
+
+        let (prompt, completion) = extract_anthropic_usage_tokens(&message_start);
+        assert_eq!(prompt, Some(123));
+        assert_eq!(completion, None);
+
+        let (prompt, completion) = extract_anthropic_usage_tokens(&message_delta);
+        assert_eq!(prompt, None);
+        assert_eq!(completion, Some(45));
     }
 
     #[test]

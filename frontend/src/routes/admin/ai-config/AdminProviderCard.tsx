@@ -22,7 +22,6 @@ export function AdminProviderCard({ provider, index, errors, onDelete, onUpdateF
   const idError = errors[`providers[${index}].id`];
   const nameError = errors[`providers[${index}].name`];
   const baseUrlError = errors[`providers[${index}].baseUrl`];
-  const apiModeError = errors[`providers[${index}].apiMode`];
 
   return (
     <article className="glass-list-row flex-col items-stretch gap-3 p-3">
@@ -60,22 +59,6 @@ export function AdminProviderCard({ provider, index, errors, onDelete, onUpdateF
           onChange={(event) => onUpdateField(index, { field: 'apiKey', value: event.target.value })}
         />
       </GlassField>
-
-      {preset?.supportsGeminiMode ? (
-        <div className="space-y-1.5">
-          <label className="flex items-center gap-2 text-xs text-[var(--glass-text-secondary)]">
-            <input
-              type="checkbox"
-              checked={provider.apiMode === 'gemini-sdk'}
-              onChange={(event) =>
-                onUpdateField(index, { field: 'apiMode', value: event.target.checked ? 'gemini-sdk' : undefined })
-              }
-            />
-            Gemini SDK mode
-          </label>
-          {apiModeError ? <p className="text-xs text-[var(--glass-tone-danger-fg)]">{apiModeError}</p> : null}
-        </div>
-      ) : null}
     </article>
   );
 }

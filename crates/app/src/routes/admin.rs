@@ -75,7 +75,14 @@ fn provider_key(value: &str) -> &str {
 
 fn assert_allowed_provider(id: &str, field: &str) -> Result<(), AppError> {
     let key = provider_key(id);
-    let allowed = ["fal", "qwen", "openai-compatible", "gemini-compatible"];
+    let allowed = [
+        "fal",
+        "qwen",
+        "openai-compatible",
+        "gemini-compatible",
+        "anthropic",
+        "jimeng",
+    ];
     if allowed.contains(&key) {
         Ok(())
     } else {
@@ -153,14 +160,6 @@ fn validate_payload(payload: &AiConfigPutBody) -> Result<(), AppError> {
             )));
         }
         assert_allowed_provider(&id, &format!("providers[{index}].id"))?;
-        if let Some(mode) = &provider.api_mode
-            && !mode.trim().is_empty()
-            && mode != "gemini-sdk"
-        {
-            return Err(AppError::invalid_params(format!(
-                "providers[{index}].apiMode invalid"
-            )));
-        }
     }
 
     let mut enabled_models: HashMap<String, UnifiedModelType> = HashMap::new();

@@ -48,7 +48,6 @@ export function listUserModels() {
   return apiRequest<UserModelsPayload>('/api/user/models');
 }
 
-export type UserApiMode = 'gemini-sdk' | 'openai-official';
 export type UserApiModelType = 'llm' | 'image' | 'video' | 'audio' | 'lipsync';
 
 export interface UserApiProvider {
@@ -57,7 +56,6 @@ export interface UserApiProvider {
   baseUrl?: string;
   apiKey?: string;
   hasApiKey?: boolean;
-  apiMode?: UserApiMode;
 }
 
 export interface UserApiCustomPricing {

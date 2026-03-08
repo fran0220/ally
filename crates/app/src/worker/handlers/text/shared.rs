@@ -259,6 +259,9 @@ pub fn remove_character_prompt_suffix(prompt: &str) -> String {
         .replace(CHARACTER_PROMPT_SUFFIX_ZH, "")
         .replace(CHARACTER_PROMPT_SUFFIX_EN, "")
         .trim()
+        .trim_end_matches('，')
+        .trim_end_matches(',')
+        .trim()
         .to_string()
 }
 

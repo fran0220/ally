@@ -8,7 +8,6 @@ export interface AdminProvider {
   name: string;
   baseUrl?: string;
   apiKey?: string;
-  apiMode?: 'gemini-sdk';
 }
 
 export interface AdminModel {

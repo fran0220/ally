@@ -2,8 +2,6 @@ import type { ModelCapabilities } from '../model-config-contract';
 
 export type ModelType = 'llm' | 'image' | 'video' | 'audio' | 'lipsync';
 
-export type ProviderApiMode = 'gemini-sdk' | 'openai-official';
-
 export interface ParsedModelKey {
   provider: string;
   modelId: string;
@@ -15,7 +13,6 @@ export interface AiConfigProvider {
   baseUrl?: string;
   apiKey?: string;
   hasApiKey?: boolean;
-  apiMode?: ProviderApiMode;
 }
 
 export interface AiConfigModel {

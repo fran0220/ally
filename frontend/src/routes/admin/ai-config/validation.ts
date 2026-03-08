@@ -1,6 +1,13 @@
 import type { AdminAiConfig, AdminDefaultModels, ModelType } from '../../../api/admin';
 
-const ALLOWED_PROVIDER_BASE_KEYS = ['fal', 'qwen', 'openai-compatible', 'gemini-compatible'] as const;
+const ALLOWED_PROVIDER_BASE_KEYS = [
+  'fal',
+  'qwen',
+  'openai-compatible',
+  'gemini-compatible',
+  'anthropic',
+  'jimeng',
+] as const;
 
 type AllowedProviderBaseKey = (typeof ALLOWED_PROVIDER_BASE_KEYS)[number];
 const DEFAULT_MODEL_FIELD_TYPES: Record<keyof AdminDefaultModels, ModelType> = {
@@ -48,7 +55,6 @@ export function validateAdminAiConfig(config: AdminAiConfig | null): Record<stri
     const id = provider.id.trim();
     const name = provider.name.trim();
     const baseKey = providerBaseKey(id);
-    const mode = provider.apiMode?.trim() ?? '';
 
     if (!id) {
       errors[`providers[${index}].id`] = 'Provider ID is required.';
@@ -62,11 +68,7 @@ export function validateAdminAiConfig(config: AdminAiConfig | null): Record<stri
       errors[`providers[${index}].id`] = 'Provider key is not allowed.';
     }
 
-    if (mode && mode !== 'gemini-sdk') {
-      errors[`providers[${index}].apiMode`] = 'API mode must be gemini-sdk when provided.';
-    }
-
-    const needsBaseUrl = baseKey === 'openai-compatible' || baseKey === 'gemini-compatible';
+    const needsBaseUrl = ['openai-compatible', 'gemini-compatible', 'anthropic', 'jimeng'].includes(baseKey);
     if (needsBaseUrl && !(provider.baseUrl ?? '').trim()) {
       errors[`providers[${index}].baseUrl`] = 'Base URL is required for compatible providers.';
     }

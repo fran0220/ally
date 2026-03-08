@@ -10,7 +10,14 @@ import type {
 import { validateAdminAiConfig } from './validation';
 
 export const MODEL_TYPES: ModelType[] = ['llm', 'image', 'video', 'audio', 'lipsync'];
-export const PROVIDER_BASE_KEYS = ['openai-compatible', 'gemini-compatible', 'fal', 'qwen'] as const;
+export const PROVIDER_BASE_KEYS = [
+  'openai-compatible',
+  'gemini-compatible',
+  'anthropic',
+  'jimeng',
+  'fal',
+  'qwen',
+] as const;
 export const DEFAULT_MODEL_FIELDS = [
   'analysisModel',
   'characterModel',
@@ -27,29 +34,32 @@ export type DefaultModelField = (typeof DEFAULT_MODEL_FIELDS)[number];
 export interface ProviderPreset {
   label: string;
   needsBaseUrl: boolean;
-  supportsGeminiMode: boolean;
 }
 
 export const PROVIDER_PRESETS: Record<ProviderBaseKey, ProviderPreset> = {
   'openai-compatible': {
     label: 'OpenAI Compatible',
     needsBaseUrl: true,
-    supportsGeminiMode: false,
   },
   'gemini-compatible': {
     label: 'Gemini Compatible',
     needsBaseUrl: true,
-    supportsGeminiMode: true,
+  },
+  anthropic: {
+    label: 'Anthropic',
+    needsBaseUrl: true,
+  },
+  jimeng: {
+    label: 'Jimeng Video',
+    needsBaseUrl: true,
   },
   fal: {
     label: 'fal.ai',
     needsBaseUrl: false,
-    supportsGeminiMode: false,
   },
   qwen: {
     label: 'Qwen',
     needsBaseUrl: false,
-    supportsGeminiMode: false,
   },
 };
 
@@ -63,8 +73,7 @@ export interface AdminAiConfigState {
 export type ProviderFieldUpdate =
   | { field: 'name'; value: string }
   | { field: 'baseUrl'; value: string }
-  | { field: 'apiKey'; value: string }
-  | { field: 'apiMode'; value: 'gemini-sdk' | undefined };
+  | { field: 'apiKey'; value: string };
 
 export type ModelFieldUpdate =
   | { field: 'name'; value: string }
@@ -129,7 +138,6 @@ export function addProvider(draft: AdminAiConfig, baseKey: ProviderBaseKey): Adm
     name: `${preset.label} ${draft.providers.length + 1}`,
     baseUrl: preset.needsBaseUrl ? '' : undefined,
     apiKey: '',
-    apiMode: preset.supportsGeminiMode ? 'gemini-sdk' : undefined,
   };
 
   return {
@@ -306,8 +314,6 @@ export function adminAiConfigReducer(state: AdminAiConfigState, action: AdminAiC
             return { ...provider, baseUrl: action.payload.value };
           case 'apiKey':
             return { ...provider, apiKey: action.payload.value };
-          case 'apiMode':
-            return { ...provider, apiMode: action.payload.value };
         }
       });
 

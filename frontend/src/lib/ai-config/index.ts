@@ -4,7 +4,6 @@ export type {
   AiConfigProvider,
   ModelType,
   ParsedModelKey,
-  ProviderApiMode,
 } from './types';
 
 export {

@@ -30,7 +30,6 @@ export interface Provider {
     baseUrl?: string
     apiKey?: string
     hasApiKey?: boolean
-    apiMode?: 'gemini-sdk' | 'openai-official'
 }
 
 export interface LlmCustomPricing {
@@ -77,6 +76,8 @@ const PROVIDER_DISPLAY_NAME_MAP: Record<string, { en: string; zh?: string }> = {
     qwen: { en: 'Qwen' },
     'gemini-compatible': { en: 'Gemini Compatible' },
     'openai-compatible': { en: 'OpenAI Compatible' },
+    anthropic: { en: 'Anthropic', zh: 'Anthropic' },
+    jimeng: { en: 'Jimeng Video', zh: '即梦视频' },
 }
 
 function isZhLocale(locale?: string): boolean {
